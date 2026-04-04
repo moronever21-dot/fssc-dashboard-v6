@@ -1,0 +1,1628 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Control Room - Calidad FSSC 22000 | INGAMA</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+<style>
+body{background:#080e1a;font-family:'Segoe UI',sans-serif}
+.grid-bg{background-image:linear-gradient(rgba(6,182,212,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(6,182,212,.04) 1px,transparent 1px);background-size:36px 36px}
+@keyframes pulseRed{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.5)}50%{box-shadow:0 0 0 10px rgba(239,68,68,0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.pulse-red{animation:pulseRed 1.4s infinite}
+.blink{animation:blink 1s infinite}
+.card-base{backdrop-filter:blur(8px);border-radius:.75rem}
+.card-ok{background:rgba(5,15,10,.85);border:1px solid rgba(34,197,94,.35)}
+.card-warn{background:rgba(20,15,5,.85);border:1px solid rgba(245,158,11,.5)}
+.card-alert{background:rgba(20,4,4,.9);border:1px solid rgba(239,68,68,.6)}
+.card-nd{background:rgba(15,15,20,.7);border:1px solid rgba(100,116,139,.25)}
+.card-dark{background:rgba(13,22,38,.9);border:1px solid rgba(6,182,212,.18)}
+.mono{font-family:'Consolas','Courier New',monospace}
+.pbar{transition:width .4s ease}
+a.btn-hoja{display:inline-flex;align-items:center;gap:4px;background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.35);color:#67e8f9;padding:3px 10px;border-radius:6px;font-size:11px;text-decoration:none;transition:all .2s}
+a.btn-hoja:hover{background:rgba(6,182,212,.25);color:#fff}
+a.btn-alerta{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.45);color:#fca5a5}
+a.btn-alerta:hover{background:rgba(239,68,68,.3);color:#fff}
+</style>
+</head>
+<body class="grid-bg text-white min-h-screen">
+<div id="root"></div>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="./aggregates_by_tab_generated.js"></script>
+<script src="../Produccion/produccion_aggregates_generated.js"></script>
+<script src="../Produccion/calculos_dashboard_produccion.js"></script>
+<script src="../Produccion/lote_info_pd02.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel">
+const{useEffect,useRef,useState,useMemo}=React;
+if(window.ChartDataLabels){
+  Chart.register(window.ChartDataLabels);
+}
+
+/* ============================================================
+   DATOS REALES - 14 REGISTROS DE CALIDAD INGAMA FSSC 22000
+  Actualizados al 31/03/2026
+   ============================================================ */
+const SHEETS=[
+/* ---- RC.CC.01 ---- */
+{id:1,codigo:"RC.CC.01",nombre:"Control % Podrida / Ombligo - Seleccionado MPS (PPROP-04)",
+ link:"https://docs.google.com/spreadsheets/d/1d0prT3LWszhEhg4zvmgBxQf4bxrLz_e7kF8AAhNijcE/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/1d0prT3LWszhEhg4zvmgBxQf4bxrLz_e7kF8AAhNijcE/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"15-01-2026",responsable:"Mery Saavedra Chipunavi",
+ controles:[
+  {name:"% Ombligo (Lona)",limite:2,op:"max",unidad:"%",valor:1.53,
+   hist:{labels:["07/01","09/01","12/01","13/01","15/01"],data:[1.32,1.29,1.22,1.13,1.53]}},
+  {name:"% Podrida (Lona)",limite:3,op:"max",unidad:"%",valor:2.04,
+   hist:{labels:["07/01","09/01","12/01","13/01","15/01"],data:[2.49,2.33,2.22,2.21,2.04]}}]},
+
+/* ---- RC.CC.1.1 ---- */
+{id:2,codigo:"RC.CC.1.1",nombre:"Control % Corte (Chias) - Recepcion Almendra",
+ link:"https://docs.google.com/spreadsheets/d/1YhGfSrQ3YtOL535wnerlmCYNxPni8ThzX41WDfy-Fs4/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/1YhGfSrQ3YtOL535wnerlmCYNxPni8ThzX41WDfy-Fs4/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"11-12-2025",responsable:"Elmo Felipe Espinoza Trujillo",
+ controles:[
+  {name:"% Corte Chias",limite:10,op:"max",unidad:"%",valor:2.50,
+   hist:{labels:["L01","L02","L03","L04","L05","L06","L07","L08"],data:[4.50,4.50,1.67,4.50,4.17,1.67,4.50,2.50]}}]},
+
+/* ---- RC.CC.02 ---- */
+{id:3,codigo:"RC.CC.02",nombre:"Control % Chias - Seleccionado Almendra Pelada Cruda (PPROP-05)",
+ link:"https://docs.google.com/spreadsheets/d/180CSHCjVKgng9xKAYFTthUfNr_qhNKeGuEXjIPF7tLU/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/180CSHCjVKgng9xKAYFTthUfNr_qhNKeGuEXjIPF7tLU/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"14-01-2026",responsable:"Yirsa Aguilar Rojas",
+ controles:[
+  {name:"% Primera Banadera",limite:90,op:"min",unidad:"%",valor:84.5,
+   hist:{labels:["8:20","9:30","10:40","11:30","12:45","13:40","14:38","15:15"],data:[82.5,77.0,82.9,80.1,86.7,88.4,87.1,91.1]}},
+  {name:"% Pedazos Lona 1",limite:4,op:"max",unidad:"%",valor:1.6,
+   hist:{labels:["8:20","9:30","10:40","11:30","12:45","13:40","14:38","15:15"],data:[4.0,2.1,3.0,2.1,2.7,3.8,1.7,1.6]}},
+  {name:"% Chias Lona 1",limite:3,op:"max",unidad:"%",valor:1.2,
+   hist:{labels:["8:20","9:30","10:40","11:30","12:45","13:40","14:38","15:15"],data:[1.6,0.5,1.7,0.2,1.6,1.6,1.1,1.2]}}]},
+
+/* ---- RC.CC.04 (antes en noData como RC.CC.03 - DATOS REALES RECUPERADOS) ---- */
+{id:4,codigo:"RC.CC.04",nombre:"Control Almendra Dannada y Severamente Dannada - Seleccionado (PPROP-05)",
+ link:"https://docs.google.com/spreadsheets/d/1HHW21Eql5j_AlgWrEg92hquBqkEo6t7wCiqpZ2fO_8g/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/1HHW21Eql5j_AlgWrEg92hquBqkEo6t7wCiqpZ2fO_8g/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"16-01-2026",responsable:"Amelia Tanaka Fernandez",
+ controles:[
+  {name:"% Dannadas",limite:5,op:"max",unidad:"%",valor:8.7,
+   hist:{labels:["C1","C2","C3","C4"],data:[3.6,6.1,8.7,4.5]}},
+  {name:"% Severamente Dannadas",limite:4,op:"max",unidad:"%",valor:9.1,
+   hist:{labels:["C1","C2","C3","C4"],data:[7.3,4.4,6.6,9.1]}},
+  {name:"% Chias",limite:3,op:"max",unidad:"%",valor:9.1,
+   hist:{labels:["C1","C2","C3","C4"],data:[7.3,4.4,6.6,9.1]}}]},
+
+/* ---- RC.CC.05 ---- */
+{id:5,codigo:"RC.CC.05",nombre:"Control Calidad Producto Terminado (PPROP-06)",
+ link:"https://docs.google.com/spreadsheets/d/19tAPT8hR8gUziLQNxVL5V0eo866C4IUr9ljzXWI5mnA/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/19tAPT8hR8gUziLQNxVL5V0eo866C4IUr9ljzXWI5mnA/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"16-01-2026",responsable:"Mayerlin Rafael Aguada",
+ controles:[
+  {name:"% Danadas",limite:5,op:"max",unidad:"%",valor:1.75,
+   hist:{labels:["M1","M2","M3","M4","M5","M6","M7","M8","M9"],data:[1.50,1.60,2.05,1.25,1.70,1.65,1.85,1.75,0.95]}},
+  {name:"% Sev. Danadas",limite:4,op:"max",unidad:"%",valor:1.45,
+   hist:{labels:["M1","M2","M3","M4","M5","M6","M7","M8","M9"],data:[0.50,0.85,0.75,0.45,0.75,1.00,1.15,1.45,1.00]}},
+  {name:"Mat. Extranos",limite:"Ausente",op:"cualitativo",unidad:"",valor:"AUSENTE"}]},
+
+/* ---- RC.CC.06 ---- */
+{id:6,codigo:"RC.CC.06",nombre:"Control Cajas Pinchadas - Producto Terminado",
+ link:"https://docs.google.com/spreadsheets/d/1Azuyxj2TNKLmNzqx6QvYCLHTlF9v7xr3CJkK0_mt0uI/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/1Azuyxj2TNKLmNzqx6QvYCLHTlF9v7xr3CJkK0_mt0uI/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"30-01-2026",responsable:"Bismarck Forero Saucedo",
+ controles:[
+  {name:"Cajas Reembazadas (Promedio)",limite:10,op:"max",unidad:" cajas",valor:6,
+   hist:{labels:["17/01","21/01","22/01","23/01","26/01","28/01","29/01","30/01"],data:[4,7,13,6,4,7,10,6]}},
+  {name:"Estado Reemplazo",limite:"Control total",op:"cualitativo",unidad:"",valor:"CONTROLADO"}]},
+
+/* ---- RC.CC.07 ---- */
+{id:7,codigo:"RC.CC.07",nombre:"Control Detector de Metales PCC-02",
+ link:"https://docs.google.com/spreadsheets/d/1o9WflLxWc2CzcMb_kbXVAq7aGCvfWDx-aVqKAkDsRR0/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/1o9WflLxWc2CzcMb_kbXVAq7aGCvfWDx-aVqKAkDsRR0/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"17-01-2026",responsable:"Bismarck Forero Saucedo",
+ controles:[
+  {name:"Ferroso Fe 3mm",limite:"Ausente",op:"cualitativo",unidad:"",valor:"ATRAPA ok"},
+  {name:"No Ferroso 3.5mm",limite:"Ausente",op:"cualitativo",unidad:"",valor:"ATRAPA ok"},
+  {name:"Acero Inox 4mm",limite:"Ausente",op:"cualitativo",unidad:"",valor:"ATRAPA ok"}]},
+
+/* ---- RC.CC.08 ---- */
+{id:8,codigo:"RC.CC.08",nombre:"Control Metales con Imanes - Vaciado Almendra",
+ link:"https://docs.google.com/spreadsheets/d/1QEiNvG3e4qz9REdlro3O5_7oI26uwy92VwpHFabgCPM/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/1QEiNvG3e4qz9REdlro3O5_7oI26uwy92VwpHFabgCPM/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"29-01-2026",responsable:"Cristian Suarez Rivero",
+ controles:[
+  {name:"Alambre 1.5cm",limite:"Ausente",op:"cualitativo",unidad:"",valor:"AUSENTE"},
+  {name:"Pernos 2cm",limite:"Ausente",op:"cualitativo",unidad:"",valor:"AUSENTE"},
+  {name:"Clavos/Clips",limite:"Ausente",op:"cualitativo",unidad:"",valor:"AUSENTE"}]},
+
+/* ---- RC.CC.09 ---- */
+{id:9,codigo:"RC.CC.09",nombre:"Certificado de Analisis (COA) - Laboratorio LABCAR",
+ link:"https://docs.google.com/spreadsheets/d/1UNmL2BFzyBM-MXShC5lpxaMOstnkLh3NO8lXJeQyK5o/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/1UNmL2BFzyBM-MXShC5lpxaMOstnkLh3NO8lXJeQyK5o/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"04-02-2026",responsable:"Tania Rojas Quette",
+ controles:[
+  {name:"Aflatoxina B1",limite:5,op:"max",unidad:" ppb",valor:0.50},
+  {name:"Total Aflatoxinas",limite:10,op:"max",unidad:" ppb",valor:0.90},
+  {name:"Humedad",limite:4,op:"max",unidad:"%",valor:3.20},
+  {name:"Total Bacterias",limite:50000,op:"max",unidad:" UFC/g",valor:2000},
+  {name:"E. coli",limite:"Ausente",op:"cualitativo",unidad:"",valor:"AUSENTE"},
+  {name:"Salmonella",limite:"Ausente",op:"cualitativo",unidad:"",valor:"AUSENTE"}]},
+
+/* ---- RC.CC.10 - DATOS REALES RECUPERADOS ---- */
+{id:10,codigo:"RC.CC.10",nombre:"Control Inspeccion del Contenedor Previo Aceptacion",
+ link:"https://docs.google.com/spreadsheets/d/1OKBjSUd7rIdDkHs2fh6Jmp2vudXVcLjtBcq43r7J4CU/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/1OKBjSUd7rIdDkHs2fh6Jmp2vudXVcLjtBcq43r7J4CU/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"17-06-2025",responsable:"INGAMA",
+ controles:[
+  {name:"Tren de Rodaje",limite:"Apto",op:"cualitativo",unidad:"",valor:"APTO-SI"},
+  {name:"Puertas Int. y Ext.",limite:"Apto",op:"cualitativo",unidad:"",valor:"APTO-SI"},
+  {name:"Prueba de Luz",limite:"Apto",op:"cualitativo",unidad:"",valor:"APTO-SI"},
+  {name:"Condic. Limpieza",limite:"Apto",op:"cualitativo",unidad:"",valor:"APTO-SI"},
+  {name:"Contenedor Aceptado",limite:"SI",op:"cualitativo",unidad:"",valor:"ACEPTADO"}]},
+
+/* ---- RC.CC.11 - DATOS REALES RECUPERADOS ---- */
+{id:11,codigo:"RC.CC.11",nombre:"Control Embalado de Broken - PPROP-07",
+ link:"https://docs.google.com/spreadsheets/d/1apbRKPoVq8OXEYfGviZXBRkMvGc-W9Rdy--9RwDXVwI/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/1apbRKPoVq8OXEYfGviZXBRkMvGc-W9Rdy--9RwDXVwI/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"16-01-2026",responsable:"B-14",
+ controles:[
+  {name:"% Podrida Broken N",limite:2,op:"max",unidad:"%",valor:0.40},
+  {name:"Chias Broken",limite:3,op:"max",unidad:"%",valor:0.0},
+  {name:"Punto Cafe",limite:4,op:"max",unidad:"%",valor:0.20},
+  {name:"Mat. Extranos",limite:"Ausente",op:"cualitativo",unidad:"",valor:"AUSENTE"}]},
+
+/* ---- RC.CC.13 ---- */
+{id:12,codigo:"RC.CC.13",nombre:"Verificacion de Balanza y Control de Peso del Producto Terminado",
+ link:"https://docs.google.com/spreadsheets/d/1xCVOvIesYySTqYB9qbroVoJtCHhfgPd6Wo0xg5ceZq0/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/1xCVOvIesYySTqYB9qbroVoJtCHhfgPd6Wo0xg5ceZq0/edit#gid=0",
+ nombreHoja:"RG 01-CV PLL01",ultimaFecha:"16-01-2026",responsable:"Bismark Forero Saucedo",
+ controles:[
+  {name:"Tara Promedio (kg)",limite:0.70,op:"max",unidad:" kg",valor:0.68},
+  {name:"Peso Neto (kg)",limite:19.80,op:"min",unidad:" kg",valor:19.96},
+  {name:"Cumple",limite:"SI",op:"cualitativo",unidad:"",valor:"SI"}]},
+
+/* ---- RC.CC.14 - DATOS REALES RECUPERADOS ---- */
+{id:13,codigo:"RC.CC.14",nombre:"Control % Humedad MPH Almacenada - PPROP-02",
+ link:"https://docs.google.com/spreadsheets/d/16mBCHcPztf_YGDI_zqmU5idmzllhw40-rIpyleZgLI0/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/16mBCHcPztf_YGDI_zqmU5idmzllhw40-rIpyleZgLI0/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"03-01-2026",responsable:"Elmo Felipe Espinoza / Tania Rojas",
+ controles:[
+  {name:"% Humedad Recepcion",limite:28,op:"max",unidad:"%",valor:24.5,
+   hist:{labels:["06/12","10/12","11/12","15/12","22/12","29/12","03/01"],data:[24.5,24.1,24.7,24.4,23.8,23.2,23.0]}},
+  {name:"% Humedad Salida Proceso",limite:28,op:"max",unidad:"%",valor:23.0,
+   hist:{labels:["15/12","22/12","29/12","03/01"],data:[24.4,23.8,23.2,23.0]}},
+  {name:"Ultima Salida a Proceso",limite:"Fecha",op:"cualitativo",unidad:"",valor:"03-01-26"}]},
+
+/* ---- RC.CC.17 - DATOS REALES RECUPERADOS ---- */
+{id:14,codigo:"RC.CC.17",nombre:"Control Sancochado de Almendra en Cascara (Autoclave)",
+ link:"https://docs.google.com/spreadsheets/d/1ZRXfyPBLpqDc0ycwpEG_nkhWd36kCT78calkszVeSvs/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/1ZRXfyPBLpqDc0ycwpEG_nkhWd36kCT78calkszVeSvs/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"26-01-2026",responsable:"Elmo Felipe Espinoza Trujillo",
+ controles:[
+  {name:"Manometro Distribuidor",limite:7,op:"max",unidad:" bar",valor:7,
+   hist:{labels:["13/01 P1","13/01 P2","14/01 P1","14/01 P2","17/01","19/01","20/01","22/01","24/01","26/01"],data:[7,7,7,7,7,7,7,7,7,7]}},
+  {name:"Manometro Autoclave",limite:4,op:"max",unidad:" bar",valor:4,
+   hist:{labels:["13/01 P1","13/01 P2","14/01 P1","14/01 P2","17/01","19/01","20/01","22/01","24/01","26/01"],data:[4,4,4,4,4,4,4,4,4,4]}},
+  {name:"% Corte (max aceptable)",limite:9,op:"max",unidad:"%",valor:5,
+   hist:{labels:["13/01","14/01","17/01","19/01","20/01","22/01","24/01","26/01"],data:[4,4,5,2,5,3,9,4]}}]}
+];
+
+/* Pestañas tomadas del enlace guía RC.CC.1.1 (orden izquierda→derecha de la hoja) */
+const TAB_REFERENCE=["RG 01-CV","RG 02-CV","BSI 01","DA 01-CV","AA 01-26","AA 02-26","RG 03-CV","AA 03-26","RG 04-CV","FV 01-CV"];
+
+/* Mapa de coincidencia de pestañas por registro (extraído de htmlview público) */
+const SHEET_TAB_MAP={
+  1:["RG 01-CV","RG 02-CV","BSI 01","DA 01-CV","AA 01-26"],
+  2:["RG 01-CV","RG 02-CV","DA 01-CV","AA 01-26","AA 02-26","RG 03-CV"],
+  3:["RG 01-CV","RG 02-CV","DA 01-CV"],
+  4:["RG 01-CV","RG 02-CV","DA 01-CV"],
+  5:["RG 01-CV","RG 02-CV","DA 01-CV"],
+  6:["RG 01-CV","RG 02-CV","BSI 01","DA 01-CV"],
+  7:["RG 01-CV","RG 02-CV","DA 01-CV"],
+  8:["RG 01-CV","RG 02-CV","BSI 01","RG 03-CV","AA 01-26"],
+  9:["RG 01-CV","RG 02-CV","BSI 01","DA 01-CV","AA 01-26"],
+  10:["RG 01-CV"],
+  11:["RG 01-CV","RG 02-CV","DA 01-CV"],
+  12:["RG 01-CV","RG 02-CV","BSI 01","DA 01-CV"],
+  13:["RG 01-CV","RG 02-CV","AA 01-26","AA 02-26","DA 01-CV","RG 03-CV","BSI 01","AA 03-26","RG 04-CV","FV 01-CV"],
+  14:["RG 01-CV","RG 02-CV","BSI 01"]
+};
+
+/* Ubicación observada del dato lote/proveedor: no siempre está en C7 */
+const CELL_REFERENCE_MAP={
+  1:"C8",
+  2:"B6-B7",
+  3:"B7",
+  4:"C7",
+  5:"B7",
+  6:"Fila 8",
+  7:"Fecha en fila 9",
+  8:"B9",
+  9:"No aplica C7 (COA)",
+  10:"B7",
+  11:"B7",
+  12:"B9",
+  13:"C7",
+  14:"Tabla principal"
+};
+
+const PRODUCTION_LINKS=[
+  {codigo:"RC.PD.02",id:"1_aWiCwHrAx1bHpJ3twchTRwX0sCRtmwglVkPE7WrN04"},
+  {codigo:"RC.PD.03",id:"1Ueb02r1KKiCSlsgr0DFm4LJNLSvHwMtpjsnMmLf82d8"},
+  {codigo:"RC.PD.05",id:"1l_WaU1PekIp_Cyk79jGhEGhtZkWJ0X6pOnupCnAhSQQ"},
+  {codigo:"RC.PD.06",id:"17KcWzCQeIyGdsn9YNTjPNtqd7dq1kcB7aQVIGqXKyL8"},
+  {codigo:"RC.PD.07",id:"1z7zUKc2-kS2BZA6e7Wakzuk0tgoBeV5_F8quvTu2qrA"},
+  {codigo:"RC.PD.08",id:"1D9R19nsSb0bhqBgEWBCEbeDDdyOmpams8sLMhCAqdf4"},
+  {codigo:"RC.PD.09",id:"1Ruel5WGlQtLjHIdXsX3LhV6bI3VaxiI4rk_C5qCNvlU"},
+  {codigo:"RC.PD.10",id:"1IadQ8KERDI8rvKLBKervoSyaotP2Opdtu_n3FmgTJT4"},
+  {codigo:"RC.PD.11",id:"1Ld8XA13BnSBYoJ6uMsQiptu7v_t4uKFdXwfBwtnFYaI"},
+  {codigo:"RC.PD.12",id:"1W5eGAe2LOzIrQax_wLI386oZpDXQiAdp9rGgWxdqLQ4"},
+  {codigo:"RC.PD.13",id:"1p9v0jkbcKgul_Ba40-2166b0vOucHh53U3qbp6aib0M"}
+].map(item=>({
+  ...item,
+  url:`https://docs.google.com/spreadsheets/d/${item.id}/edit`
+}));
+/* Orden izquierda→derecha de hojas en RC.PD.02 */
+const PRODUCTION_TAB_FALLBACK=["RG 01-CV","RG 02-CV","BSI 01","DA 01-CV","AA 01-26","AA 02-26"];
+const PRODUCTION_TRACE_FLOW=[
+  {codigo:"RC.PD.02",titulo:"Kilos Recibidos",detalle:"Entrada base del lote y punto de partida para trazabilidad."},
+  {codigo:"RC.PD.08",titulo:"Rendimiento de Pelado",detalle:"% Corte, calibres y rendimiento de almendra clasificada."},
+  {codigo:"RC.PD.09",titulo:"Humedad Final y PCC",detalle:"Temperatura del proceso y control de humedad por hora/dia."},
+  {codigo:"RC.PD.11",titulo:"Cajas Selladas",detalle:"Salida empacada y conteo final de unidades selladas."},
+  {codigo:"RC.PD.12",titulo:"Saldo en Almacen",detalle:"Inventario remanente para validar cierre del lote."},
+  {codigo:"RC.PD.13",titulo:"Cierre de Despacho",detalle:"Validacion final de salida versus saldo en almacen."}
+];
+const PRODUCTION_KPI_FORMULAS=[
+  {titulo:"Efficiency Yield",formula:"(Total Kilos Sellados / Total Kilos Recibidos) * 100",fuente:"RC.PD.11 vs RC.PD.02"},
+  {titulo:"PCC Status",formula:"Temperatura PD.09 > 75 C o Humedad PD.05 > 18%",fuente:"RC.PD.09 y RC.PD.05"},
+  {titulo:"Quality Index",formula:"PROMEDIO(% Corte en RC.PD.08)",fuente:"RC.PD.08"},
+  {titulo:"Validacion de Despacho",formula:"Saldo RC.PD.12 - Despacho RC.PD.13 = saldo esperado",fuente:"RC.PD.12 y RC.PD.13"}
+];
+const PRODUCTION_GRAPH_PLAN=[
+  {tipo:"Waterfall Chart",uso:"Perdida de masa por etapa",detalle:"PD.02 recibido -> PD.08 clasificado -> PD.09 deshidratado -> PD.11 sellado"},
+  {tipo:"Pie Chart",uso:"Mezcla de calibres",detalle:"Medium, Midget y Tiny desde RC.PD.08"},
+  {tipo:"Line Chart",uso:"Control de humedad",detalle:"Humedad/temperatura por hora o dia desde RC.PD.09"},
+  {tipo:"Table View",uso:"Salud del Lote",detalle:"Semaforos Verde/Amarillo/Rojo con lote, yield, PCC, humedad y saldo"}
+];
+const PRODUCTION_SHEETS_FORMULAS=[
+  {titulo:"Tabla maestra por lote",formula:"=QUERY(Data!A:Z, \"select B, sum(H), avg(M), sum(Q) where B is not null group by B label sum(H) 'Kg Recibidos', avg(M) 'Humedad Final', sum(Q) 'Cajas Selladas'\", 1)"},
+  {titulo:"Cruce de trazabilidad",formula:"=ARRAYFORMULA(IF(A2:A=\"\",\"\",VLOOKUP(A2:A,QUERY(Data!A:Z,\"select B, sum(H) group by B\",1),2,FALSE)))"},
+  {titulo:"Quality Index",formula:"=ARRAYFORMULA(IF(A2:A=\"\",\"\",VLOOKUP(A2:A,QUERY(Data!A:Z,\"select B, avg(N) group by B\",1),2,FALSE)))"},
+  {titulo:"PCC Status",formula:"=ARRAYFORMULA(IF(A2:A=\"\",\"\",IF((VLOOKUP(A2:A,TempRange,2,FALSE)>75)+(VLOOKUP(A2:A,HumedadRange,2,FALSE)>18),\"ROJO\",\"VERDE\")))"},
+  {titulo:"Saldo validado",formula:"=ARRAYFORMULA(IF(A2:A=\"\",\"\",VLOOKUP(A2:A,SaldoAlmacen,2,FALSE)-VLOOKUP(A2:A,Despachos,2,FALSE)))"}
+];
+const PRODUCTION_COST_LOSS_FORMULA="Si Yield < 30%, Perdida Bs/USD = (Kg Recibidos * (0.30 - YieldReal)) * CostoUnitario";
+
+/* Agregados por lote (promedio de pestañas/planillas disponibles) */
+const AGGREGATES_BASE={
+  "RG 01-CV":{
+    "RC.CC.02":{
+      muestras:8,
+      controles:{
+        "% Primera Banadera":{valor:84.5,hist:[82.5,77.0,82.9,80.1,86.7,88.4,87.1,91.1]},
+        "% Pedazos Lona 1":{valor:2.6,hist:[4.0,2.1,3.0,2.1,2.7,3.8,1.7,1.6]},
+        "% Chias Lona 1":{valor:1.2,hist:[1.6,0.5,1.7,0.2,1.6,1.6,1.1,1.2]}
+      }
+    },
+    "RC.CC.04":{
+      muestras:4,
+      controles:{
+        "% Dannadas":{valor:5.73,hist:[3.6,6.1,8.7,4.5]},
+        "% Severamente Dannadas":{valor:6.85,hist:[7.3,4.4,6.6,9.1]}
+      }
+    },
+    "RC.CC.05":{
+      muestras:8,
+      controles:{
+        "% Danadas":{valor:1.42,hist:[1.50,1.60,2.05,1.25,1.70,1.65,1.85,1.75]},
+        "% Sev. Danadas":{valor:0.95,hist:[0.50,0.85,0.75,0.45,0.75,1.00,1.15,1.45]}
+      }
+    },
+    "RC.CC.11":{
+      muestras:8,
+      controles:{
+        "% Podrida Broken N":{valor:0.55},
+        "Chias Broken":{valor:0.06},
+        "Punto Cafe":{valor:0.80}
+      }
+    },
+    "RC.CC.13":{
+      muestras:8,
+      controles:{
+        "Tara Promedio (kg)":{valor:0.68},
+        "Peso Neto (kg)":{valor:19.96}
+      }
+    }
+  },
+  "RG 02-CV":{
+    "RC.CC.05":{muestras:6,controles:{"% Danadas":{valor:0.53},"% Sev. Danadas":{valor:0.14}}},
+    "RC.CC.11":{muestras:6,controles:{"% Podrida Broken N":{valor:0.14},"Chias Broken":{valor:0.01},"Punto Cafe":{valor:0.16}}},
+    "RC.CC.13":{muestras:6,controles:{"Tara Promedio (kg)":{valor:0.68},"Peso Neto (kg)":{valor:19.96}}}
+  },
+  "BSI 01":{
+    "RC.CC.13":{muestras:3,controles:{"Tara Promedio (kg)":{valor:0.68},"Peso Neto (kg)":{valor:19.96}}}
+  },
+  "DA 01-CV":{
+    "RC.CC.11":{muestras:1,controles:{"Mat. Extranos":{valor:"AUSENTE"}}}
+  }
+};
+
+const AGGREGATES_BY_TAB=window.AGGREGATES_BY_TAB_GENERATED&&typeof window.AGGREGATES_BY_TAB_GENERATED==="object"
+  ? window.AGGREGATES_BY_TAB_GENERATED
+  : {};
+
+/* ============================================================
+   LOGICA DE ESTADOS
+   ============================================================ */
+const fuera=c=>{
+  if(c.op==="max")return typeof c.valor==="number"&&c.valor>c.limite;
+  if(c.op==="min")return typeof c.valor==="number"&&c.valor<c.limite;
+  return false;
+};
+const cerca=c=>{
+  if(fuera(c))return false;
+  if(c.op==="max")return typeof c.valor==="number"&&c.valor>c.limite*0.78;
+  if(c.op==="min")return typeof c.valor==="number"&&c.valor<c.limite*1.18;
+  return false;
+};
+const stSheet=s=>{
+  if(s.noData)return"nd";
+  if(s.listadoMaestro)return"nd";
+  if(s.controles.some(fuera))return"alert";
+  if(s.controles.some(cerca))return"warn";
+  return"ok";
+};
+const pct=c=>{if(typeof c.valor!=="number")return 100;return Math.min((c.valor/c.limite)*100,100);};
+const pctCol=c=>fuera(c)?"bg-red-500":cerca(c)?"bg-yellow-400":"bg-green-500";
+const ptCol=(v,l,op)=>(op==="max"&&v>l)||(op==="min"&&v<l)?"#ef4444":(op==="max"&&v>l*0.78)||(op==="min"&&v<l*1.18)?"#f59e0b":"#22c55e";
+const formatChartValue=(value,{percent=false,suffix="",decimals=2}={})=>{
+  if(typeof value!=="number"||!Number.isFinite(value)) return "";
+  const rounded=Math.abs(value)>=100?value.toFixed(0):value.toFixed(decimals);
+  const normalized=String(rounded).replace(/\.00$/," ").replace(/(\.\d*[1-9])0+$/,"$1").trim();
+  return `${normalized}${percent?"%":""}${suffix}`;
+};
+const chartDataLabelOptions=({percent=false,suffix="",decimals=2,color="#e2e8f0",align="top",anchor="end",offset=4}={})=>({
+  color,
+  anchor,
+  align,
+  offset,
+  clamp:true,
+  clip:false,
+  font:{weight:"bold",size:10},
+  formatter:(value)=>formatChartValue(value,{percent,suffix,decimals})
+});
+const doughnutLabelOptions=(suffix="")=>({
+  color:"#f8fafc",
+  anchor:"center",
+  align:"center",
+  offset:0,
+  clamp:true,
+  clip:false,
+  font:{weight:"bold",size:10},
+  formatter:(value)=>formatChartValue(value,{suffix,decimals:0})
+});
+const limLine=(n,val,lbl,col="#ef4444")=>({type:"line",label:lbl,data:Array(n).fill(val),borderColor:col,borderDash:[6,3],borderWidth:1.8,pointRadius:0,fill:false,datalabels:{display:false}});
+const mkFallbackHist=(val,tag,samples=6)=>{
+  const labels=Array.from({length:samples},(_,i)=>`${tag}-${i+1}`);
+  return {labels,data:Array(samples).fill(val)};
+};
+const parseUiDate=(value)=>{
+  const text=String(value||"").trim();
+  if(!text) return 0;
+  const direct=Date.parse(text);
+  if(!Number.isNaN(direct)) return direct;
+
+  const ymd=text.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+  if(ymd){
+    const [,year,month,day]=ymd;
+    const iso=`${year}-${month.padStart(2,"0")}-${day.padStart(2,"0")}`;
+    const stamp=Date.parse(iso);
+    if(!Number.isNaN(stamp)) return stamp;
+  }
+
+  const dmyOrMdy=text.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
+  if(!dmyOrMdy) return 0;
+  let [,a,b,year]=dmyOrMdy;
+  if(year.length===2) year=`20${year}`;
+
+  const candidates=[];
+  const dmy=`${year.padStart(4,"0")}-${b.padStart(2,"0")}-${a.padStart(2,"0")}`;
+  const mdy=`${year.padStart(4,"0")}-${a.padStart(2,"0")}-${b.padStart(2,"0")}`;
+  const dmyStamp=Date.parse(dmy);
+  const mdyStamp=Date.parse(mdy);
+  if(!Number.isNaN(dmyStamp)) candidates.push(dmyStamp);
+  if(!Number.isNaN(mdyStamp)) candidates.push(mdyStamp);
+  if(!candidates.length) return 0;
+  return Math.max(...candidates);
+};
+const mkTrendLabels=(selectedTab,controlName,length)=>{
+  const prefix=selectedTab==="TODAS"?"M":normTabName(selectedTab).split(" ").slice(0,2).join("-")||"L";
+  const shortName=String(controlName||"").split(" ")[0]||"C";
+  return Array.from({length},(_,i)=>`${prefix}-${shortName}-${i+1}`);
+};
+const normTabName=(value)=>String(value||"")
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g,"")
+  .toUpperCase()
+  .replace(/[._-]+/g," ")
+  .replace(/\s+/g," ")
+  .trim();
+const canonicalTabName=(value)=>normTabName(value).replace(/\s+/g,"");
+const sameTabName=(a,b)=>{
+  const ca=canonicalTabName(a),cb=canonicalTabName(b);
+  if(!ca||!cb) return false;
+  return ca===cb;
+};
+const MAX_PRODUCTION_METRICS=140;
+const MAX_PRODUCTION_POINTS=80;
+const safeStringArray=(value)=>Array.isArray(value)
+  ? value.map((item)=>String(item||"").trim()).filter(Boolean)
+  : [];
+const toNumericArray=(value)=>Array.isArray(value)
+  ? value.filter((item)=>typeof item==="number"&&Number.isFinite(item))
+  : [];
+const trimSeries=(arr,maxPoints)=>arr.length>maxPoints?arr.slice(arr.length-maxPoints):arr;
+
+/* ============================================================
+   COMPONENTE PRINCIPAL
+   ============================================================ */
+function Dashboard(){
+const [selectedView,setSelectedView]=useState("PRODUCCION");
+const [selectedTab,setSelectedTab]=useState("TODAS");
+const [selectedRegistro,setSelectedRegistro]=useState("TODOS");
+const [selectedProdTab,setSelectedProdTab]=useState("TODAS");
+const [sidebarProdOpen,setSidebarProdOpen]=useState(true);
+const [sidebarQualityOpen,setSidebarQualityOpen]=useState(false);
+const computedSheets=useMemo(()=>{
+  const clone=JSON.parse(JSON.stringify(SHEETS));
+  const agg=AGGREGATES_BY_TAB[selectedTab]||{};
+  const allTabsRecords=selectedTab==="TODAS"?Object.values(AGGREGATES_BY_TAB):[];
+  clone.forEach((sheet)=>{
+    let byRecord=agg[sheet.codigo]||null;
+    if(selectedTab==="TODAS"){
+      const records=allTabsRecords
+        .map((tabPayload)=>tabPayload&&tabPayload[sheet.codigo]?tabPayload[sheet.codigo]:null)
+        .filter(Boolean);
+      if(records.length){
+        const mergedControls={};
+        (sheet.controles||[]).forEach((ctrl)=>{
+          const samples=records
+            .map((r)=>r&&r.controles?r.controles[ctrl.name]:null)
+            .filter(Boolean);
+          if(!samples.length) return;
+          const numericVals=samples
+            .map((s)=>typeof s.valor==="number"&&Number.isFinite(s.valor)?s.valor:null)
+            .filter((v)=>v!=null);
+          const stringVals=samples
+            .map((s)=>typeof s.valor==="string"?s.valor.trim():"")
+            .filter(Boolean);
+          const hist=samples
+            .flatMap((s)=>Array.isArray(s.hist)?s.hist:[])
+            .filter((v)=>typeof v==="number"&&Number.isFinite(v));
+          const labels=samples
+            .flatMap((s)=>Array.isArray(s.labels)?s.labels:[])
+            .map((v)=>String(v||"").trim())
+            .filter(Boolean);
+          const payload={};
+          if(numericVals.length){
+            payload.valor=Math.round((numericVals.reduce((a,b)=>a+b,0)/numericVals.length)*100)/100;
+          } else if(stringVals.length){
+            payload.valor=stringVals[stringVals.length-1];
+          } else {
+            payload.valor=null;
+          }
+          if(hist.length) payload.hist=hist;
+          if(labels.length===hist.length&&hist.length) payload.labels=labels;
+          mergedControls[ctrl.name]=payload;
+        });
+        byRecord={
+          muestras:records.reduce((acc,r)=>acc+(typeof r.muestras==="number"?r.muestras:1),0),
+          controles:mergedControls
+        };
+      }
+    }
+    sheet.dataSource=byRecord?"lote_real":"sin_dato_real";
+    sheet.promedioMuestras=byRecord&&byRecord.muestras?byRecord.muestras:null;
+    sheet.controles=sheet.controles.map((c)=>{
+      const updated={...c};
+      const originalHist=updated.hist&&Array.isArray(updated.hist.data)&&updated.hist.data.length
+        ? {...updated.hist}
+        : null;
+      const ov=byRecord&&byRecord.controles?byRecord.controles[c.name]:null;
+      updated.histSource="none";
+      if(ov){
+        if(typeof ov.valor==="number") updated.valor=ov.valor;
+        if(typeof ov.valor==="string") updated.valor=ov.valor;
+        if(Array.isArray(ov.hist)&&ov.hist.length){
+          const labels=Array.isArray(ov.labels)&&ov.labels.length===ov.hist.length
+            ? ov.labels
+            : originalHist&&Array.isArray(originalHist.labels)&&originalHist.labels.length===ov.hist.length
+            ? originalHist.labels
+            : mkTrendLabels(selectedTab,c.name,ov.hist.length);
+          updated.hist={labels,data:ov.hist};
+          updated.histSource=sheet.promedioMuestras&&sheet.promedioMuestras>1?"aggregate":"detail";
+        }
+      } else {
+        updated.valor=null;
+        updated.hist={labels:[],data:[]};
+      }
+      return updated;
+    });
+  });
+  return clone;
+},[selectedTab]);
+
+const sheetView=useMemo(()=>computedSheets.map((s)=>{
+  const aggForTab=AGGREGATES_BY_TAB[selectedTab]||{};
+  const hasAgg=!!aggForTab[s.codigo];
+  const matchBySheetMap=(SHEET_TAB_MAP[s.id]||[]).some(tab=>sameTabName(tab,selectedTab));
+  const matchTab=(s.id===1||s.id===2)
+    ? (selectedTab==="TODAS"||hasAgg)
+    : (selectedTab==="TODAS"||matchBySheetMap||hasAgg);
+  return {
+    ...s,
+    matchTab,
+    hojaActiva:selectedTab==="TODAS"?s.nombreHoja:selectedTab
+  };
+}),[computedSheets,selectedTab]);
+
+const scopedSheets=selectedRegistro==="TODOS"
+  ? sheetView
+  : sheetView.filter(s=>s.codigo===selectedRegistro);
+
+const activeSheets=scopedSheets.filter(s=>s.matchTab);
+
+const alertas=activeSheets.filter(s=>!s.noData&&!s.listadoMaestro&&s.controles.some(fuera));
+const warns=activeSheets.filter(s=>!s.noData&&!s.listadoMaestro&&!s.controles.some(fuera)&&s.controles.some(cerca));
+const conD=activeSheets.filter(s=>!s.noData&&!s.listadoMaestro);
+const datosRealesActivos=selectedTab==="TODAS"
+  ? conD.length
+  : conD.filter(s=>s.dataSource==="lote_real").length;
+const conf=conD.filter(s=>!s.controles.some(fuera)).length;
+const cPct=conD.length?Math.round(conf/conD.length*100):0;
+const registrosDisponibles=activeSheets.map(s=>s.codigo);
+const selectedRecordObj=selectedRegistro==="TODOS"?null:sheetView.find(s=>s.codigo===selectedRegistro);
+const trendSheets=scopedSheets.map(s=>{
+  const hasHist=(s.controles||[]).some(c=>typeof c.valor==="number"&&c.hist&&Array.isArray(c.hist.data)&&c.hist.data.length);
+  const hasAggregateTrend=(s.controles||[]).some(c=>c.histSource==="aggregate");
+  return {...s,hasHist,hasAggregateTrend};
+});
+const aggregateTabOrder=useMemo(()=>Object.keys(AGGREGATES_BY_TAB),[]);
+const knownTabs=useMemo(()=>{
+  const ordered=[];
+  const seen=new Set();
+  const pushIfNew=(name)=>{
+    const clean=String(name||"").trim();
+    if(!clean||seen.has(clean)) return;
+    seen.add(clean);
+    ordered.push(clean);
+  };
+  TAB_REFERENCE.forEach(pushIfNew);
+  Object.keys(AGGREGATES_BY_TAB).forEach(pushIfNew);
+  return ordered;
+},[]);
+const lotAudit=useMemo(()=>knownTabs.map((tab)=>{
+  const present=SHEETS.filter(s=>((SHEET_TAB_MAP[s.id]||[]).some(name=>sameTabName(name,tab))||!!((AGGREGATES_BY_TAB[tab]||{})[s.codigo]))).map(s=>s.codigo);
+  const missing=SHEETS.map(s=>s.codigo).filter(code=>!present.includes(code));
+  return {tab,present,missing,isComplete:missing.length===0};
+}),[knownTabs]);
+const completeLots=lotAudit.filter(item=>item.isComplete);
+const incompleteLots=lotAudit.filter(item=>!item.isComplete);
+const latestRecords=useMemo(()=>SHEETS.map((sheet)=>{
+  const tabsWithRecord=aggregateTabOrder.filter(tabName=>!!((AGGREGATES_BY_TAB[tabName]||{})[sheet.codigo]));
+  const lastTab=tabsWithRecord.length?tabsWithRecord[tabsWithRecord.length-1]:"";
+  let bestDate=sheet.ultimaFecha||"";
+  let bestTimestamp=parseUiDate(bestDate);
+  let bestTab=lastTab||sheet.nombreHoja||"";
+
+  const scanRecord=(tabName,record)=>{
+    if(!record||!record.controles) return;
+    Object.entries(record.controles).forEach(([controlName,control])=>{
+      const keyTs=parseUiDate(controlName);
+      if(keyTs>bestTimestamp){
+        bestTimestamp=keyTs;
+        bestDate=String(controlName).trim();
+        bestTab=tabName;
+      }
+      if(control&&Array.isArray(control.labels)){
+        control.labels.forEach((label)=>{
+          const ts=parseUiDate(label);
+          if(ts>bestTimestamp){
+            bestTimestamp=ts;
+            bestDate=String(label).trim();
+            bestTab=tabName;
+          }
+        });
+      }
+      if(control&&typeof control.valor==="string"){
+        const ts=parseUiDate(control.valor);
+        if(ts>bestTimestamp){
+          bestTimestamp=ts;
+          bestDate=String(control.valor).trim();
+          bestTab=tabName;
+        }
+      }
+
+      if(control&&typeof control.ultimaFechaRegistro==="string"){
+        const ts=parseUiDate(control.ultimaFechaRegistro);
+        if(ts>bestTimestamp){
+          bestTimestamp=ts;
+          bestDate=String(control.ultimaFechaRegistro).trim();
+          bestTab=tabName;
+        }
+      }
+    });
+  };
+
+  if(lastTab){
+    scanRecord(lastTab,(AGGREGATES_BY_TAB[lastTab]||{})[sheet.codigo]);
+  }
+  Object.entries(AGGREGATES_BY_TAB).forEach(([tabName,records])=>{
+    const record=records&&records[sheet.codigo];
+    scanRecord(tabName,record);
+  });
+
+  return {
+    codigo:sheet.codigo,
+    nombre:sheet.nombre,
+    ultimaFecha:bestDate,
+    hoja:bestTab,
+    timestamp:bestTimestamp,
+    dataSource:"estatico"
+  };
+}).sort((a,b)=>b.timestamp-a.timestamp),[aggregateTabOrder]);
+const subtitleLote=selectedTab==="TODAS"?"Vista Consolidada":"Lote "+selectedTab;
+const qualityTrendAvg=useMemo(()=>{
+  const result={};
+  [1,2].forEach((id)=>{
+    const base=SHEETS.find((s)=>s.id===id);
+    if(!base) return;
+    // intentar usar aggregates del tab seleccionado, sino usar datos estáticos
+    const agg=AGGREGATES_BY_TAB&&selectedTab!=="TODAS"?AGGREGATES_BY_TAB[selectedTab]:null;
+    const byRecord=agg&&agg[base.codigo]?agg[base.codigo]:null;
+    result[id]=(base.controles||[]).map((c)=>{
+      let histData=[];
+      if(byRecord&&byRecord.controles&&byRecord.controles[c.name]){
+        const ov=byRecord.controles[c.name];
+        histData=Array.isArray(ov.hist)&&ov.hist.length?ov.hist:(c.hist&&Array.isArray(c.hist.data)?c.hist.data:[]);
+      } else {
+        histData=c.hist&&Array.isArray(c.hist.data)&&c.hist.data.length?c.hist.data:[];
+      }
+      const nums=histData.filter((v)=>typeof v==="number"&&Number.isFinite(v));
+      if(!nums.length) return null;
+      const avg=Math.round((nums.reduce((a,b)=>a+b,0)/nums.length)*100)/100;
+      return {name:c.name,avg,count:nums.length,unidad:c.unidad||""};
+    }).filter(Boolean);
+  });
+  return result;
+},[selectedTab]);
+const subtitleRegistro=selectedRegistro==="TODOS"?"Todos los registros":selectedRegistro;
+const qualityLotInfo=useMemo(()=>{
+  const lotInfoRaw=window.LOTE_INFO_PD02&&typeof window.LOTE_INFO_PD02==="object"
+    ? window.LOTE_INFO_PD02
+    : {};
+  const defaultKey=TAB_REFERENCE.find((name)=>Object.keys(lotInfoRaw).some((k)=>sameTabName(k,name)))||Object.keys(lotInfoRaw)[0]||"";
+  const selectedInfoKey=selectedTab!=="TODAS"
+    ? (Object.keys(lotInfoRaw).find((name)=>sameTabName(name,selectedTab))||defaultKey)
+    : defaultKey;
+  const data=lotInfoRaw[selectedInfoKey]||{};
+  return {
+    loteProveedor:data.lote_proveedor||"—",
+    loteTrazabilidad:data.lote_trazabilidad||"—",
+    exportado:data.exportado!=null&&data.exportado!==""?data.exportado:"—"
+  };
+},[selectedTab]);
+const productionRecords=useMemo(()=>{
+  const generated=window.PRODUCCION_AGGREGATES_GENERATED&&typeof window.PRODUCCION_AGGREGATES_GENERATED==="object"
+    ? window.PRODUCCION_AGGREGATES_GENERATED
+    : {};
+  return PRODUCTION_LINKS.map((item)=>{
+    const info=generated[item.codigo]||{};
+    const tabsFromData=safeStringArray(info.tabs);
+    const tabs=tabsFromData.length?tabsFromData:PRODUCTION_TAB_FALLBACK;
+    const matchTab=selectedProdTab==="TODAS"||tabs.some((name)=>sameTabName(name,selectedProdTab));
+    const byTab=info.byTab&&typeof info.byTab==="object"?info.byTab:{};
+    const selectedKey=selectedProdTab!=="TODAS"
+      ? Object.keys(byTab).find((tabName)=>sameTabName(tabName,selectedProdTab))
+      : "";
+    const selectedByTab=selectedKey&&byTab[selectedKey]&&typeof byTab[selectedKey].metrics==="object"
+      ? byTab[selectedKey].metrics
+      : (info.metrics&&typeof info.metrics==="object"?info.metrics:{});
+    const controles=Object.entries(selectedByTab)
+      .slice(0,MAX_PRODUCTION_METRICS)
+      .map(([name,metric])=>{
+        if(!metric||typeof metric!=="object") return null;
+        const histData=trimSeries(toNumericArray(metric.hist),MAX_PRODUCTION_POINTS);
+        const rawLabels=safeStringArray(metric.labels);
+        const histLabels=trimSeries(rawLabels,MAX_PRODUCTION_POINTS);
+        return {
+          name,
+          valor:typeof metric.valor==="number"&&Number.isFinite(metric.valor)?metric.valor:null,
+          hist:{
+            labels:histLabels.length===histData.length?histLabels:histData.map((_,i)=>`P${i+1}`),
+            data:histData
+          },
+          min:typeof metric.min==="number"&&Number.isFinite(metric.min)?metric.min:null,
+          max:typeof metric.max==="number"&&Number.isFinite(metric.max)?metric.max:null,
+          avg:typeof metric.avg==="number"&&Number.isFinite(metric.avg)?metric.avg:null
+        };
+      })
+      .filter(Boolean);
+    return {
+      ...item,
+      tabs,
+      tabsCount:typeof info.tabsCount==="number"&&info.tabsCount>0?info.tabsCount:tabs.length,
+      latestTab:typeof info.latestTab==="string"?info.latestTab:(tabs[tabs.length-1]||""),
+      latestDate:info.latestDate||"",
+      status:info.status||"ok",
+      error:info.error||"",
+      matchTab,
+      controles
+    };
+  });
+},[selectedProdTab]);
+const productionTabOptions=useMemo(()=>{
+  const ordered=[];
+  const seen=new Set();
+  const pushIfNew=(name)=>{
+    const clean=String(name||"").trim();
+    if(!clean||seen.has(clean)) return;
+    seen.add(clean);
+    ordered.push(clean);
+  };
+  PRODUCTION_TAB_FALLBACK.forEach(pushIfNew);
+  productionRecords.forEach((item)=>item.tabs.forEach(pushIfNew));
+  return ["TODAS",...ordered];
+},[productionRecords]);
+const productionActive=useMemo(()=>productionRecords.filter((item)=>item.matchTab),[productionRecords]);
+const productionWithData=useMemo(()=>productionActive.filter((item)=>item.controles.some((c)=>Array.isArray(c.hist.data)&&c.hist.data.length>=2)),[productionActive]);
+const productionMetricsCount=useMemo(()=>productionActive.reduce((acc,item)=>acc+item.controles.length,0),[productionActive]);
+const productionErrorCount=useMemo(()=>productionActive.filter((item)=>item.status==="error").length,[productionActive]);
+const productionPartialCount=useMemo(()=>productionActive.filter((item)=>item.status!=="error"&&!item.controles.some((c)=>Array.isArray(c.hist.data)&&c.hist.data.length>=2)&&item.controles.length>0).length,[productionActive]);
+const productionNoDataCount=useMemo(()=>productionActive.filter((item)=>item.status!=="error"&&item.controles.length===0).length,[productionActive]);
+const productionKnownTabs=useMemo(()=>productionTabOptions.filter((tab)=>tab!=="TODAS"),[productionTabOptions]);
+const productionAliasMap=useMemo(()=>{
+  const alias={};
+  productionKnownTabs.forEach((tab,idx)=>{
+    alias[tab]=`IA-${String(idx+1).padStart(3,"0")}`;
+  });
+  return alias;
+},[productionKnownTabs]);
+const productionDisplayName=(tabName)=>{
+  const clean=String(tabName||"").trim();
+  if(!clean) return "";
+  const key=Object.keys(productionAliasMap).find((name)=>sameTabName(name,clean))||clean;
+  const alias=productionAliasMap[key]||"";
+  return alias||key;
+};
+const qualityAliasMap=useMemo(()=>{
+  const alias={};
+  TAB_REFERENCE.forEach((tab,idx)=>{
+    alias[tab]=`IA-${String(idx+1).padStart(3,"0")}`;
+  });
+  return alias;
+},[]);
+const qualityDisplayName=(tabName)=>{
+  const clean=String(tabName||"").trim();
+  if(!clean) return "";
+  const key=TAB_REFERENCE.find((name)=>sameTabName(name,clean))||clean;
+  const alias=qualityAliasMap[key]||"";
+  return alias||key;
+};
+const productionLotAudit=useMemo(()=>productionKnownTabs.map((tab)=>{
+  const present=productionRecords.filter((item)=>item.tabs.some((name)=>sameTabName(name,tab))).map((item)=>item.codigo);
+  const missing=productionRecords.map((item)=>item.codigo).filter((code)=>!present.includes(code));
+  return {tab,present,missing,isComplete:missing.length===0};
+}),[productionKnownTabs,productionRecords]);
+const productionCompleteLots=useMemo(()=>productionLotAudit.filter((item)=>item.isComplete),[productionLotAudit]);
+const productionIncompleteLots=useMemo(()=>productionLotAudit.filter((item)=>!item.isComplete),[productionLotAudit]);
+const productionLatestRecords=useMemo(()=>productionRecords.map((item)=>({
+  codigo:item.codigo,
+  ultimaFecha:item.latestDate||"",
+  hoja:item.latestTab||"",
+  timestamp:parseUiDate(item.latestDate||"")
+})).sort((a,b)=>b.timestamp-a.timestamp),[productionRecords]);
+useEffect(()=>{
+  if(selectedProdTab==="TODAS"&&productionKnownTabs.length){
+    setSelectedProdTab(productionKnownTabs[0]);
+  }
+},[productionKnownTabs,selectedProdTab]);
+const productionCalc=useMemo(()=>{
+  const raw=window.CALCULOS_DASHBOARD_PRODUCCION&&typeof window.CALCULOS_DASHBOARD_PRODUCCION==="object"
+    ? window.CALCULOS_DASHBOARD_PRODUCCION
+    : null;
+  const byLot=raw&&raw.por_lote&&typeof raw.por_lote==="object"?raw.por_lote:{};
+  const lotListRaw=Array.isArray(raw&&raw.lotes_disponibles?raw.lotes_disponibles:[])
+    ? raw.lotes_disponibles
+    : [];
+  const lotList=lotListRaw.length?lotListRaw:Object.keys(byLot);
+  const selectedLot=selectedProdTab!=="TODAS"
+    ? lotList.find((lot)=>sameTabName(lot,selectedProdTab))||""
+    : (lotList[0]||"");
+  const selectedData=selectedLot&&byLot[selectedLot]?byLot[selectedLot]:null;
+
+  const rendimientoSeries=lotList.map((lot)=>{
+    const row=byLot[lot]||{};
+    const kpis=row.kpis||{};
+    return {
+      lot,
+      pre:typeof kpis.rendimiento_pre_limpieza_pct==="number"&&Number.isFinite(kpis.rendimiento_pre_limpieza_pct)?kpis.rendimiento_pre_limpieza_pct:null,
+      fin:typeof kpis.rendimiento_final_lote_pct==="number"&&Number.isFinite(kpis.rendimiento_final_lote_pct)?kpis.rendimiento_final_lote_pct:null
+    };
+  });
+
+  const corteSeries=lotList.map((lot)=>{
+    const row=byLot[lot]||{};
+    const kpis=row.kpis||{};
+    return typeof kpis.indice_dano_corte_pct==="number"&&Number.isFinite(kpis.indice_dano_corte_pct)
+      ? kpis.indice_dano_corte_pct
+      : null;
+  });
+
+  const humedadSeries=lotList.map((lot)=>{
+    const row=byLot[lot]||{};
+    const inps=row.inputs||{};
+    const h=inps.humedad_pd07_pct&&typeof inps.humedad_pd07_pct.valor==="number"&&Number.isFinite(inps.humedad_pd07_pct.valor)
+      ? inps.humedad_pd07_pct.valor
+      : null;
+    return h;
+  });
+
+  const tempSeries=lotList.map((lot)=>{
+    const row=byLot[lot]||{};
+    const inps=row.inputs||{};
+    const t=inps.temperatura_pd09_c&&typeof inps.temperatura_pd09_c.valor==="number"&&Number.isFinite(inps.temperatura_pd09_c.valor)
+      ? inps.temperatura_pd09_c.valor
+      : null;
+    return t;
+  });
+
+  const lotInfoRaw=window.LOTE_INFO_PD02&&typeof window.LOTE_INFO_PD02==="object"
+    ? window.LOTE_INFO_PD02
+    : {};
+  const selectedInfoKey=selectedProdTab!=="TODAS"
+    ? (Object.keys(lotInfoRaw).find((name)=>sameTabName(name,selectedProdTab))||selectedLot)
+    : (selectedLot||Object.keys(lotInfoRaw)[0]||"");
+  const _li=lotInfoRaw[selectedInfoKey]||{};
+  const loteProveedor=_li.lote_proveedor||"—";
+  const loteTrazabilidad=_li.lote_trazabilidad||"—";
+  const recepcionMp=_li.recepcion_mp!=null?_li.recepcion_mp:"—";
+  const exportado=_li.exportado!=null&&_li.exportado!==""?_li.exportado:"—";
+  return {
+    raw,
+    lotList,
+    selectedLot,
+    selectedData,
+    rendimientoSeries,
+    corteSeries,
+    humedadSeries,
+    tempSeries,
+    loteProveedor,
+    loteTrazabilidad,
+    recepcionMp,
+    exportado
+  };
+},[selectedProdTab]);
+
+useEffect(()=>{
+  setSelectedRegistro("TODOS");
+},[selectedTab]);
+useEffect(()=>{
+  if(selectedView==="CALIDAD") setSelectedRegistro("TODOS");
+},[selectedView]);
+
+useEffect(()=>{
+if(window._p)Object.values(window._p).forEach(x=>{try{x.destroy();}catch(e){}});
+window._p={};
+if(selectedView!=="PRODUCCION") return;
+const grd="rgba(255,255,255,0.06)",tk="#64748b",leg={labels:{color:"#cbd5e1",font:{size:10}}};
+const palette=["#22c55e","#0ea5e9","#f59e0b","#ef4444","#14b8a6","#eab308"];
+productionActive.forEach((record)=>{
+  const chartId=`ptrend-${record.codigo.replace(/[^A-Za-z0-9]/g,"")}`;
+  const cv=document.getElementById(chartId);
+  if(!cv) return;
+  const controls=record.controles.filter((c)=>c.hist&&Array.isArray(c.hist.data)&&c.hist.data.length>=2).slice(0,3);
+  if(!controls.length) return;
+  const labels=controls[0].hist.labels&&controls[0].hist.labels.length===controls[0].hist.data.length
+    ? controls[0].hist.labels
+    : controls[0].hist.data.map((_,i)=>`P${i+1}`);
+  const datasets=controls.map((c,idx)=>({
+    label:c.name,
+    data:c.hist.data,
+    borderColor:palette[idx%palette.length],
+    backgroundColor:palette[idx%palette.length]+"33",
+    tension:.35,
+    borderWidth:2,
+    pointRadius:3
+  }));
+  window._p[chartId]=new Chart(cv,{type:"line",data:{labels,datasets},options:{responsive:true,plugins:{legend:leg,datalabels:chartDataLabelOptions()},scales:{y:{grid:{color:grd},ticks:{color:tk}},x:{grid:{color:grd},ticks:{color:tk}}}}});
+});
+const prodPie=document.getElementById("chp");
+if(prodPie){
+  window._p.chp=new Chart(prodPie,{type:"doughnut",data:{labels:["Con tendencia","Parcial","Error","Sin datos"],datasets:[{data:[productionWithData.length,productionPartialCount,productionErrorCount,productionNoDataCount],backgroundColor:["rgba(34,197,94,.8)","rgba(245,158,11,.8)","rgba(239,68,68,.8)","rgba(100,116,139,.4)"],borderColor:["#16a34a","#d97706","#b91c1c","#475569"],borderWidth:2}]},options:{responsive:true,plugins:{legend:{labels:{color:"#94a3b8",font:{size:10}}},datalabels:doughnutLabelOptions()}}});
+}
+
+const lotLabels=productionCalc.lotList;
+const lotRend=document.getElementById("prod-lot-rendimiento");
+if(lotRend&&lotLabels.length){
+  window._p.prodLotRend=new Chart(lotRend,{
+    type:"line",
+    data:{
+      labels:lotLabels,
+      datasets:[
+        {
+          label:"Pre-limpieza %",
+          data:productionCalc.rendimientoSeries.map((x)=>x.pre),
+          borderColor:"#22c55e",
+          backgroundColor:"rgba(34,197,94,.2)",
+          borderWidth:2,
+          tension:.25,
+          pointRadius:3
+        },
+        {
+          label:"Final lote %",
+          data:productionCalc.rendimientoSeries.map((x)=>x.fin),
+          borderColor:"#0ea5e9",
+          backgroundColor:"rgba(14,165,233,.2)",
+          borderWidth:2,
+          tension:.25,
+          pointRadius:3
+        }
+      ]
+    },
+    options:{responsive:true,plugins:{legend:leg,datalabels:chartDataLabelOptions({percent:true})},scales:{y:{grid:{color:grd},ticks:{color:tk}},x:{grid:{color:grd},ticks:{color:tk}}}}
+  });
+}
+
+const lotWaterfall=document.getElementById("prod-lot-waterfall");
+if(lotWaterfall&&productionCalc.selectedData&&productionCalc.selectedData.waterfall_mermas){
+  const wf=productionCalc.selectedData.waterfall_mermas;
+  const data=[
+    typeof wf.inicio_pd02_kg==="number"?wf.inicio_pd02_kg:0,
+    typeof wf.menos_merma_cilindros_pd05_kg==="number"?wf.menos_merma_cilindros_pd05_kg:0,
+    typeof wf.menos_merma_horno_pd09_kg==="number"?wf.menos_merma_horno_pd09_kg:0,
+    typeof wf.final_pd11_kg==="number"?wf.final_pd11_kg:0
+  ];
+  window._p.prodLotWaterfall=new Chart(lotWaterfall,{
+    type:"bar",
+    data:{
+      labels:["Inicio PD.02","Merma Cilindros PD.05","Merma Horno PD.09","Final PD.11"],
+      datasets:[{label:"Kg",data,backgroundColor:["rgba(34,197,94,.7)","rgba(239,68,68,.7)","rgba(245,158,11,.7)","rgba(14,165,233,.7)"],borderColor:["#22c55e","#ef4444","#f59e0b","#0ea5e9"],borderWidth:1.5}]
+    },
+    options:{responsive:true,plugins:{legend:{display:false},datalabels:chartDataLabelOptions({suffix:" kg",decimals:0})},scales:{y:{grid:{color:grd},ticks:{color:tk}},x:{grid:{color:grd},ticks:{color:tk}}}}
+  });
+}
+
+const lotQuality=document.getElementById("prod-lot-calidad");
+if(lotQuality&&lotLabels.length){
+  window._p.prodLotQuality=new Chart(lotQuality,{
+    type:"line",
+    data:{
+      labels:lotLabels,
+      datasets:[
+        {
+          label:"Humedad %",
+          data:productionCalc.humedadSeries,
+          borderColor:"#22d3ee",
+          backgroundColor:"rgba(34,211,238,.2)",
+          borderWidth:2,
+          pointRadius:3,
+          tension:.25
+        },
+        {
+          label:"Corte %",
+          data:productionCalc.corteSeries,
+          borderColor:"#ef4444",
+          backgroundColor:"rgba(239,68,68,.2)",
+          borderWidth:2,
+          pointRadius:3,
+          tension:.25
+        },
+        {
+          label:"Temp C",
+          data:productionCalc.tempSeries,
+          borderColor:"#eab308",
+          backgroundColor:"rgba(234,179,8,.2)",
+          borderWidth:2,
+          pointRadius:3,
+          tension:.25
+        }
+      ]
+    },
+    options:{responsive:true,plugins:{legend:leg,datalabels:chartDataLabelOptions()},scales:{y:{grid:{color:grd},ticks:{color:tk}},x:{grid:{color:grd},ticks:{color:tk}}}}
+  });
+}
+
+const lotMix=document.getElementById("prod-lot-mix");
+if(lotMix&&productionCalc.selectedData&&productionCalc.selectedData.inputs){
+  const inp=productionCalc.selectedData.inputs;
+  const medium=inp.medium_pd11&&typeof inp.medium_pd11.valor==="number"?inp.medium_pd11.valor:0;
+  const midget=inp.midget_pd11&&typeof inp.midget_pd11.valor==="number"?inp.midget_pd11.valor:0;
+  const tiny=inp.tiny_pd11&&typeof inp.tiny_pd11.valor==="number"?Math.max(inp.tiny_pd11.valor,0):0;
+  window._p.prodLotMix=new Chart(lotMix,{
+    type:"doughnut",
+    data:{labels:["Medium","Midget","Tiny"],datasets:[{data:[medium,midget,tiny],backgroundColor:["rgba(34,197,94,.8)","rgba(14,165,233,.8)","rgba(245,158,11,.8)"],borderColor:["#22c55e","#0ea5e9","#f59e0b"],borderWidth:1.5}]},
+    options:{responsive:true,plugins:{legend:{labels:{color:"#cbd5e1",font:{size:10}}},datalabels:doughnutLabelOptions()}}
+  });
+}
+
+const lotTrace=document.getElementById("prod-lot-trazabilidad");
+if(lotTrace&&productionCalc.selectedData&&productionCalc.selectedData.inputs){
+  const inp=productionCalc.selectedData.inputs;
+  const entrada=inp.kg_entrada_pd02&&typeof inp.kg_entrada_pd02.valor==="number"?inp.kg_entrada_pd02.valor:0;
+  const salida=inp.kg_salida_pd03&&typeof inp.kg_salida_pd03.valor==="number"?inp.kg_salida_pd03.valor:0;
+  const sellado=inp.kg_sellados_pd11&&typeof inp.kg_sellados_pd11.valor==="number"?inp.kg_sellados_pd11.valor:0;
+  const stock=inp.stock_pd12&&typeof inp.stock_pd12.valor==="number"?inp.stock_pd12.valor:0;
+  const carga=inp.carga_pd13&&typeof inp.carga_pd13.valor==="number"?inp.carga_pd13.valor:0;
+  window._p.prodLotTrace=new Chart(lotTrace,{
+    type:"bar",
+    data:{
+      labels:["Entrada PD.02","Salida PD.03","Sellado PD.11","Stock PD.12","Carga PD.13"],
+      datasets:[{data:[entrada,salida,sellado,stock,carga],backgroundColor:["rgba(34,197,94,.75)","rgba(14,165,233,.75)","rgba(234,179,8,.75)","rgba(167,139,250,.75)","rgba(239,68,68,.75)"],borderWidth:1.5,borderColor:["#22c55e","#0ea5e9","#eab308","#a78bfa","#ef4444"]}]
+    },
+    options:{responsive:true,plugins:{legend:{display:false},datalabels:chartDataLabelOptions({suffix:" kg",decimals:0})},scales:{y:{grid:{color:grd},ticks:{color:tk}},x:{grid:{display:false},ticks:{color:tk}}}}
+  });
+}
+
+const lotKpis=document.getElementById("prod-lot-kpis");
+if(lotKpis&&productionCalc.selectedData&&productionCalc.selectedData.kpis){
+  const k=productionCalc.selectedData.kpis;
+  const valPre=typeof k.rendimiento_pre_limpieza_pct==="number"?k.rendimiento_pre_limpieza_pct:0;
+  const valFin=typeof k.rendimiento_final_lote_pct==="number"?k.rendimiento_final_lote_pct:0;
+  const valCorte=typeof k.indice_dano_corte_pct==="number"?k.indice_dano_corte_pct:0;
+  window._p.prodLotKpis=new Chart(lotKpis,{
+    type:"bar",
+    data:{
+      labels:["Yield Pre %","Yield Final %","Corte %"],
+      datasets:[{data:[valPre,valFin,valCorte],backgroundColor:["rgba(34,197,94,.75)","rgba(14,165,233,.75)",valCorte>5?"rgba(239,68,68,.8)":"rgba(234,179,8,.75)"],borderColor:["#22c55e","#0ea5e9",valCorte>5?"#ef4444":"#eab308"],borderWidth:1.5}]
+    },
+    options:{responsive:true,plugins:{legend:{display:false},datalabels:chartDataLabelOptions({percent:true})},scales:{y:{grid:{color:grd},ticks:{color:tk}},x:{grid:{display:false},ticks:{color:tk}}}}
+  });
+}
+},[selectedView,productionActive,productionWithData.length,productionPartialCount,productionErrorCount,productionNoDataCount,productionCalc]);
+
+useEffect(()=>{
+if(window._c)Object.values(window._c).forEach(x=>{try{x.destroy();}catch(e){}});
+window._c={};
+const grd="rgba(255,255,255,0.06)",tk="#64748b",leg={labels:{color:"#cbd5e1",font:{size:10}}};
+
+const palette=["#06b6d4","#a78bfa","#f59e0b","#22c55e","#fb7185","#38bdf8"];
+trendSheets.forEach((sheet)=>{
+  const cv=document.getElementById(`trend-${sheet.id}`);
+  if(!cv) return;
+  if(!sheet.matchTab) return;
+  let controlesSource=sheet.controles||[];
+  const histControls=controlesSource.filter(c=>typeof c.valor==="number"&&c.hist&&Array.isArray(c.hist.data)&&c.hist.data.length);
+  if(!histControls.length) return;
+  const labels=histControls[0].hist.labels||histControls[0].hist.data.map((_,i)=>`M${i+1}`);
+  const datasets=[];
+  histControls.slice(0,3).forEach((c,idx)=>{
+    const col=palette[idx%palette.length];
+    datasets.push({
+      label:c.name,
+      data:c.hist.data,
+      borderColor:col,
+      backgroundColor:col+"33",
+      tension:.35,
+      borderWidth:2,
+      pointBackgroundColor:c.hist.data.map(v=>ptCol(v,c.limite,c.op)),
+      pointRadius:4
+    });
+    if(typeof c.limite==="number") datasets.push(limLine(c.hist.data.length,c.limite,`Lim ${c.name}`,"#ef4444"));
+  });
+  window._c[`trend_${sheet.id}`]=new Chart(cv,{type:"line",data:{labels,datasets},options:{responsive:true,plugins:{legend:leg,datalabels:chartDataLabelOptions()},scales:{y:{grid:{color:grd},ticks:{color:tk}},x:{grid:{color:grd},ticks:{color:tk}}}}});
+});
+
+/* CH8: Doughnut resumen */
+const noD=activeSheets.filter(s=>s.noData||s.listadoMaestro).length,wN=warns.length,aL=alertas.length,okN=Math.max(conf-wN,0);
+const e8=document.getElementById("ch8");
+if(e8)window._c.c8=new Chart(e8,{type:"doughnut",data:{labels:["Conforme","Advertencia","No Conforme","Sin Datos/Maestro"],datasets:[{data:[okN,wN,aL,noD],backgroundColor:["rgba(34,197,94,.8)","rgba(245,158,11,.8)","rgba(239,68,68,.8)","rgba(100,116,139,.4)"],borderColor:["#16a34a","#d97706","#b91c1c","#475569"],borderWidth:2}]},options:{responsive:true,plugins:{legend:{labels:{color:"#94a3b8",font:{size:10}}},datalabels:doughnutLabelOptions()}}});
+},[selectedTab,selectedRegistro,activeSheets.length,trendSheets]);
+
+return(
+<div className="min-h-screen relative">
+
+  <div className="fixed left-1 md:left-3 top-16 z-50 w-[140px] rounded-lg border border-cyan-900/50 bg-slate-950/95 p-2 flex flex-col gap-1.5 max-h-screen overflow-y-auto">
+    <p className="text-[10px] text-slate-500 uppercase tracking-wide text-center pt-1">Interfaz</p>
+    <button
+      onClick={()=>{
+        if(selectedView==="PRODUCCION"){
+          setSidebarProdOpen((open)=>!open);
+          return;
+        }
+        setSelectedView("PRODUCCION");
+        setSidebarProdOpen(true);
+      }}
+      className={"w-full px-2 py-1.5 rounded text-xs border font-bold "+(selectedView==="PRODUCCION"?"bg-green-900/40 border-green-500 text-green-300":"bg-slate-900/40 border-slate-700 text-slate-400")}
+    >
+      Produccion
+    </button>
+    {selectedView==="PRODUCCION"&&sidebarProdOpen&&(
+      <div className="flex flex-col gap-1 pr-0.5 max-h-56 overflow-y-auto">
+        {productionKnownTabs.map((tab)=>(
+          <button
+            key={`prod-side-${tab}`}
+            onClick={()=>setSelectedProdTab(tab)}
+            className={"w-full text-left px-2 py-1 rounded text-[10px] border "+(selectedProdTab===tab?"bg-green-900/40 border-green-500 text-green-200":"bg-slate-900/40 border-slate-700 text-slate-400")}
+            title={tab}
+          >
+            {productionDisplayName(tab)}
+          </button>
+        ))}
+      </div>
+    )}
+    <div className="border-t border-slate-800/60 mt-0.5"></div>
+    <button
+      onClick={()=>{
+        if(selectedView==="CALIDAD"){
+          setSidebarQualityOpen((open)=>!open);
+          return;
+        }
+        setSelectedView("CALIDAD");
+        setSidebarQualityOpen(true);
+      }}
+      className={"w-full px-2 py-1.5 rounded text-xs border font-bold "+(selectedView==="CALIDAD"?"bg-cyan-900/40 border-cyan-500 text-cyan-300":"bg-slate-900/40 border-slate-700 text-slate-400")}
+    >
+      Calidad
+    </button>
+    {selectedView==="CALIDAD"&&sidebarQualityOpen&&(
+      <div className="flex flex-col gap-1 pr-0.5 max-h-56 overflow-y-auto">
+        <button
+          onClick={()=>setSelectedTab("TODAS")}
+          className={"w-full text-left px-2 py-1 rounded text-[10px] border "+(selectedTab==="TODAS"?"bg-cyan-900/40 border-cyan-500 text-cyan-200":"bg-slate-900/40 border-slate-700 text-slate-400")}
+        >
+          TODAS
+        </button>
+        {TAB_REFERENCE.map((tab)=>(
+          <button
+            key={`qal-side-${tab}`}
+            onClick={()=>setSelectedTab(tab)}
+            className={"w-full text-left px-2 py-1 rounded text-[10px] border "+(selectedTab===tab?"bg-cyan-900/40 border-cyan-500 text-cyan-200":"bg-slate-900/40 border-slate-700 text-slate-400")}
+            title={tab}
+          >
+            {qualityDisplayName(tab)}
+          </button>
+        ))}
+      </div>
+    )}
+  </div>
+
+  {selectedView==="PRODUCCION"?(
+  <div className="min-h-screen p-4 md:p-6 md:pl-44">
+    <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-green-900/40 pb-4">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-extrabold text-green-400 tracking-tight">CONTROL ROOM - PRODUCCION</h1>
+        <p className="text-slate-400 text-sm mt-1">Proceso, mermas y porcentajes operativos RC.PD</p>
+      </div>
+      <div className="text-right mono text-xs space-y-1">
+        <div className="text-green-400 font-bold">MODO PRODUCCION</div>
+        <div className="text-slate-500">En la misma interfaz, sin salir de Calidad</div>
+      </div>
+    </div>
+
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="card-base card-dark p-4"><p className="text-slate-500 text-xs uppercase tracking-widest mb-1">Lote de Proveedor</p><p className="text-2xl font-bold text-green-400 truncate" title={productionCalc.loteProveedor}>{productionCalc.loteProveedor}</p></div>
+      <div className="card-base card-dark p-4"><p className="text-slate-500 text-xs uppercase tracking-widest mb-1">Lote de Trazabilidad</p><p className="text-2xl font-bold text-cyan-400 truncate" title={productionCalc.loteTrazabilidad}>{productionCalc.loteTrazabilidad}</p></div>
+      <div className="card-base card-dark p-4"><p className="text-slate-500 text-xs uppercase tracking-widest mb-1">Recepcion MP</p><p className="text-3xl font-bold text-yellow-400">{productionCalc.recepcionMp}</p></div>
+      <div className="card-base card-dark p-4"><p className="text-slate-500 text-xs uppercase tracking-widest mb-1">Exportado</p><p className="text-lg md:text-2xl font-bold text-green-400" title={productionCalc.exportado}>{productionCalc.exportado}</p></div>
+    </div>
+
+    <div className="card-base card-dark p-4 mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <h2 className="text-sm font-bold text-cyan-300 uppercase tracking-wide">Graficos de Tendencia por Lote (Lo que pediste)</h2>
+        <span className="text-xs text-slate-500">Lote evaluado: <span className="mono text-cyan-300">{productionDisplayName(productionCalc.selectedLot)||"N/D"}</span></span>
+      </div>
+      {productionCalc.selectedData?(
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <div className="rounded border border-emerald-800/30 bg-emerald-950/10 p-3">
+          <p className="text-xs text-emerald-300 font-bold mb-2">Trazabilidad del lote</p>
+          <canvas id="prod-lot-trazabilidad" height="160"></canvas>
+        </div>
+        <div className="rounded border border-indigo-800/30 bg-indigo-950/10 p-3">
+          <p className="text-xs text-indigo-300 font-bold mb-2">KPIs criticos del lote</p>
+          <canvas id="prod-lot-kpis" height="160"></canvas>
+        </div>
+        <div className="rounded border border-cyan-800/30 bg-cyan-950/10 p-3">
+          <p className="text-xs text-cyan-300 font-bold mb-2">1) Rendimiento pre-limpieza vs final</p>
+          <canvas id="prod-lot-rendimiento" height="160"></canvas>
+        </div>
+        <div className="rounded border border-red-800/30 bg-red-950/10 p-3">
+          <p className="text-xs text-red-300 font-bold mb-2">2) Cascada de merma total (waterfall)</p>
+          <canvas id="prod-lot-waterfall" height="160"></canvas>
+        </div>
+        <div className="rounded border border-yellow-800/30 bg-yellow-950/10 p-3">
+          <p className="text-xs text-yellow-300 font-bold mb-2">3) Calidad e inocuidad (humedad, corte, temperatura)</p>
+          <canvas id="prod-lot-calidad" height="160"></canvas>
+        </div>
+        <div className="rounded border border-green-800/30 bg-green-950/10 p-3">
+          <p className="text-xs text-green-300 font-bold mb-2">4) Mix de calidades + conciliacion comercial</p>
+          <canvas id="prod-lot-mix" height="160"></canvas>
+          <div className="mt-3 text-xs text-slate-300 grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="rounded bg-black/20 border border-slate-700/40 p-2">
+              <p className="text-slate-500">Conciliacion Almacen - Carga</p>
+              <p className="mono text-cyan-300">{productionCalc.selectedData.kpis&&typeof productionCalc.selectedData.kpis.conciliacion_almacen_carga_delta==="number"?productionCalc.selectedData.kpis.conciliacion_almacen_carga_delta:"N/D"}</p>
+            </div>
+            <div className="rounded bg-black/20 border border-slate-700/40 p-2">
+              <p className="text-slate-500">PCC Humedad</p>
+              <p className={(productionCalc.selectedData.kpis&&productionCalc.selectedData.kpis.pcc_humedad_estado==="ROJO"?"text-red-400":"text-green-400")+" font-bold"}>{productionCalc.selectedData.kpis&&productionCalc.selectedData.kpis.pcc_humedad_estado?productionCalc.selectedData.kpis.pcc_humedad_estado:"N/D"}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      ):(
+      <div className="text-xs text-yellow-300 bg-yellow-900/20 border border-yellow-700/30 rounded p-3">No hay datos de calculo por lote para la seleccion actual.</div>
+      )}
+    </div>
+
+    <h2 className="text-base font-bold text-green-400 mb-4 uppercase tracking-wide">Tendencias de Produccion</h2>
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
+      {productionActive.map((item)=>{
+        const chartId=`ptrend-${item.codigo.replace(/[^A-Za-z0-9]/g,"")}`;
+        const hasTrend=item.controles.some((c)=>Array.isArray(c.hist.data)&&c.hist.data.length>=2);
+        return(
+        <div key={item.codigo+"-trend"} className={"card-base p-4 "+(item.status!=="error"?"card-ok":"card-alert")}>
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <span className="mono text-xs text-green-300 font-bold bg-green-900/30 border border-green-700/30 px-2 py-0.5 rounded">{item.codigo}</span>
+            <a href={item.url} target="_blank" rel="noopener noreferrer" className="btn-hoja">&#8599; Abrir</a>
+          </div>
+          <p className="text-xs text-slate-500 mb-2">Ultima hoja: {item.latestTab||"N/D"} | Fecha: {item.latestDate||"N/D"}</p>
+          {hasTrend?<canvas id={chartId} height="150"></canvas>:<div className="text-xs text-slate-500 bg-black/20 rounded p-3">Sin tendencia numerica detectable.</div>}
+        </div>
+      );})}
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div className="card-base card-dark p-5 flex flex-col items-center justify-center">
+        <h3 className="text-sm font-bold text-green-300 mb-3">Estado General Produccion</h3>
+        <div style={{maxWidth:"220px",width:"100%"}}>
+          <canvas id="chp"></canvas>
+        </div>
+      </div>
+      <div className="md:col-span-2 card-base card-dark p-5">
+        <h3 className="text-sm font-bold text-green-300 mb-3">POES - Proceso Operativo ({selectedProdTab})</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <div className="bg-green-900/20 border border-green-600/30 rounded-lg p-3">
+            <p className="text-green-400 font-bold mb-1">Registros con tendencia</p>
+            <p className="text-slate-300">{productionWithData.length} de {productionActive.length} registros con series detectadas.</p>
+            <p className="text-slate-500 mt-1">Actualización por pestaña de Producción.</p>
+          </div>
+          <div className="bg-yellow-900/20 border border-yellow-600/30 rounded-lg p-3">
+            <p className="text-yellow-400 font-bold mb-1">Registros parciales</p>
+            <p className="text-slate-300">{productionPartialCount} registro(s) con datos sin tendencia suficiente.</p>
+            <p className="text-slate-500 mt-1">Requieren más puntos numéricos para curva.</p>
+          </div>
+          <div className={(productionErrorCount?"bg-red-900/20 border-red-600/30":"bg-slate-900/20 border-slate-700/30")+" border rounded-lg p-3"}>
+            <p className={(productionErrorCount?"text-red-400":"text-slate-400")+" font-bold mb-1"}>{productionErrorCount?"Errores activos":"Sin errores de lectura"}</p>
+            <p className="text-slate-300">{productionErrorCount?`${productionErrorCount} registro(s) con error de lectura.`:`Todos los enlaces activos se leyeron correctamente.`}</p>
+            <p className="text-slate-500 mt-1">Abrir interfaz RC.PD para validar detalle.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h2 className="text-base font-bold text-green-400 mb-4 uppercase tracking-wide">Los {productionRecords.length} Registros de Produccion</h2>
+    {productionActive.length===0&&(
+    <div className="mb-4 text-xs text-yellow-400 bg-yellow-900/20 border border-yellow-700/30 rounded p-3">
+      No se encontraron registros que coincidan con la pestaña {selectedProdTab}.
+    </div>)}
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      {productionActive.map((item)=>{
+        const statusOk=item.status!=="error";
+        return(
+        <div key={item.codigo} className={"card-base p-4 "+(statusOk?"card-ok":"card-alert")}>
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <span className="mono text-xs text-green-300 font-bold bg-green-900/30 border border-green-700/30 px-2 py-0.5 rounded">{item.codigo}</span>
+            <span className={"text-xs font-bold "+(statusOk?"text-green-400":"text-red-400")}>{statusOk?"LECTURA OK":"ERROR"}</span>
+          </div>
+          <p className="text-xs text-slate-400 mb-1">Pestañas: <span className="text-slate-200">{item.tabsCount}</span></p>
+          <p className="text-xs text-slate-400 mb-1">Última pestaña: <span className="text-slate-200">{item.latestTab||"N/D"}</span></p>
+          <p className="text-xs text-slate-500 mb-2">Última fecha: {item.latestDate||"N/D"}</p>
+          <div className="space-y-1 mb-3 max-h-32 overflow-auto pr-1">
+            {item.controles.slice(0,5).map((c,idx)=>(
+              <div key={item.codigo+"-c-"+idx} className="text-xs bg-black/20 rounded border border-slate-700/30 p-2 flex items-center justify-between gap-2">
+                <span className="text-slate-300 truncate">{c.name}</span>
+                <span className="mono text-green-300 shrink-0">{typeof c.valor==="number"?c.valor:"N/D"}</span>
+              </div>
+            ))}
+            {!item.controles.length&&<p className="text-xs text-slate-600">Sin métricas numéricas para esta selección.</p>}
+          </div>
+          <div className="flex flex-wrap gap-1 mb-3">
+            {item.tabs.slice(0,8).map((tab,idx)=>(
+              <span key={item.codigo+"-"+idx} className="px-2 py-0.5 rounded bg-slate-900/60 border border-slate-700/50 text-[11px] text-slate-300">{tab}</span>
+            ))}
+          </div>
+          {item.error&&<p className="text-[11px] text-red-300 mb-2">{item.error}</p>}
+          <a href={item.url} target="_blank" rel="noopener noreferrer" className="btn-hoja">&#8599; Abrir interfaz {item.codigo}</a>
+        </div>
+      );})}
+    </div>
+
+    <div className="mt-8">
+      <h2 className="text-base font-bold text-green-400 mb-4 uppercase tracking-wide">Cobertura de Lotes y Registros - Produccion</h2>
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <div className="card-base card-dark p-4">
+          <h3 className="text-sm font-bold text-green-300 mb-3">Lotes completos</h3>
+          {productionCompleteLots.length===0?<p className="text-xs text-slate-500">Todavía no hay lotes con todos los registros RC.PD completos.</p>:<div className="space-y-2">{productionCompleteLots.map(item=>(<div key={item.tab} className="rounded border border-green-700/30 bg-green-950/20 p-3 text-xs"><span className="mono text-green-300 font-bold">{item.tab}</span><span className="text-slate-400 ml-2">{item.present.length} de {productionRecords.length} registros</span></div>))}</div>}
+        </div>
+        <div className="card-base card-dark p-4">
+          <h3 className="text-sm font-bold text-yellow-300 mb-3">Lotes con registros faltantes</h3>
+          <div className="space-y-2 max-h-96 overflow-auto pr-1">
+            {productionIncompleteLots.map(item=>(
+            <div key={item.tab} className="rounded border border-yellow-700/30 bg-yellow-950/10 p-3 text-xs">
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <span className="mono text-yellow-300 font-bold">{item.tab}</span>
+                <span className="text-slate-500">{item.present.length}/{productionRecords.length}</span>
+              </div>
+              <p className="text-slate-400">Faltan: {item.missing.join(", ")}</p>
+            </div>))}
+          </div>
+        </div>
+        <div className="card-base card-dark p-4">
+          <h3 className="text-sm font-bold text-cyan-300 mb-3">Ultimas Fechas por Registro</h3>
+          <div className="space-y-2 max-h-96 overflow-auto pr-1">
+            {productionLatestRecords.map(item=>(
+            <div key={item.codigo} className="rounded border border-cyan-800/30 bg-cyan-950/10 p-3 text-xs">
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <span className="mono text-cyan-300 font-bold">{item.codigo}</span>
+                <span className="text-slate-300">{item.ultimaFecha||"SIN FECHA"}</span>
+              </div>
+              <p className="text-slate-500 mt-1">Hoja/Lote referencia: {item.hoja||"N/D"}</p>
+              <p className="text-slate-600 mt-1">Fuente: Todas las hojas del link de Producción</p>
+            </div>))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  ):(
+<div className="min-h-screen p-4 md:p-6 md:pl-44">
+
+  {/* ===== HEADER ===== */}
+  <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-cyan-900/40 pb-4">
+    <div>
+      <h1 className="text-2xl md:text-3xl font-extrabold text-cyan-400 tracking-tight">CONTROL ROOM - CALIDAD FSSC 22000</h1>
+      <p className="text-slate-400 text-sm mt-1">INGAMA Beneficiadora &mdash; {subtitleLote} &mdash; {subtitleRegistro}</p>
+    </div>
+    <div className="text-right mono text-xs space-y-1">
+      <div className="text-green-400 font-bold">SISTEMA ACTIVO</div>
+      <div className="text-slate-500">Ultima actualizacion: 31/03/2026</div>
+    </div>
+  </div>
+
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div className="card-base card-dark p-4"><p className="text-slate-500 text-xs uppercase tracking-widest mb-1">Lote de Proveedor</p><p className="text-2xl font-bold text-green-400 truncate" title={qualityLotInfo.loteProveedor}>{qualityLotInfo.loteProveedor}</p></div>
+    <div className="card-base card-dark p-4"><p className="text-slate-500 text-xs uppercase tracking-widest mb-1">Lote de Trazabilidad</p><p className="text-2xl font-bold text-cyan-400 truncate" title={qualityLotInfo.loteTrazabilidad}>{qualityLotInfo.loteTrazabilidad}</p></div>
+    <div className="card-base card-dark p-4"><p className="text-slate-500 text-xs uppercase tracking-widest mb-1">Exportado</p><p className="text-lg md:text-2xl font-bold text-green-400" title={qualityLotInfo.exportado}>{qualityLotInfo.exportado}</p></div>
+  </div>
+
+  {/* ===== KPIs ===== */}
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    {[
+      {l:"CUMPLIMIENTO",v:cPct+"%",s:conf+"/"+conD.length+" controles OK",c:"text-green-400"},
+      {l:"ALERTAS",v:alertas.length,s:"No conformidades activas",c:alertas.length?"text-red-400 blink":"text-slate-500"},
+      {l:"ADVERTENCIAS",v:warns.length,s:"Cerca del limite critico",c:warns.length?"text-yellow-400":"text-slate-500"},
+      {l:"DATOS REALES",v:datosRealesActivos+"/"+activeSheets.length,s:"Registros activos con consolidado publico",c:"text-cyan-400"}
+    ].map((k,i)=>(
+    <div key={i} className="card-base card-dark p-4">
+      <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">{k.l}</p>
+      <p className={"text-3xl font-bold "+k.c}>{k.v}</p>
+      <p className="text-slate-600 text-xs mt-1">{k.s}</p>
+    </div>))}
+  </div>
+
+  {/* ===== ALERTAS CRITICAS ===== */}
+  {alertas.length>0&&(
+  <div className="mb-6 p-4 rounded-xl border border-red-700/50 bg-red-950/30">
+    <h2 className="text-base font-bold text-red-400 mb-3 flex items-center gap-2">
+      <span className="blink text-lg">&#9888;</span>
+      <span className="blink">ALERTAS CRITICAS ACTIVAS ({alertas.length})</span>
+    </h2>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      {alertas.map(s=>(
+      <div key={s.id} className="card-base card-alert pulse-red p-4">
+        <div className="flex items-start justify-between mb-2 gap-2">
+          <div>
+            <span className="mono text-xs text-red-300 bg-red-900/40 px-2 py-0.5 rounded font-bold">{s.codigo}</span>
+            <p className="text-white text-xs font-semibold leading-tight mt-1">{s.nombre}</p>
+            <p className="text-slate-500 text-xs mono mt-0.5">Hoja: {s.hojaActiva} | {s.ultimaFecha}</p>
+          </div>
+        </div>
+        {s.controles.filter(fuera).map((c,i)=>(
+        <div key={i} className="mt-2 text-xs bg-red-900/30 border border-red-700/30 rounded p-2">
+          <span className="text-red-200 font-bold">{c.name}:</span>
+          <span className="text-red-100 mono ml-1">{c.valor}{c.unidad}</span>
+          <span className="text-slate-500 ml-1">vs limite {c.op==="min"?">=":(c.op==="max"?"<":"")}{c.limite}{typeof c.limite==="number"?c.unidad:""}</span>
+          <span className="text-red-400 font-bold ml-2">FUERA</span>
+        </div>))}
+        <a href={s.hojaDirecta} target="_blank" rel="noopener noreferrer" className="btn-hoja btn-alerta mt-3 inline-block">
+          &#8599; Ver lote {selectedTab==="TODAS"?s.nombreHoja:selectedTab}
+        </a>
+      </div>))}
+    </div>
+  </div>)}
+
+  {/* ===== LEYENDA ===== */}
+  <div className="flex flex-wrap gap-4 mb-6 text-xs text-slate-500">
+    <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-red-500 inline-block"></span>Punto ROJO = supera limite</span>
+    <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-yellow-400 inline-block"></span>Punto AMARILLO = cerca del limite</span>
+    <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-green-500 inline-block"></span>Punto VERDE = conforme</span>
+    <span className="flex items-center gap-1"><span className="inline-block w-6 border-t-2 border-dashed border-red-500"></span> Linea de puntos = Limite critico</span>
+  </div>
+
+  {/* ===== TENDENCIAS DINAMICAS (TODOS LOS REGISTROS) ===== */}
+  <h2 className="text-base font-bold text-cyan-400 mb-4 uppercase tracking-wide">Tendencias con Limites Criticos - Todos los Registros</h2>
+  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-4">
+    {trendSheets.map((s)=>{
+      const st=stSheet(s);
+      const cardClass=!s.matchTab?"card-nd opacity-70":st==="alert"?"card-alert":st==="warn"?"card-warn":"card-ok";
+      return (
+      <div key={"trend-card-"+s.id} className={"card-base p-4 "+cardClass}>
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <div>
+            <p className="mono text-xs text-cyan-500 font-bold">{s.codigo}</p>
+            <h3 className="text-sm font-bold text-slate-200 leading-tight">{s.nombre}</h3>
+            <p className="text-slate-500 text-xs mt-0.5">{s.ultimaFecha} | Lote: {s.hojaActiva}</p>
+          </div>
+          <a href={s.hojaDirecta||s.link} target="_blank" rel="noopener noreferrer" className={"btn-hoja "+(st==="alert"?"btn-alerta":"")}>
+            &#8599; {selectedTab==="TODAS"?"Registro":"Lote "+selectedTab}
+          </a>
+        </div>
+        {!s.matchTab&&selectedTab!=="TODAS"&&<p className="text-xs text-slate-500 mb-2">No aplica para {selectedTab}</p>}
+        {s.matchTab&&selectedTab!=="TODAS"&&s.dataSource==="base_registro"&&<div className="text-xs text-yellow-300 bg-yellow-900/20 border border-yellow-700/30 rounded p-3 mb-2">Sin consolidado publico para {selectedTab} en este registro. Se muestra base validada del registro.</div>}
+        {s.matchTab&&selectedTab!=="TODAS"&&s.promedioMuestras&&s.hasAggregateTrend&&<div className="text-xs text-cyan-300 bg-cyan-950/20 border border-cyan-800/30 rounded p-3 mb-2">Promedio operativo calculado con {s.promedioMuestras} hoja(s) para este nombre.</div>}
+        {s.matchTab&&selectedTab!=="TODAS"&&!s.hasAggregateTrend&&s.hasHist&&<div className="text-xs text-green-300 bg-green-950/20 border border-green-800/30 rounded p-3 mb-2">Detalle real de la hoja seleccionada para {selectedTab}.</div>}
+        {s.hasHist&&s.matchTab?<canvas id={`trend-${s.id}`} height="150"></canvas>:<div className="text-xs text-slate-500 bg-black/20 rounded p-3">Sin tendencia historica numerica en este registro.</div>}
+      </div>
+      );
+    })}
+  </div>
+
+  {/* DOUGHNUT */}
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+    <div className="card-base card-dark p-5 flex flex-col items-center justify-center">
+      <h3 className="text-sm font-bold text-cyan-300 mb-3">Estado General 14 Registros</h3>
+      <div style={{maxWidth:"220px",width:"100%"}}>
+        <canvas id="ch8"></canvas>
+      </div>
+    </div>
+    <div className="md:col-span-2 card-base card-dark p-5">
+      <h3 className="text-sm font-bold text-cyan-300 mb-3">POES - Higiene y Saneamiento ({selectedTab})</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+        <div className="bg-green-900/20 border border-green-600/30 rounded-lg p-3">
+          <p className="text-green-400 font-bold mb-1">Registros conformes</p>
+          <p className="text-slate-300">{conf} de {conD.length} registros conformes en el nombre seleccionado.</p>
+          <p className="text-slate-500 mt-1">Actualización instantánea por pestaña/lote.</p>
+        </div>
+        <div className="bg-green-900/20 border border-green-600/30 rounded-lg p-3">
+          <p className="text-green-400 font-bold mb-1">Advertencias activas</p>
+          <p className="text-slate-300">{warns.length} registro(s) cerca del límite crítico.</p>
+          <p className="text-slate-500 mt-1">Revisar tendencias de color amarillo en los cuadros.</p>
+        </div>
+        <div className={(alertas.length?"bg-red-900/20 border-red-600/30":"bg-slate-900/20 border-slate-700/30")+" border rounded-lg p-3"}>
+          <p className={(alertas.length?"text-red-400":"text-slate-400")+" font-bold mb-1"}>{alertas.length?"Alertas críticas activas":"Sin alertas críticas"}</p>
+          <p className="text-slate-300">{alertas.length?`${alertas.length} registro(s) fuera de límite para ${selectedTab}.`:`No hay no conformidades para el nombre seleccionado.`}</p>
+          <p className="text-slate-500 mt-1">Usa el botón Registro en cada tendencia para ir directo a la hoja.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* ===== GRID 14 REGISTROS ===== */}
+  <h2 className="text-base font-bold text-cyan-400 mb-4 uppercase tracking-wide">Los 14 Registros de Calidad</h2>
+  {activeSheets.length===0&&(
+  <div className="mb-4 text-xs text-yellow-400 bg-yellow-900/20 border border-yellow-700/30 rounded p-3">
+    No se encontraron registros que coincidan con la pestaña {selectedTab}.
+  </div>)}
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 mb-8">
+    {scopedSheets.map(s=>{
+    const st=stSheet(s);
+    const matchTab=s.matchTab;
+    const isAlert=matchTab&&st==="alert",isWarn=matchTab&&st==="warn",isNd=!matchTab||st==="nd"||s.listadoMaestro;
+    return(
+    <div key={s.id} className={"card-base p-4 "+(isAlert?"card-alert pulse-red":isWarn?"card-warn":isNd?"card-nd opacity-80":"card-ok")}>
+      <div className="flex items-center justify-between mb-2">
+        <span className={"mono text-xs px-2 py-0.5 rounded font-bold "+(isAlert?"bg-red-900/50 text-red-300":isWarn?"bg-yellow-900/50 text-yellow-300":isNd?"bg-slate-700/50 text-slate-400":"bg-green-900/50 text-green-300")}>{s.codigo}</span>
+        <span className={"text-xs font-bold "+(isAlert?"text-red-400 blink":isWarn?"text-yellow-400":isNd?"text-slate-500":"text-green-400")}>
+          {isAlert?"ALERTA":isWarn?"ADVERTENCIA":isNd?(!matchTab&&selectedTab!=="TODAS"?"NO APLICA":(s.listadoMaestro?"LISTADO":"SIN DATOS")):"OK"}
+        </span>
+      </div>
+      <p className="text-white text-xs font-semibold leading-tight mb-1">{s.nombre}</p>
+      {s.nombreHoja&&<p className="text-slate-600 text-xs mono mb-3">Hoja activa: {selectedTab==="TODAS"?s.nombreHoja:selectedTab}</p>}
+      {s.promedioMuestras&&<p className="text-cyan-400 text-xs mono mb-2">Promedio calculado con {s.promedioMuestras} hoja(s)</p>}
+      {matchTab&&selectedTab!=="TODAS"&&s.dataSource==="base_registro"&&<p className="text-yellow-300 text-xs mono mb-2">Fuente: base del registro (sin consolidado publico del lote)</p>}
+      <p className="text-slate-600 text-xs mono mb-2">Ubicacion lote/ref: {CELL_REFERENCE_MAP[s.id]||"N/D"}</p>
+      {selectedTab!=="TODAS"&&<p className={"text-xs mb-2 "+(matchTab?"text-cyan-400":"text-slate-500")}>{matchTab?"Coincide con pestaña: "+selectedTab:"No coincide con pestaña: "+selectedTab}</p>}
+
+      {!s.noData&&!s.listadoMaestro&&matchTab&&s.controles.map((c,i)=>{
+      const isO=fuera(c),isN=cerca(c),num=typeof c.valor==="number";
+      const avgEntry=(s.id===1||s.id===2)?((qualityTrendAvg[s.id]||[]).find((m)=>m.name===c.name)):null;
+      const displayVal=avgEntry!=null?avgEntry.avg:c.valor;
+      return(
+      <div key={i} className={"mb-2 p-2 rounded text-xs "+(isO?"bg-red-900/30 border border-red-700/40":isN?"bg-yellow-900/20 border border-yellow-700/30":"bg-black/20")}>
+        <div className="flex justify-between mb-1">
+          <span className="text-slate-300 font-medium truncate mr-2">{c.name}</span>
+          <span className={"mono font-bold shrink-0 "+(isO?"text-red-400":isN?"text-yellow-400":"text-green-400")}>{typeof displayVal==="number"?displayVal+c.unidad:c.valor}</span>
+        </div>
+        <div className="flex justify-between text-slate-500 mb-1">
+          <span>Lim: {c.op==="min"?">=":c.op==="max"?"<":""}{c.limite}{typeof c.limite==="number"?c.unidad:""}</span>
+          {isO&&<span className="text-red-400 font-bold">FUERA</span>}
+          {isN&&!isO&&<span className="text-yellow-400">CERCA</span>}
+        </div>
+        {num&&<div className="w-full bg-slate-800 rounded-full h-1.5"><div className={"h-1.5 rounded-full pbar "+pctCol(c)} style={{width:Math.min(pct(c),100)+"%"}}/></div>}
+      </div>);})}
+
+      {s.listadoMaestro&&<p className="text-slate-500 text-xs italic py-1">Listado maestro - ver hoja para detalle RC.PD.xx</p>}
+      {s.noData&&<p className="text-slate-500 text-xs italic py-2">Archivo no accesible (requiere login Google Sheets)</p>}
+      <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-800/50 gap-2 flex-wrap">
+        <span className="text-slate-600 text-xs mono">{s.ultimaFecha}</span>
+        <a href={s.hojaDirecta||s.link} target="_blank" rel="noopener noreferrer" className={"btn-hoja "+(isAlert?"btn-alerta":"")}>
+          &#8599; Ver {selectedTab==="TODAS"?(s.nombreHoja||"hoja"):selectedTab}
+        </a>
+      </div>
+    </div>);})}
+  </div>
+
+  <div className="text-center py-3 border-t border-slate-800/40">
+    <p className="text-slate-700 text-xs">Dashboard FSSC 22000 - INGAMA Beneficiadora - 14 Registros Reales Verificados - 31/03/2026</p>
+  </div>
+
+  <div className="mt-8">
+    <h2 className="text-base font-bold text-cyan-400 mb-4 uppercase tracking-wide">Cobertura de Lotes y Registros</h2>
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+      <div className="card-base card-dark p-4">
+        <h3 className="text-sm font-bold text-green-300 mb-3">Lotes completos</h3>
+        {completeLots.length===0?<p className="text-xs text-slate-500">Todavía no hay lotes con los 14 registros completos.</p>:<div className="space-y-2">{completeLots.map(item=>(<div key={item.tab} className="rounded border border-green-700/30 bg-green-950/20 p-3 text-xs"><span className="mono text-green-300 font-bold">{item.tab}</span><span className="text-slate-400 ml-2">{item.present.length} de {SHEETS.length} registros</span></div>))}</div>}
+      </div>
+      <div className="card-base card-dark p-4">
+        <h3 className="text-sm font-bold text-yellow-300 mb-3">Lotes con registros faltantes</h3>
+        <div className="space-y-2 max-h-96 overflow-auto pr-1">
+          {incompleteLots.map(item=>(
+          <div key={item.tab} className="rounded border border-yellow-700/30 bg-yellow-950/10 p-3 text-xs">
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <span className="mono text-yellow-300 font-bold">{item.tab}</span>
+              <span className="text-slate-500">{item.present.length}/{SHEETS.length}</span>
+            </div>
+            <p className="text-slate-400">Faltan: {item.missing.join(", ")}</p>
+          </div>))}
+        </div>
+      </div>
+      <div className="card-base card-dark p-4">
+        <h3 className="text-sm font-bold text-cyan-300 mb-3">Ultimas Fechas por Registro</h3>
+        <div className="space-y-2 max-h-96 overflow-auto pr-1">
+          {latestRecords.map(item=>(
+          <div key={item.codigo} className="rounded border border-cyan-800/30 bg-cyan-950/10 p-3 text-xs">
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <span className="mono text-cyan-300 font-bold">{item.codigo}</span>
+              <span className="text-slate-300">{item.ultimaFecha||"SIN FECHA"}</span>
+            </div>
+            <p className="text-slate-400 leading-relaxed">{item.nombre}</p>
+            <p className="text-slate-500 mt-1">Hoja/Lote referencia: {item.hoja||"N/D"}</p>
+            <p className="text-slate-600 mt-1">Fuente: {item.dataSource==="estatico"?"Todas las hojas del link":item.dataSource==="lote_real"?"Lote real":item.dataSource==="consolidado"?"Consolidado":"Base del registro"}</p>
+          </div>))}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+)}
+</div>);}
+
+try{
+  ReactDOM.createRoot(document.getElementById("root")).render(<Dashboard/>);
+}catch(error){
+  const root=document.getElementById("root");
+  if(root){
+    root.innerHTML=`<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#080e1a;color:#fca5a5;font-family:Segoe UI,sans-serif;">
+      <div style="max-width:780px;border:1px solid rgba(239,68,68,.45);background:rgba(127,29,29,.2);padding:20px;border-radius:12px;">
+        <h2 style="margin:0 0 10px;font-size:18px;color:#f87171;">Error de carga del dashboard</h2>
+        <p style="margin:0 0 8px;color:#fecaca;">Se produjo un error de JavaScript y la vista no pudo renderizarse.</p>
+        <p style="margin:0;color:#fca5a5;font-size:12px;word-break:break-word;">${String(error&&error.message?error.message:error)}</p>
+      </div>
+    </div>`;
+  }
+  console.error("Dashboard render failed",error);
+}
+</script>
+</body>
+</html>

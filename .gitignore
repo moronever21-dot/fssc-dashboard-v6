@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.pytest_cache/
+
+# Virtual env
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Logs and temp
+*.log
+*.tmp
+*.bak
+
+# Project diagnostics
+PPRo/diagnostico/
+PPRo/out.txt
+PPRo/err.txt
+
+# Large generated artifacts (keep tracked if needed by dashboard)
+# PPRo/aggregates_by_tab_generated.json
+# Produccion/produccion_aggregates_generated.json
