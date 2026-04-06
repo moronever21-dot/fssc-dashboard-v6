@@ -115,13 +115,43 @@
       "muestras": 8,
       "controles": {
         "% Chias": {
-          "valor": null
+          "valor": 6.17,
+          "hist": [
+            6.85,
+            12.7,
+            5.53,
+            5.53,
+            3.48,
+            4.47,
+            4.65,
+            6.15
+          ]
         },
         "% Dannadas": {
-          "valor": null
+          "valor": 8.36,
+          "hist": [
+            5.72,
+            15.48,
+            7.17,
+            9.35,
+            6.95,
+            8.9,
+            5.88,
+            7.43
+          ]
         },
         "% Severamente Dannadas": {
-          "valor": null
+          "valor": 6.65,
+          "hist": [
+            6.85,
+            15.0,
+            6.6,
+            6.03,
+            3.48,
+            4.47,
+            4.65,
+            6.15
+          ]
         }
       }
     },
@@ -686,13 +716,37 @@
       "muestras": 6,
       "controles": {
         "% Chias": {
-          "valor": null
+          "valor": 5.37,
+          "hist": [
+            7.5,
+            6.5,
+            4.95,
+            3.67,
+            4.8,
+            4.8
+          ]
         },
         "% Dannadas": {
-          "valor": null
+          "valor": 11.27,
+          "hist": [
+            17.3,
+            11.25,
+            15.65,
+            10.67,
+            6.3,
+            6.45
+          ]
         },
         "% Severamente Dannadas": {
-          "valor": null
+          "valor": 6.08,
+          "hist": [
+            9.7,
+            7.5,
+            4.95,
+            4.0,
+            4.8,
+            5.5
+          ]
         }
       }
     },
@@ -1185,6 +1239,108 @@
         }
       }
     },
+    "RC.CC.02": {
+      "muestras": 7,
+      "controles": {
+        "% Chias Lona 1": {
+          "valor": 2.06,
+          "hist": [
+            1.93,
+            2.04,
+            2.02,
+            2.18,
+            2.17,
+            2.03,
+            2.08
+          ]
+        },
+        "% Pedazos Lona 1": {
+          "valor": 5.13,
+          "hist": [
+            5.19,
+            5.18,
+            5.25,
+            5.03,
+            5.12,
+            4.96,
+            5.15
+          ]
+        },
+        "% Primera Banadera": {
+          "valor": 88.24,
+          "hist": [
+            88.3,
+            88.01,
+            87.96,
+            88.24,
+            88.23,
+            88.7,
+            88.22
+          ]
+        }
+      }
+    },
+    "RC.CC.04": {
+      "muestras": 7,
+      "controles": {
+        "% Chias": {
+          "valor": 4.72,
+          "hist": [
+            4.0,
+            3.3,
+            3.5,
+            5.97,
+            6.3,
+            6.0,
+            4.0
+          ]
+        },
+        "% Dannadas": {
+          "valor": 10.06,
+          "hist": [
+            12.0,
+            9.35,
+            9.95,
+            10.77,
+            9.2,
+            6.87,
+            12.3
+          ]
+        },
+        "% Severamente Dannadas": {
+          "valor": 5.18,
+          "hist": [
+            4.0,
+            3.3,
+            3.5,
+            5.97,
+            9.8,
+            6.67,
+            3.0
+          ]
+        }
+      }
+    },
+    "RC.CC.05": {
+      "muestras": 7,
+      "controles": {
+        "% Danadas": {
+          "valor": 1.65,
+          "hist": [
+            1.65
+          ]
+        },
+        "% Sev. Danadas": {
+          "valor": 0.45,
+          "hist": [
+            0.45
+          ]
+        },
+        "Mat. Extranos": {
+          "valor": "AUSENTE"
+        }
+      }
+    },
     "RC.CC.06": {
       "muestras": 1,
       "controles": {
@@ -1246,6 +1402,59 @@
         }
       }
     },
+    "RC.CC.07": {
+      "muestras": 7,
+      "controles": {
+        "Acero Inox 4mm": {
+          "valor": "ATRAPA ok"
+        },
+        "Cajas Almendra 1ra": {
+          "valor": 114.43,
+          "hist": [
+            119,
+            100,
+            89,
+            171,
+            84,
+            109,
+            129
+          ]
+        },
+        "Cajas Almendra 2da": {
+          "valor": 14.29,
+          "hist": [
+            13,
+            12,
+            17,
+            9,
+            11,
+            14,
+            24
+          ]
+        },
+        "Ferroso Fe 3mm": {
+          "valor": "ATRAPA ok"
+        },
+        "No Ferroso 3.5mm": {
+          "valor": "ATRAPA ok"
+        },
+        "Pasajes Verificados": {
+          "valor": 2.86,
+          "hist": [
+            3,
+            3,
+            3,
+            3,
+            2,
+            3,
+            3
+          ]
+        },
+        "Ultima Fecha Registro": {
+          "valor": "28-02-2026"
+        }
+      }
+    },
     "RC.CC.08": {
       "muestras": 1,
       "controles": {
@@ -1289,6 +1498,50 @@
         },
         "Total Bacterias": {
           "valor": null
+        }
+      }
+    },
+    "RC.CC.11": {
+      "muestras": 7,
+      "controles": {
+        "% Podrida Broken N": {
+          "valor": 0.15,
+          "hist": [
+            0.12,
+            0.11,
+            0.11,
+            0.17,
+            0.19,
+            0.18,
+            0.19
+          ]
+        },
+        "Chias Broken": {
+          "valor": 0.07,
+          "hist": [
+            0.06,
+            0.03,
+            0.04,
+            0.08,
+            0.07,
+            0.11,
+            0.1
+          ]
+        },
+        "Mat. Extranos": {
+          "valor": "AUSENTE"
+        },
+        "Punto Cafe": {
+          "valor": 0.0,
+          "hist": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
         }
       }
     },
@@ -1531,39 +1784,39 @@
       "muestras": 7,
       "controles": {
         "% Chias Lona 1": {
-          "valor": 2.06,
+          "valor": 2.11,
           "hist": [
-            1.93,
-            2.04,
-            2.02,
-            2.18,
-            2.17,
-            2.03,
-            2.08
+            1.78,
+            1.87,
+            2.56,
+            2.01,
+            2.37,
+            2.15,
+            2.06
           ]
         },
         "% Pedazos Lona 1": {
-          "valor": 5.13,
+          "valor": 4.83,
           "hist": [
-            5.19,
-            5.18,
-            5.25,
+            3.67,
+            4.93,
+            5.64,
+            4.8,
             5.03,
-            5.12,
-            4.96,
-            5.15
+            4.91,
+            4.8
           ]
         },
         "% Primera Banadera": {
-          "valor": 88.24,
+          "valor": 88.54,
           "hist": [
-            88.3,
-            88.01,
-            87.96,
-            88.24,
-            88.23,
-            88.7,
-            88.22
+            91.06,
+            88.87,
+            87.21,
+            88.62,
+            87.87,
+            87.7,
+            88.46
           ]
         }
       }
@@ -1572,29 +1825,60 @@
       "muestras": 7,
       "controles": {
         "% Chias": {
-          "valor": null
+          "valor": 5.9,
+          "hist": [
+            5.1,
+            5.17,
+            3.85,
+            5.9,
+            8.32,
+            4.8,
+            8.17
+          ]
         },
         "% Dannadas": {
-          "valor": null
+          "valor": 7.34,
+          "hist": [
+            8.32,
+            5.93,
+            3.38,
+            7.1,
+            8.93,
+            7.38,
+            10.33
+          ]
         },
         "% Severamente Dannadas": {
-          "valor": null
+          "valor": 5.9,
+          "hist": [
+            5.1,
+            5.17,
+            3.85,
+            5.9,
+            8.32,
+            4.8,
+            8.17
+          ]
         }
       }
     },
     "RC.CC.05": {
-      "muestras": 7,
+      "muestras": 3,
       "controles": {
         "% Danadas": {
-          "valor": 1.65,
+          "valor": 1.29,
           "hist": [
-            1.65
+            0.96,
+            1.41,
+            1.49
           ]
         },
         "% Sev. Danadas": {
-          "valor": 0.45,
+          "valor": 0.58,
           "hist": [
-            0.45
+            0.7,
+            0.46,
+            0.57
           ]
         },
         "Mat. Extranos": {
@@ -1667,59 +1951,6 @@
         }
       }
     },
-    "RC.CC.07": {
-      "muestras": 7,
-      "controles": {
-        "Acero Inox 4mm": {
-          "valor": "ATRAPA ok"
-        },
-        "Cajas Almendra 1ra": {
-          "valor": 114.43,
-          "hist": [
-            119,
-            100,
-            89,
-            171,
-            84,
-            109,
-            129
-          ]
-        },
-        "Cajas Almendra 2da": {
-          "valor": 14.29,
-          "hist": [
-            13,
-            12,
-            17,
-            9,
-            11,
-            14,
-            24
-          ]
-        },
-        "Ferroso Fe 3mm": {
-          "valor": "ATRAPA ok"
-        },
-        "No Ferroso 3.5mm": {
-          "valor": "ATRAPA ok"
-        },
-        "Pasajes Verificados": {
-          "valor": 2.86,
-          "hist": [
-            3,
-            3,
-            3,
-            3,
-            2,
-            3,
-            3
-          ]
-        },
-        "Ultima Fecha Registro": {
-          "valor": "28-02-2026"
-        }
-      }
-    },
     "RC.CC.08": {
       "muestras": 1,
       "controles": {
@@ -1767,30 +1998,14 @@
       }
     },
     "RC.CC.11": {
-      "muestras": 8,
+      "muestras": 1,
       "controles": {
         "% Podrida Broken N": {
-          "valor": 0.15,
-          "hist": [
-            0.12,
-            0.11,
-            0.11,
-            0.16,
-            0.19,
-            0.18,
-            0.19
-          ]
+          "valor": null
         },
         "Chias Broken": {
-          "valor": 0.15,
+          "valor": 0.67,
           "hist": [
-            0.06,
-            0.03,
-            0.04,
-            0.12,
-            0.07,
-            0.11,
-            0.1,
             0.67
           ]
         },
@@ -1800,13 +2015,6 @@
         "Punto Cafe": {
           "valor": 0.0,
           "hist": [
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
             0.0
           ]
         }
@@ -2019,6 +2227,38 @@
         }
       }
     },
+    "RC.CC.02": {
+      "muestras": 4,
+      "controles": {
+        "% Chias Lona 1": {
+          "valor": 2.56,
+          "hist": [
+            2.52,
+            2.51,
+            2.61,
+            2.61
+          ]
+        },
+        "% Pedazos Lona 1": {
+          "valor": 4.76,
+          "hist": [
+            4.78,
+            4.52,
+            4.87,
+            4.87
+          ]
+        },
+        "% Primera Banadera": {
+          "valor": 86.6,
+          "hist": [
+            87.71,
+            87.81,
+            85.44,
+            85.44
+          ]
+        }
+      }
+    },
     "RC.CC.06": {
       "muestras": 1,
       "controles": {
@@ -2126,6 +2366,20 @@
           "valor": null
         },
         "Total Bacterias": {
+          "valor": null
+        }
+      }
+    },
+    "RC.CC.13": {
+      "muestras": 2,
+      "controles": {
+        "Cumple": {
+          "valor": "SI"
+        },
+        "Peso Neto (kg)": {
+          "valor": null
+        },
+        "Tara Promedio (kg)": {
           "valor": null
         }
       }
@@ -2349,6 +2603,50 @@
         }
       }
     },
+    "RC.CC.02": {
+      "muestras": 8,
+      "controles": {
+        "% Chias Lona 1": {
+          "valor": 2.22,
+          "hist": [
+            2.7,
+            2.85,
+            1.63,
+            2.93,
+            2.17,
+            2.09,
+            1.57,
+            1.81
+          ]
+        },
+        "% Pedazos Lona 1": {
+          "valor": 4.76,
+          "hist": [
+            4.63,
+            4.43,
+            4.24,
+            5.05,
+            4.73,
+            5.06,
+            4.94,
+            5.02
+          ]
+        },
+        "% Primera Banadera": {
+          "valor": 87.94,
+          "hist": [
+            87.08,
+            87.47,
+            89.23,
+            86.91,
+            87.95,
+            87.62,
+            89.15,
+            88.07
+          ]
+        }
+      }
+    },
     "RC.CC.06": {
       "muestras": 1,
       "controles": {
@@ -2409,6 +2707,29 @@
         },
         "Estado Reemplazo": {
           "valor": "CONTROLADO"
+        }
+      }
+    },
+    "RC.CC.08": {
+      "muestras": 1,
+      "controles": {
+        "Alambre 1.5cm": {
+          "valor": "DETECTADO"
+        },
+        "Clavos/Clips": {
+          "valor": "DETECTADO"
+        },
+        "Pase Patrones Pre OK": {
+          "valor": 6.0,
+          "hist": [
+            6
+          ]
+        },
+        "Pernos 2cm": {
+          "valor": "DETECTADO"
+        },
+        "Ultima Fecha Registro": {
+          "valor": "10-10-2026"
         }
       }
     },

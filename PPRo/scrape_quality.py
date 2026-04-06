@@ -5,6 +5,7 @@ import sys
 import urllib.request
 from collections import defaultdict
 from datetime import date
+from functools import lru_cache
 from html.parser import HTMLParser
 from pathlib import Path
 import unicodedata
@@ -98,6 +99,7 @@ def get_tabs(sheet_id):
     return tabs
 
 
+@lru_cache(maxsize=None)
 def get_table(sheet_id, gid):
     text = fetch_text(f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:html&gid={gid}')
     parser = TableParser()
@@ -313,21 +315,26 @@ def parse_rc_cc_04(rows):
     danadas = []
     severas = []
     chias = []
+    pending_label = ''
     for row in rows:
         if len(row) < 4:
             continue
-        label = normalize_text(row[1])
-        unit = normalize_text(row[2]) if len(row) > 2 else ''
-        if unit != '%':
+        raw_label = row[1].strip() if len(row) > 1 else ''
+        raw_unit = row[2].strip() if len(row) > 2 else ''
+        label = normalize_text(raw_label)
+        if raw_label:
+            pending_label = label
+        if raw_unit != '%':
             continue
+        active_label = label if label else pending_label
         row_values = extract_numeric_cells(row[3:])
         if not row_values:
             continue
-        if 'SEVER' in label:
+        if 'SEVER' in active_label:
             severas.extend(row_values)
-        elif 'DANAD' in label:
+        elif 'DANAD' in active_label:
             danadas.extend(row_values)
-        elif 'CHIA' in label:
+        elif 'CHIA' in active_label:
             chias.extend(row_values)
     return {
         '% Dannadas': mean(danadas),
@@ -620,6 +627,24 @@ def pll_number(tab_name):
     return int(match.group(1))
 
 
+def _lot_from_rows(rows):
+    """Escanea las primeras 8 filas del tab buscando un identificador de lote en los datos.
+    Retorna el nombre canónico del lote o None si no se encuentra."""
+    for row in rows[:8]:
+        for cell in row:
+            s = str(cell).strip().upper()
+            if 'ORG. 01' in s:             return 'AA 01-26'
+            if 'ORG. 02' in s:             return 'AA 02-26'
+            if 'ORG. 03' in s:             return 'BSI 01'
+            if 'BSI 01' in s or 'BSI01' in s: return 'BSI 01'
+            if 'RG.02-CV' in s or 'RG 02-CV' in s: return 'RG 02-CV'
+            if 'RG.01-CV' in s or 'RG 01-CV' in s: return 'RG 01-CV'
+            if 'DA 01-CV' in s or 'DA.01-CV' in s: return 'DA 01-CV'
+            if 'AA 01-26' in s:            return 'AA 01-26'
+            if 'AA 02-26' in s:            return 'AA 02-26'
+    return None
+
+
 def canonical_tab_name(tab_name):
     name = normalize_text(tab_name)
     compact = re.sub(r'[^A-Z0-9]', '', str(tab_name or '').upper())
@@ -660,7 +685,7 @@ REFERENCE_TAB_ORDER = [
 ]
 
 
-def group_name(code, tab_name, tab_index=0):
+def group_name(code, tab_name, tab_index=0, rows=None):
     direct_name = canonical_tab_name(tab_name)
     if code in {'RC.CC.01', 'RC.CC.1.1', 'RC.CC.06', 'RC.CC.08', 'RC.CC.09', 'RC.CC.13', 'RC.CC.14', 'RC.CC.17'}:
         if direct_name:
@@ -669,25 +694,28 @@ def group_name(code, tab_name, tab_index=0):
             return REFERENCE_TAB_ORDER[tab_index - 1]
         return direct_name
 
-    if code in {'RC.CC.02', 'RC.CC.04', 'RC.CC.05', 'RC.CC.07', 'RC.CC.11'} and direct_name == 'DA 01-CV':
-        return 'DA 01-CV'
-    if code in {'RC.CC.02', 'RC.CC.04', 'RC.CC.05', 'RC.CC.07', 'RC.CC.11'} and direct_name == 'RG 02-CV':
-        return 'RG 02-CV'
-    if code in {'RC.CC.02', 'RC.CC.04', 'RC.CC.05', 'RC.CC.07', 'RC.CC.11'} and direct_name == 'RG 01-CV':
-        return 'RG 01-CV'
+    # Para registros con pestañas numéricas (RC.CC.02/04/05/07/11):
+    # 1. Nombre canónico embebido en el nombre de la pestaña (ej: 'PLL9 RG 02-CV')
+    if direct_name:
+        return direct_name
 
+    # 2. Identificador de lote en los datos del tab (ej: 'ORG. 01', 'RG.02-CV')
+    if rows is not None:
+        row_lot = _lot_from_rows(rows)
+        if row_lot:
+            return row_lot
+
+    # 3. Fallback por rango numérico para tabs sin identificador explícito
     number = pll_number(tab_name)
     if number is None and code == 'RC.CC.07':
         number = tab_index
     if number is None:
         return None
-    if number <= 8:
-        return 'RG 01-CV'
-    if 9 <= number <= 14:
-        return 'RG 02-CV'
-    if 15 <= number <= 21:
-        return 'DA 01-CV'
-    return None
+    if number <= 8:         return 'RG 01-CV'
+    if number <= 14:        return 'RG 02-CV'
+    if number <= 21:        return 'BSI 01'    # Corrección: 15-21 = BSI 01 (no DA 01-CV)
+    if number <= 28:        return 'DA 01-CV'  # PLLs 22-28 sin identificador = DA 01-CV
+    return None  # Rangos desconocidos sin identificador: omitir para evitar clasificación errónea
 
 
 def summarize_code(code):
@@ -711,10 +739,10 @@ def summarize_code(code):
     buckets = defaultdict(list)
     samples = defaultdict(int)
     for index, tab in enumerate(get_tabs(sheet_id), start=1):
-        bucket = group_name(code, tab['name'], index)
+        rows = get_table(sheet_id, tab['gid'])
+        bucket = group_name(code, tab['name'], index, rows=rows)
         if not bucket:
             continue
-        rows = get_table(sheet_id, tab['gid'])
         summary = parser(rows)
         buckets[bucket].append(summary)
         samples[bucket] += 1
@@ -775,10 +803,10 @@ def collect_dashboard_metadata(codes):
         latest_tab = None
         tabs = get_tabs(sheet_id)
         for index, tab in enumerate(tabs, start=1):
-            lot_name = group_name(code, tab['name'], index) or canonical_tab_name(tab['name']) or tab['name'].strip()
+            rows = get_table(sheet_id, tab['gid'])
+            lot_name = group_name(code, tab['name'], index, rows=rows) or canonical_tab_name(tab['name']) or tab['name'].strip()
             if lot_name:
                 lot_presence[lot_name].add(code)
-            rows = get_table(sheet_id, tab['gid'])
             current_latest = find_latest_date_in_rows(rows)
             if current_latest and (latest is None or current_latest['sort_key'] > latest['sort_key']):
                 latest = current_latest
