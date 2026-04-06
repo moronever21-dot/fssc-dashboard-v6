@@ -403,38 +403,67 @@ def parse_rc_cc_06(rows):
     }
 
 
+def _is_fail_cell(raw):
+    """Devuelve True si la celda esta vacia, es guion o es X (falla/no aplica).
+    Devuelve False para checkmarks u otros valores positivos."""
+    raw_stripped = str(raw or '').strip()
+    return raw_stripped == '' or raw_stripped == '-' or raw_stripped.upper() == 'X'
+
+
 def parse_rc_cc_07(rows):
     fe_ok = True
     no_fe_ok = True
     inox_ok = True
     samples = 0
+    count_all_ok = 0
+    primera_total = 0
+    segunda_total = 0
     latest = find_latest_date_in_rows(rows)
     for row in rows[1:]:
         if len(row) < 6 or not row[0].strip().isdigit():
             continue
         samples += 1
-        fe = normalize_text(row[3])
-        no_fe = normalize_text(row[4])
-        inox = normalize_text(row[5])
-        if fe in {'', '-', 'X'}:
+        fe_fail = _is_fail_cell(row[3])
+        no_fe_fail = _is_fail_cell(row[4])
+        inox_fail = _is_fail_cell(row[5])
+        if fe_fail:
             fe_ok = False
-        if no_fe in {'', '-', 'X'}:
+        if no_fe_fail:
             no_fe_ok = False
-        if inox in {'', '-', 'X'}:
+        if inox_fail:
             inox_ok = False
+        if not fe_fail and not no_fe_fail and not inox_fail:
+            count_all_ok += 1
+        # Cajas almendra de primera (MEDIUM col6, MIDGET col8, TINY col10)
+        for idx in [6, 8, 10]:
+            v = to_float(row[idx]) if len(row) > idx else None
+            if v is not None:
+                primera_total += v
+        # Cajas almendra de segunda (CHIPPE col12, BROKE A col14, BROKE N col16)
+        for idx in [12, 14, 16]:
+            v = to_float(row[idx]) if len(row) > idx else None
+            if v is not None:
+                segunda_total += v
     if samples == 0:
         return {
             'Ferroso Fe 3mm': 'NO REGISTRA',
             'No Ferroso 3.5mm': 'NO REGISTRA',
             'Acero Inox 4mm': 'NO REGISTRA',
+            'Pasajes Verificados': 0,
             'Ultima Fecha Registro': latest['display'] if latest else 'SIN FECHA',
         }
-    return {
+    result = {
         'Ferroso Fe 3mm': 'ATRAPA ok' if fe_ok else 'REVISAR',
         'No Ferroso 3.5mm': 'ATRAPA ok' if no_fe_ok else 'REVISAR',
         'Acero Inox 4mm': 'ATRAPA ok' if inox_ok else 'REVISAR',
+        'Pasajes Verificados': count_all_ok,
         'Ultima Fecha Registro': latest['display'] if latest else 'SIN FECHA',
     }
+    if primera_total > 0:
+        result['Cajas Almendra 1ra'] = round(primera_total)
+    if segunda_total > 0:
+        result['Cajas Almendra 2da'] = round(segunda_total)
+    return result
 
 
 def parse_rc_cc_08(rows):
@@ -442,11 +471,18 @@ def parse_rc_cc_08(rows):
     pernos_detectado = False
     clavos_detectado = False
     clips_detectado = False
+    pre_pases_ok = 0
     latest = find_latest_date_in_rows(rows)
     for row in rows[1:]:
         if len(row) < 16:
             continue
         periodo = normalize_text(row[4])
+        # Verificar pase de patrones antes de iniciar el proceso
+        if 'PASE' in periodo and 'ANTES' in periodo:
+            # SI columns [8,10,12,14]: checkmark = detector atrapa patron OK
+            si_ok = all(not _is_fail_cell(row[idx]) for idx in [8, 10, 12, 14] if len(row) > idx)
+            if si_ok:
+                pre_pases_ok += 1
         if 'PASE' not in periodo and 'POST' not in periodo:
             continue
         alambre_no = normalize_text(row[9])
@@ -465,6 +501,7 @@ def parse_rc_cc_08(rows):
         'Alambre 1.5cm': 'DETECTADO' if alambre_detectado else 'AUSENTE',
         'Pernos 2cm': 'DETECTADO' if pernos_detectado else 'AUSENTE',
         'Clavos/Clips': 'DETECTADO' if (clavos_detectado or clips_detectado) else 'AUSENTE',
+        'Pase Patrones Pre OK': pre_pases_ok,
         'Ultima Fecha Registro': latest['display'] if latest else 'SIN FECHA',
     }
 

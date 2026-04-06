@@ -21,13 +21,13 @@
           ]
         },
         "% Podrida (Lona)": {
-          "valor": 2.04,
+          "valor": 2.21,
           "hist": [
+            2.26,
             2.49,
             2.33,
             2.22,
-            2.21,
-            2.04
+            2.21
           ],
           "labels": [
             "1/7/2026",
@@ -210,13 +210,61 @@
       "muestras": 11,
       "controles": {
         "Acero Inox 4mm": {
-          "valor": "REVISAR"
+          "valor": "ATRAPA ok"
+        },
+        "Cajas Almendra 1ra": {
+          "valor": 106.64,
+          "hist": [
+            75,
+            114,
+            147,
+            95,
+            90,
+            118,
+            136,
+            98,
+            71,
+            141,
+            88
+          ]
+        },
+        "Cajas Almendra 2da": {
+          "valor": 64.18,
+          "hist": [
+            1,
+            6,
+            11,
+            7,
+            7,
+            13,
+            13,
+            11,
+            180,
+            293,
+            164
+          ]
         },
         "Ferroso Fe 3mm": {
-          "valor": "REVISAR"
+          "valor": "ATRAPA ok"
         },
         "No Ferroso 3.5mm": {
-          "valor": "REVISAR"
+          "valor": "ATRAPA ok"
+        },
+        "Pasajes Verificados": {
+          "valor": 3.55,
+          "hist": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            3,
+            3,
+            6,
+            8,
+            7
+          ]
         },
         "Ultima Fecha Registro": {
           "valor": "13-03-2026"
@@ -231,6 +279,12 @@
         },
         "Clavos/Clips": {
           "valor": "DETECTADO"
+        },
+        "Pase Patrones Pre OK": {
+          "valor": 8.0,
+          "hist": [
+            8
+          ]
         },
         "Pernos 2cm": {
           "valor": "DETECTADO"
@@ -550,9 +604,9 @@
         "% Podrida (Lona)": {
           "valor": 1.85,
           "hist": [
+            2.04,
             2.43,
             2.03,
-            1.85,
             1.85
           ],
           "labels": [
@@ -741,13 +795,46 @@
       "muestras": 6,
       "controles": {
         "Acero Inox 4mm": {
-          "valor": "REVISAR"
+          "valor": "ATRAPA ok"
+        },
+        "Cajas Almendra 1ra": {
+          "valor": 128.5,
+          "hist": [
+            135,
+            134,
+            128,
+            134,
+            80,
+            160
+          ]
+        },
+        "Cajas Almendra 2da": {
+          "valor": 13.17,
+          "hist": [
+            14,
+            10,
+            14,
+            10,
+            22,
+            9
+          ]
         },
         "Ferroso Fe 3mm": {
-          "valor": "REVISAR"
+          "valor": "ATRAPA ok"
         },
         "No Ferroso 3.5mm": {
-          "valor": "REVISAR"
+          "valor": "ATRAPA ok"
+        },
+        "Pasajes Verificados": {
+          "valor": 3.0,
+          "hist": [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ]
         },
         "Ultima Fecha Registro": {
           "valor": "14-02-2026"
@@ -762,6 +849,12 @@
         },
         "Clavos/Clips": {
           "valor": "DETECTADO"
+        },
+        "Pase Patrones Pre OK": {
+          "valor": 8.0,
+          "hist": [
+            8
+          ]
         },
         "Pernos 2cm": {
           "valor": "DETECTADO"
@@ -1050,12 +1143,12 @@
           ]
         },
         "% Podrida (Lona)": {
-          "valor": 2.39,
+          "valor": 2.25,
           "hist": [
+            2.34,
             2.21,
             2.53,
-            2.25,
-            2.39
+            2.25
           ],
           "labels": [
             "1/23/2026",
@@ -1161,6 +1254,12 @@
         },
         "Clavos/Clips": {
           "valor": "DETECTADO"
+        },
+        "Pase Patrones Pre OK": {
+          "valor": 8.0,
+          "hist": [
+            8
+          ]
         },
         "Pernos 2cm": {
           "valor": "DETECTADO"
@@ -1386,12 +1485,12 @@
           ]
         },
         "% Podrida (Lona)": {
-          "valor": 2.28,
+          "valor": 2.2,
           "hist": [
+            2.42,
             2.67,
             2.54,
-            2.2,
-            2.28
+            2.2
           ],
           "labels": [
             "1/28/2026",
@@ -1572,16 +1671,75 @@
       "muestras": 7,
       "controles": {
         "Acero Inox 4mm": {
-          "valor": "REVISAR"
+          "valor": "ATRAPA ok"
+        },
+        "Cajas Almendra 1ra": {
+          "valor": 114.43,
+          "hist": [
+            119,
+            100,
+            89,
+            171,
+            84,
+            109,
+            129
+          ]
+        },
+        "Cajas Almendra 2da": {
+          "valor": 14.29,
+          "hist": [
+            13,
+            12,
+            17,
+            9,
+            11,
+            14,
+            24
+          ]
         },
         "Ferroso Fe 3mm": {
-          "valor": "REVISAR"
+          "valor": "ATRAPA ok"
         },
         "No Ferroso 3.5mm": {
-          "valor": "REVISAR"
+          "valor": "ATRAPA ok"
+        },
+        "Pasajes Verificados": {
+          "valor": 2.86,
+          "hist": [
+            3,
+            3,
+            3,
+            3,
+            2,
+            3,
+            3
+          ]
         },
         "Ultima Fecha Registro": {
           "valor": "28-02-2026"
+        }
+      }
+    },
+    "RC.CC.08": {
+      "muestras": 1,
+      "controles": {
+        "Alambre 1.5cm": {
+          "valor": "DETECTADO"
+        },
+        "Clavos/Clips": {
+          "valor": "DETECTADO"
+        },
+        "Pase Patrones Pre OK": {
+          "valor": 8.0,
+          "hist": [
+            8
+          ]
+        },
+        "Pernos 2cm": {
+          "valor": "DETECTADO"
+        },
+        "Ultima Fecha Registro": {
+          "valor": "10-10-2026"
         }
       }
     },
@@ -1934,6 +2092,12 @@
         },
         "Clavos/Clips": {
           "valor": "DETECTADO"
+        },
+        "Pase Patrones Pre OK": {
+          "valor": 6.0,
+          "hist": [
+            6
+          ]
         },
         "Pernos 2cm": {
           "valor": "DETECTADO"
@@ -2403,23 +2567,6 @@
             "12-1-26",
             "12-1-26"
           ]
-        }
-      }
-    },
-    "RC.CC.08": {
-      "muestras": 1,
-      "controles": {
-        "Alambre 1.5cm": {
-          "valor": "DETECTADO"
-        },
-        "Clavos/Clips": {
-          "valor": "DETECTADO"
-        },
-        "Pernos 2cm": {
-          "valor": "DETECTADO"
-        },
-        "Ultima Fecha Registro": {
-          "valor": "10-10-2026"
         }
       }
     },

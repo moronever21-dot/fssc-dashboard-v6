@@ -1,8 +1,13 @@
 # Continuidad del proyecto FSSC 22000 v6
 
 ## 1) Donde guardar el proyecto
-- Carpeta de trabajo: esta raiz (Visual Code) en OneDrive.
+- Carpeta de trabajo: esta raiz (INGAMA) en OneDrive.
 - Recomendado: repositorio privado en GitHub para historial, versionado y trabajo en otra PC.
+
+## 1.1) Modo preferido del usuario (sin Git local)
+- El usuario puede trabajar sin instalar Git en otra PC.
+- Flujo permitido: OneDrive + GitHub web (Upload files / Download ZIP).
+- Nota: este modo es mas manual y puede generar conflictos si se edita en dos PCs al mismo tiempo.
 
 ## 2) Estado del proyecto
 - Calidad: PPRo/
@@ -35,6 +40,32 @@
 3. Abrir carpeta clonada en VS Code.
 4. Crear entorno Python si aplica (.venv) y ejecutar scrapers.
 
+## 6.1) Trabajar desde otra PC sin Git (alternativa)
+1. Instalar VS Code.
+2. Abrir OneDrive con la misma cuenta y trabajar en la misma carpeta sincronizada.
+3. Si necesitas traer cambios desde GitHub sin Git:
+   - abrir el repo en GitHub
+   - usar Download ZIP
+   - extraer y copiar solo archivos necesarios a tu carpeta OneDrive
+4. Si necesitas subir cambios a GitHub sin Git:
+   - abrir el repo en GitHub
+   - usar Add file > Upload files
+   - subir los archivos modificados
+
+## 6.2) Regla de sincronizacion
+- OneDrive se actualiza automaticamente al guardar archivos (si hay internet y sync activo).
+- GitHub NO se actualiza automaticamente cuando editas localmente.
+- GitHub solo cambia cuando haces push (con Git) o upload manual en la web.
+
 ## 7) Regla de datos reales
 - El dashboard se mantiene en modo datos reales.
 - Si no hay dato real para un lote/registro, debe verse como sin dato (no fallback inventado).
+
+## 8) Actualizacion rapida de calculos
+- Cuando agregues registros nuevos en los Google Sheets, ejecuta en la raiz del proyecto:
+   - ACTUALIZAR_DASHBOARD.cmd
+- Esto regenera:
+   - PPRo/aggregates_by_tab_generated.json + .js
+   - Produccion/produccion_aggregates_generated.json + .js
+   - Produccion/lote_info_pd02.json + .js
+- Luego refresca el navegador con Ctrl+F5.
