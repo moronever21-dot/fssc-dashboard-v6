@@ -1110,129 +1110,65 @@ trendSheets.forEach((sheet)=>{
   if(!sheet.matchTab) return;
 
   /* ================================================================
-     MODO TODAS — comparacion multi-lote: todos los lotes en X,
-     valor promedio por lote en Y, con colores semaforo.
+     GRAFICO MULTI-LOTE (unificado): todos los lotes en X, valor
+     promedio en Y. Cuando hay un lote seleccionado se resalta ese
+     lote (opacidad alta, borde grueso) y los demas se atenuan.
+     TODAS = misma opacidad para todos los lotes.
   ================================================================ */
-  if(selectedTab==="TODAS"){
-    const allLotKeys=Object.keys(AGGREGATES_BY_TAB);
-    const baseSheet=SHEETS.find(s=>s.id===sheet.id);
-    const baseCtrls=(baseSheet?.controles||[]).filter(c=>c.op!=="cualitativo");
-    const numCtrls=baseCtrls.filter(c=>allLotKeys.some(lot=>{
-      const v=(AGGREGATES_BY_TAB[lot]?.[sheet.codigo]?.controles||{})[c.name]?.valor;
-      return typeof v==="number";
-    })).slice(0,3);
-    if(!numCtrls.length) return;
-    const validLots=allLotKeys.filter(lot=>numCtrls.some(c=>{
-      const v=(AGGREGATES_BY_TAB[lot]?.[sheet.codigo]?.controles||{})[c.name]?.valor;
-      return typeof v==="number";
-    }));
-    if(!validLots.length) return;
-    const isSingle=numCtrls.length===1;
-    const ds=[];
-    numCtrls.forEach((c,idx)=>{
-      const col=palette[idx%palette.length];
-      const data=validLots.map(lot=>{
-        const v=(AGGREGATES_BY_TAB[lot]?.[sheet.codigo]?.controles||{})[c.name]?.valor;
-        return typeof v==="number"?v:null;
-      });
-      if(isSingle){
-        const bgs=data.map(v=>{
-          if(v==null)return"rgba(100,116,139,0.25)";
-          const pc=ptCol(v,c.limite,c.op);
-          const base=pc==="#ef4444"?"239,68,68":pc==="#f59e0b"?"245,158,11":"34,197,94";
-          return`rgba(${base},0.82)`;
-        });
-        ds.push({label:c.name,data,backgroundColor:bgs,borderColor:bgs.map(b=>b.replace("0.82","1")),
-          borderWidth:1.5,borderRadius:4,
-          datalabels:{...chartDataLabelOptions({suffix:c.unidad||"",decimals:2}),display:true,align:"end"}});
-        if(typeof c.limite==="number") ds.push(limLine(validLots.length,c.limite,`Lím ${c.name}`,"#ef4444"));
-      } else {
-        const bgs=validLots.map(()=>h2r(col,0.78));
-        ds.push({label:c.name,data,backgroundColor:bgs,borderColor:validLots.map(()=>h2r(col,1)),
-          borderWidth:1.5,borderRadius:3,
-          datalabels:{...chartDataLabelOptions({suffix:c.unidad||"",decimals:2}),display:true}});
-        if(typeof c.limite==="number") ds.push({...limLine(validLots.length,c.limite,`Lím ${c.name}`,"#ef4444"),type:"line"});
-      }
-    });
-    window._c[`trend_${sheet.id}`]=new Chart(cv,{
-      type:"bar",
-      data:{labels:validLots,datasets:ds},
-      options:{indexAxis:isSingle?"y":"x",responsive:true,
-        plugins:{legend:leg,datalabels:chartDataLabelOptions({suffix:"",decimals:2})},
-        scales:{y:{grid:{color:grd},ticks:{color:tk,font:{size:9}}},x:{grid:{color:grd},ticks:{color:tk,font:{size:9}}}}
-      }
-    });
-    return;
-  }
-
-  /* ================================================================
-     MODO LOTE ESPECIFICO — historial real de mediciones del lote:
-     X = fechas/muestras, Y = valor por medicion.
-     computedSheets ya mapeó sheet.controles con los datos reales
-     de AGGREGATES_BY_TAB[selectedTab][sheet.codigo].
-  ================================================================ */
-  const histControls=(sheet.controles||[]).filter(c=>
-    typeof c.valor==="number"&&c.hist&&Array.isArray(c.hist.data)&&c.hist.data.length
-  );
-  if(!histControls.length){
-    /* Fallback: sin hist disponible para este lote → mostrar valor actual como barra */
-    const valControls=(sheet.controles||[]).filter(c=>typeof c.valor==="number");
-    if(!valControls.length) return;
-    const vSlice=valControls.slice(0,3);
-    const bgs=vSlice.map(c=>{
-      const pc=ptCol(c.valor,c.limite,c.op);
-      return pc==="#ef4444"?"rgba(239,68,68,0.80)":pc==="#f59e0b"?"rgba(245,158,11,0.80)":"rgba(34,197,94,0.65)";
-    });
-    window._c[`trend_${sheet.id}`]=new Chart(cv,{
-      type:"bar",
-      data:{labels:vSlice.map(c=>c.name),datasets:[{
-        label:"Valor actual \u2022 "+selectedTab,
-        data:vSlice.map(c=>c.valor),
-        backgroundColor:bgs,borderColor:bgs.map(b=>b.replace("0.80","1").replace("0.65","0.9")),
-        borderWidth:1.5,borderRadius:4,
-        datalabels:{...chartDataLabelOptions({suffix:"",decimals:2}),display:true,align:"end"}
-      }]},
-      options:{responsive:true,
-        plugins:{legend:{...leg,display:false},datalabels:chartDataLabelOptions({suffix:"",decimals:2})},
-        scales:{y:{grid:{color:grd},ticks:{color:tk}},x:{grid:{color:grd},ticks:{color:tk,font:{size:9}}}}
-      }
-    });
-    return;
-  }
-  const labels=histControls[0].hist.labels||histControls[0].hist.data.map((_,i)=>`M${i+1}`);
-  const nPts=histControls[0].hist.data.length;
-  const useBar=nPts<=4;
-  const datasets=[];
-  histControls.slice(0,3).forEach((c,idx)=>{
+  const allLotKeys=Object.keys(AGGREGATES_BY_TAB);
+  const baseSheet=SHEETS.find(s=>s.id===sheet.id);
+  const baseCtrls=(baseSheet?.controles||[]).filter(c=>c.op!=="cualitativo");
+  const numCtrls=baseCtrls.filter(c=>allLotKeys.some(lot=>{
+    const v=(AGGREGATES_BY_TAB[lot]?.[sheet.codigo]?.controles||{})[c.name]?.valor;
+    return typeof v==="number";
+  })).slice(0,3);
+  if(!numCtrls.length) return;
+  const validLots=allLotKeys.filter(lot=>numCtrls.some(c=>{
+    const v=(AGGREGATES_BY_TAB[lot]?.[sheet.codigo]?.controles||{})[c.name]?.valor;
+    return typeof v==="number";
+  }));
+  if(!validLots.length) return;
+  const isSingle=numCtrls.length===1;
+  /* null = TODAS (todos igual); string = lote activo a resaltar */
+  const activeLot=selectedTab!=="TODAS"?selectedTab:null;
+  const ds=[];
+  numCtrls.forEach((c,idx)=>{
     const col=palette[idx%palette.length];
-    const hasLim=typeof c.limite==="number";
-    if(useBar){
-      const bColors=c.hist.data.map(v=>{
-        const pc=hasLim?ptCol(v,c.limite,c.op):"#22c55e";
-        return pc==="#ef4444"?"rgba(239,68,68,0.80)":pc==="#f59e0b"?"rgba(245,158,11,0.80)":"rgba(34,197,94,0.65)";
+    const data=validLots.map(lot=>{
+      const v=(AGGREGATES_BY_TAB[lot]?.[sheet.codigo]?.controles||{})[c.name]?.valor;
+      return typeof v==="number"?v:null;
+    });
+    if(isSingle){
+      const bgs=data.map((v,li)=>{
+        if(v==null)return"rgba(100,116,139,0.25)";
+        const isAct=!activeLot||sameTabName(validLots[li],activeLot);
+        const pc=ptCol(v,c.limite,c.op);
+        const base=pc==="#ef4444"?"239,68,68":pc==="#f59e0b"?"245,158,11":"34,197,94";
+        return isAct?`rgba(${base},0.88)`:`rgba(${base},0.22)`;
       });
-      datasets.push({label:c.name,data:c.hist.data,backgroundColor:bColors,
-        borderColor:bColors.map(x=>x.replace("0.80","1").replace("0.65","0.9")),
-        borderWidth:1.5,borderRadius:4,
-        datalabels:{...chartDataLabelOptions({suffix:c.unidad||"",decimals:2}),display:true}});
-      if(hasLim) datasets.push({...limLine(nPts,c.limite,`Lím ${c.name}`,"#ef4444"),type:"line"});
+      const bws=validLots.map(lot=>(!activeLot||sameTabName(lot,activeLot))?3:1.5);
+      ds.push({label:c.name,data,backgroundColor:bgs,
+        borderColor:bgs.map(b=>b.replace("0.88","1").replace("0.22","0.50")),
+        borderWidth:bws,borderRadius:4,
+        datalabels:{...chartDataLabelOptions({suffix:c.unidad||"",decimals:2}),display:true,align:"end",
+          color:validLots.map(lot=>(!activeLot||sameTabName(lot,activeLot))?"#f1f5f9":"#475569")}});
+      if(typeof c.limite==="number") ds.push(limLine(validLots.length,c.limite,`Lím ${c.name}`,"#ef4444"));
     } else {
-      const fillOpt=hasLim&&c.op==="max"?{target:{value:c.limite},above:"rgba(239,68,68,0.09)",below:"transparent"}:
-                    hasLim&&c.op==="min"?{target:{value:c.limite},below:"rgba(239,68,68,0.09)",above:"transparent"}:false;
-      datasets.push({label:c.name,data:c.hist.data,borderColor:col,backgroundColor:col+"22",
-        tension:.35,borderWidth:2,fill:fillOpt,
-        pointBackgroundColor:c.hist.data.map(v=>ptCol(v,c.limite,c.op)),
-        pointRadius:4,pointHoverRadius:6,
-        datalabels:{...chartDataLabelOptions({suffix:c.unidad||"",decimals:2}),display:true}});
-      if(hasLim) datasets.push(limLine(nPts,c.limite,`Lím ${c.name}`,"#ef4444"));
+      const bgs=validLots.map(lot=>(!activeLot||sameTabName(lot,activeLot))?h2r(col,0.85):h2r(col,0.22));
+      ds.push({label:c.name,data,backgroundColor:bgs,
+        borderColor:validLots.map(lot=>(!activeLot||sameTabName(lot,activeLot))?h2r(col,1):h2r(col,0.45)),
+        borderWidth:1.5,borderRadius:3,
+        datalabels:{...chartDataLabelOptions({suffix:c.unidad||"",decimals:2}),display:true,
+          color:validLots.map(lot=>(!activeLot||sameTabName(lot,activeLot))?"#f1f5f9":"#475569")}});
+      if(typeof c.limite==="number") ds.push({...limLine(validLots.length,c.limite,`Lím ${c.name}`,"#ef4444"),type:"line"});
     }
   });
   window._c[`trend_${sheet.id}`]=new Chart(cv,{
-    type:useBar?"bar":"line",
-    data:{labels,datasets},
-    options:{responsive:true,
+    type:"bar",
+    data:{labels:validLots,datasets:ds},
+    options:{indexAxis:isSingle?"y":"x",responsive:true,
       plugins:{legend:leg,datalabels:chartDataLabelOptions({suffix:"",decimals:2})},
-      scales:{y:{grid:{color:grd},ticks:{color:tk}},x:{grid:{color:grd},ticks:{color:tk,font:{size:9}}}}
+      scales:{y:{grid:{color:grd},ticks:{color:tk,font:{size:9}}},x:{grid:{color:grd},ticks:{color:tk,font:{size:9}}}}
     }
   });
 });
