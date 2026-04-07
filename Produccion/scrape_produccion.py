@@ -201,6 +201,262 @@ def extract_tab_metrics(rows):
     }
 
 
+def _cell(row, idx):
+    """Safe cell access stripped."""
+    if idx < len(row):
+        return row[idx].strip()
+    return ""
+
+
+def _pn(row, idx):
+    """parse_number from cell."""
+    return parse_number(_cell(row, idx))
+
+
+def _find_date_in_rows(rows, col=0):
+    """Return latest datetime found in a column."""
+    best, best_ts = None, 0
+    for row in rows:
+        dt = parse_date(_cell(row, col))
+        if dt and dt.timestamp() > best_ts:
+            best_ts = dt.timestamp()
+            best = _cell(row, col)
+    return best or ""
+
+
+def _series_from_col(rows, date_col, val_col, min_pts=2):
+    """Extract (date_label, value) pairs from data rows."""
+    pts = []
+    for row in rows:
+        v = _pn(row, val_col)
+        if v is None:
+            continue
+        label = _cell(row, date_col) or f"M{len(pts)+1}"
+        pts.append((label, v))
+    if len(pts) < min_pts:
+        return None
+    return pts
+
+
+def _make_metric(pts):
+    labels = [p[0] for p in pts]
+    hist = [round(p[1], 4) for p in pts]
+    return {
+        "valor": hist[-1],
+        "hist": hist,
+        "labels": labels,
+        "min": round(min(hist), 4),
+        "max": round(max(hist), 4),
+        "avg": round(sum(hist) / len(hist), 4),
+    }
+
+
+# ── RC.PD.05: Control de Ingreso a Cilindros ──────────────────────────────────
+def parse_rc_pd_05(rows):
+    """Parsea RC.PD.05: extrae Kg Ingreso, %H Entrada, %H Salida por sesion de cilindrado."""
+    metrics = {}
+    data = rows[3:] if len(rows) > 3 else []
+    # col 5 = fecha ingreso, col 17 o 8 = kg ingreso (varía por depósito)
+    # col 18 = %H entrada, col 19 = %H salida
+    kg_pts, h_ent_pts, h_sal_pts = [], [], []
+    latest, latest_ts = "", 0
+    for row in data:
+        fecha = _cell(row, 5)
+        # Kg ingreso: buscar en col 17, 8, 11, 14, 20 (varía por depósito)
+        kg = None
+        for c in (17, 8, 11, 14, 20):
+            v = _pn(row, c)
+            if v and v > 100:
+                kg = v
+                break
+        # %H entrada y salida: col 18/19, o 12/13, o 15/16, o 21/22
+        h_ent = None
+        for c in (18, 12, 15, 21, 9):
+            v = _pn(row, c)
+            if v and 5 < v < 60:
+                h_ent = v
+                break
+        h_sal = None
+        for c in (19, 13, 16, 22, 10):
+            v = _pn(row, c)
+            if v and 3 < v < 40:
+                h_sal = v
+                break
+        label = fecha if fecha else f"M{len(kg_pts)+1}"
+        dt = parse_date(fecha)
+        if dt and dt.timestamp() > latest_ts:
+            latest_ts = dt.timestamp()
+            latest = fecha
+        if kg:
+            kg_pts.append((label, kg))
+        if h_ent:
+            h_ent_pts.append((label, h_ent))
+        if h_sal:
+            h_sal_pts.append((label, h_sal))
+    if len(kg_pts) >= 2:
+        metrics["Kg Ingreso Cilindro"] = _make_metric(kg_pts)
+    if len(h_ent_pts) >= 2:
+        metrics["% Humedad Entrada"] = _make_metric(h_ent_pts)
+    if len(h_sal_pts) >= 2:
+        metrics["% Humedad Salida"] = _make_metric(h_sal_pts)
+    return {"metrics": metrics, "latestDate": latest, "latestDateTs": latest_ts, "rows": len(rows)}
+
+
+# ── RC.PD.08: Rendimiento Almendra Pelada Clasificada ────────────────────────
+def parse_rc_pd_08(rows):
+    """Parsea RC.PD.08: busca filas MEDIUM/MIDGET/TINY/TOTAL y extrae kg y % corte."""
+    metrics = {}
+    fecha_sanc = _cell(rows[1], 2) if len(rows) > 1 else ""
+    fecha_quebr = _cell(rows[2], 2) if len(rows) > 2 else ""
+    latest = fecha_quebr or fecha_sanc
+    latest_ts = 0
+    for f in (fecha_quebr, fecha_sanc):
+        dt = parse_date(f)
+        if dt and dt.timestamp() > latest_ts:
+            latest_ts = dt.timestamp()
+
+    tipo_map = {}
+    for row in rows:
+        tipo = _cell(row, 1).upper().strip()
+        if tipo in ("MEDIUM", "MIDGET", "TINY", "TOTAL", "PODRIDA", "PEDAZOS", "CHÍA", "CHIA"):
+            # col 8 = kg, col 9 col 10 = kg total1ª, col 7 = %corte aprox
+            kg = _pn(row, 8)
+            pct_corte_row = None
+            # row 3 tiene "% Corte" label en col 9
+            for c in (7, 6):
+                v = _pn(row, c)
+                if v and 0 < v < 50:
+                    pct_corte_row = v
+                    break
+            tipo_map[tipo] = {"kg": kg, "pct": pct_corte_row}
+
+    # % Corte general: fila 3 col 6 o col 10
+    pct_corte = None
+    if len(rows) > 3:
+        for c in (6, 10):
+            v = _pn(rows[3], c)
+            if v and 0 < v < 50:
+                pct_corte = v
+                break
+
+    label = latest or "L1"
+    if tipo_map.get("TOTAL") and tipo_map["TOTAL"]["kg"]:
+        metrics["Kg Total Clasificada"] = _make_metric([(label, tipo_map["TOTAL"]["kg"])])
+    for tipo_k in ("MEDIUM", "MIDGET", "TINY"):
+        d = tipo_map.get(tipo_k)
+        if d and d["kg"]:
+            metrics[f"Kg {tipo_k}"] = _make_metric([(label, d["kg"])])
+    if pct_corte:
+        metrics["% Corte"] = _make_metric([(label, pct_corte)])
+    return {"metrics": metrics, "latestDate": latest, "latestDateTs": latest_ts, "rows": len(rows)}
+
+
+# ── RC.PD.09: Deshidratación – Temp y Humedad ────────────────────────────────
+def parse_rc_pd_09(rows):
+    """Parsea RC.PD.09: extrae temperatura y % humedad por hora de la primera planilla."""
+    metrics = {}
+    latest, latest_ts = "", 0
+    # filas 5+ : col 0 = hora, col 1 = temp_texto "47º", col 4 = % humedad
+    temp_pts, hum_pts = [], []
+    for row in rows[5:]:
+        hora = _cell(row, 0)
+        temp_raw = _cell(row, 1).replace("°", "").replace("º", "").replace("C", "").strip()
+        temp = parse_number(temp_raw)
+        hum = _pn(row, 4)
+        if not hora:
+            continue
+        label = hora
+        if temp and 20 < temp < 120:
+            temp_pts.append((label, temp))
+        if hum and 0 < hum < 100:
+            hum_pts.append((label, hum))
+    # Latest date: fila 2 col 2 or fila 3
+    for r_idx in (2, 3):
+        if r_idx < len(rows):
+            dt = parse_date(_cell(rows[r_idx], 2))
+            if dt and dt.timestamp() > latest_ts:
+                latest_ts = dt.timestamp()
+                latest = _cell(rows[r_idx], 2)
+    if len(temp_pts) >= 2:
+        metrics["Temp Deshidratacion C"] = _make_metric(temp_pts)
+    if len(hum_pts) >= 2:
+        metrics["% Humedad Final"] = _make_metric(hum_pts)
+    return {"metrics": metrics, "latestDate": latest, "latestDateTs": latest_ts, "rows": len(rows)}
+
+
+# ── RC.PD.11: Control de Sellado ─────────────────────────────────────────────
+def parse_rc_pd_11(rows):
+    """Parsea RC.PD.11 - Control de Sellado.
+    col1 = día (ej. '16-1'), col3 = lote_trazabilidad, col6=cajas MEDIUM,
+    col9=cajas MIDGET, col12=cajas TINY, col13=total cajas, col15=kg total.
+    Fila 14 = TOTAL (acumulado del lote).
+    """
+    metrics = {}
+    cajas_med, cajas_mid, cajas_tin, total_caj, kg_tots = [], [], [], [], []
+    labels = []
+    latest, latest_ts = "", 0
+    # Detectar fecha de cabecera (fila 2 o 3 puede tener fecha en col ~2)
+    for r_idx in (1, 2, 3):
+        if r_idx < len(rows):
+            for ci in range(min(5, len(rows[r_idx]))):
+                dt = parse_date(_cell(rows[r_idx], ci))
+                if dt and dt.timestamp() > latest_ts:
+                    latest_ts = dt.timestamp()
+                    latest = _cell(rows[r_idx], ci)
+    # Iterar filas de datos (5 en adelante, hasta donde haya contenido)
+    for row in rows[5:]:
+        dia = _cell(row, 1)  # ej. "16-1"
+        if not dia or dia == "':":
+            continue
+        c_med = _pn(row, 6)
+        c_mid = _pn(row, 9)
+        c_tin = _pn(row, 12)
+        t_caj = _pn(row, 13)
+        kg_raw = _cell(row, 15).replace(",", "")
+        kg = parse_number(kg_raw) if kg_raw else None
+        tot = t_caj or (c_med or 0) + (c_mid or 0) + (c_tin or 0)
+        if tot and tot > 0:
+            labels.append(dia)
+            cajas_med.append(c_med or 0)
+            cajas_mid.append(c_mid or 0)
+            cajas_tin.append(c_tin or 0)
+            total_caj.append(tot)
+            if kg and kg > 0:
+                kg_tots.append(round(kg, 0))
+    def make_m(hist):
+        if not hist:
+            return None
+        return {"valor": hist[-1], "hist": hist, "labels": labels[: len(hist)], "min": min(hist), "max": max(hist), "avg": round(sum(hist) / len(hist), 2)}
+    if total_caj:
+        metrics["Total Cajas Selladas"] = make_m(total_caj)
+    if cajas_med:
+        metrics["Cajas MEDIUM"] = make_m(cajas_med)
+    if cajas_mid:
+        metrics["Cajas MIDGET"] = make_m(cajas_mid)
+    if cajas_tin:
+        metrics["Cajas TINY"] = make_m(cajas_tin)
+    if kg_tots:
+        metrics["Kg Sellados"] = make_m(kg_tots)
+    return {"metrics": metrics, "latestDate": latest, "latestDateTs": latest_ts, "rows": len(rows)}
+
+
+# ── Dispatcher de parsers especializados ─────────────────────────────────────
+_CUSTOM_PARSERS = {
+    "RC.PD.05": parse_rc_pd_05,
+    "RC.PD.08": parse_rc_pd_08,
+    "RC.PD.09": parse_rc_pd_09,
+    "RC.PD.11": parse_rc_pd_11,
+}
+
+
+def parse_tab(code, rows):
+    """Usa parser especializado si existe, sino el genérico."""
+    fn = _CUSTOM_PARSERS.get(code)
+    if fn:
+        return fn(rows)
+    return extract_tab_metrics(rows)
+
+
 def summarize_record(code, sheet_id):
     record = {
         "codigo": code,
@@ -228,7 +484,7 @@ def summarize_record(code, sheet_id):
         for tab in tabs:
             try:
                 rows = get_table(sheet_id, tab["gid"])
-                info = extract_tab_metrics(rows)
+                info = parse_tab(code, rows)
                 record["byTab"][tab["name"]] = {
                     "rows": info["rows"],
                     "metrics": info["metrics"],
