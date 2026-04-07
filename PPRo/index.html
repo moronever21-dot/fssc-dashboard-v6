@@ -1103,28 +1103,77 @@ trendSheets.forEach((sheet)=>{
   const cv=document.getElementById(`trend-${sheet.id}`);
   if(!cv) return;
   if(!sheet.matchTab) return;
-  /* ================================================================
-     VISTA MULTI-LOTE: siempre muestra TODOS los lotes del registro
-     X = nombres de lote, Y = valor promedio, highlight = lote activo
-  ================================================================ */
+
   const allLotKeys=Object.keys(AGGREGATES_BY_TAB);
-  /* Controles numericos del registro base (excluir cualitativos) */
   const baseSheet=SHEETS.find(s=>s.id===sheet.id);
   const baseCtrls=(baseSheet?.controles||sheet.controles||[]).filter(c=>c.op!=="cualitativo");
-  /* Solo controles con datos numericos en al menos un lote */
+
+  /* ================================================================
+     MODO A — Lote especifico seleccionado:
+     Muestra el historico de mediciones de ESE lote (hist.data)
+     con colores semaforo por punto y zona de riesgo sobre el limite.
+  ================================================================ */
+  if(selectedTab!=="TODAS"){
+    const histControls=(sheet.controles||[]).filter(c=>
+      typeof c.valor==="number"&&c.hist&&Array.isArray(c.hist.data)&&c.hist.data.length
+    );
+    /* Si no hay hist para este lote, caer en modo B (multi-lote) */
+    if(histControls.length){
+      const labels=histControls[0].hist.labels||histControls[0].hist.data.map((_,i)=>`M${i+1}`);
+      const nPts=histControls[0].hist.data.length;
+      const useBar=nPts<=4;
+      const datasets=[];
+      histControls.slice(0,3).forEach((c,idx)=>{
+        const col=palette[idx%palette.length];
+        const hasLim=typeof c.limite==="number";
+        if(useBar){
+          const bColors=c.hist.data.map(v=>{
+            const pc=hasLim?ptCol(v,c.limite,c.op):"#22c55e";
+            return pc==="#ef4444"?"rgba(239,68,68,0.80)":pc==="#f59e0b"?"rgba(245,158,11,0.80)":"rgba(34,197,94,0.65)";
+          });
+          datasets.push({label:c.name,data:c.hist.data,backgroundColor:bColors,
+            borderColor:bColors.map(x=>x.replace("0.80","1").replace("0.65","0.9")),
+            borderWidth:1.5,borderRadius:4,
+            datalabels:{...chartDataLabelOptions({suffix:c.unidad||"",decimals:2}),display:true}});
+          if(hasLim) datasets.push({...limLine(nPts,c.limite,`Lím ${c.name}`,"#ef4444"),type:"line"});
+        } else {
+          const fillOpt=hasLim&&c.op==="max"?{target:{value:c.limite},above:"rgba(239,68,68,0.09)",below:"transparent"}:
+                        hasLim&&c.op==="min"?{target:{value:c.limite},below:"rgba(239,68,68,0.09)",above:"transparent"}:false;
+          datasets.push({label:c.name,data:c.hist.data,borderColor:col,backgroundColor:col+"22",
+            tension:.35,borderWidth:2,fill:fillOpt,
+            pointBackgroundColor:c.hist.data.map(v=>ptCol(v,c.limite,c.op)),
+            pointRadius:4,pointHoverRadius:6,
+            datalabels:{...chartDataLabelOptions({suffix:c.unidad||"",decimals:2}),display:true}});
+          if(hasLim) datasets.push(limLine(nPts,c.limite,`Lím ${c.name}`,"#ef4444"));
+        }
+      });
+      window._c[`trend_${sheet.id}`]=new Chart(cv,{
+        type:useBar?"bar":"line",
+        data:{labels,datasets},
+        options:{responsive:true,
+          plugins:{legend:leg,datalabels:chartDataLabelOptions({suffix:"",decimals:2})},
+          scales:{y:{grid:{color:grd},ticks:{color:tk}},x:{grid:{color:grd},ticks:{color:tk,font:{size:9}}}}
+        }
+      });
+      return; /* hecho para este sheet */
+    }
+    /* Fallthrough a modo B si no hay hist para este lote */
+  }
+
+  /* ================================================================
+     MODO B — "TODAS" o sin hist: comparacion multi-lote
+     X = todos los nombres de lote, Y = valor promedio por lote
+  ================================================================ */
   const numCtrls=baseCtrls.filter(c=>allLotKeys.some(lot=>{
     const v=(AGGREGATES_BY_TAB[lot]?.[sheet.codigo]?.controles||{})[c.name]?.valor;
     return typeof v==="number";
   })).slice(0,3);
   if(!numCtrls.length) return;
-  /* Lotes que tienen datos para este registro */
   const validLots=allLotKeys.filter(lot=>numCtrls.some(c=>{
     const v=(AGGREGATES_BY_TAB[lot]?.[sheet.codigo]?.controles||{})[c.name]?.valor;
     return typeof v==="number";
   }));
   if(!validLots.length) return;
-  /* Lote resaltado: true = full opacity, false = atenuado */
-  const hi=(lot)=>selectedTab==="TODAS"||sameTabName(lot,selectedTab);
   const isSingle=numCtrls.length===1;
   const datasets=[];
   numCtrls.forEach((c,idx)=>{
@@ -1134,23 +1183,19 @@ trendSheets.forEach((sheet)=>{
       return typeof v==="number"?v:null;
     });
     if(isSingle){
-      /* Una metrica: barras con color semaforo + highlight lote seleccionado */
       const bgs=validLots.map((lot,i)=>{
-        const v=data[i];
-        if(v==null)return"rgba(100,116,139,0.25)";
+        const v=data[i]; if(v==null)return"rgba(100,116,139,0.25)";
         const pc=ptCol(v,c.limite,c.op);
         const base=pc==="#ef4444"?"239,68,68":pc==="#f59e0b"?"245,158,11":"34,197,94";
-        return`rgba(${base},${hi(lot)?0.82:0.30})`;
+        return`rgba(${base},0.80)`;
       });
-      const bds=bgs.map((b,i)=>b.replace(/[\d.]+\)$/,hi(validLots[i])?"1)":"0.45)"));
-      datasets.push({label:c.name,data,backgroundColor:bgs,borderColor:bds,borderWidth:1.5,borderRadius:4,
+      datasets.push({label:c.name,data,backgroundColor:bgs,
+        borderColor:bgs.map(b=>b.replace("0.80","1")),borderWidth:1.5,borderRadius:4,
         datalabels:{...chartDataLabelOptions({suffix:c.unidad||"",decimals:2}),display:true,align:"end"}});
-      /* Linea de limite en barras horizontales */
       if(typeof c.limite==="number") datasets.push(limLine(validLots.length,c.limite,`Lím ${c.name}`,"#ef4444"));
     } else {
-      /* Multiples metricas: barras agrupadas con paleta + highlight */
-      const bgs=validLots.map(lot=>h2r(col,hi(lot)?0.82:0.25));
-      const bds=validLots.map(lot=>h2r(col,hi(lot)?1:0.4));
+      const bgs=validLots.map(()=>h2r(col,0.78));
+      const bds=validLots.map(()=>h2r(col,1));
       datasets.push({label:c.name,data,backgroundColor:bgs,borderColor:bds,borderWidth:1.5,borderRadius:3,
         datalabels:{...chartDataLabelOptions({suffix:c.unidad||"",decimals:2}),display:true}});
       if(typeof c.limite==="number") datasets.push({...limLine(validLots.length,c.limite,`Lím ${c.name}`,"#ef4444"),type:"line"});
@@ -1162,11 +1207,8 @@ trendSheets.forEach((sheet)=>{
     options:{
       indexAxis:isSingle?"y":"x",
       responsive:true,
-      plugins:{legend:leg,datalabels:{display:false}},
-      scales:{
-        y:{grid:{color:grd},ticks:{color:tk,font:{size:9}}},
-        x:{grid:{color:grd},ticks:{color:tk,font:{size:9}}}
-      }
+      plugins:{legend:leg,datalabels:chartDataLabelOptions({suffix:"",decimals:2})},
+      scales:{y:{grid:{color:grd},ticks:{color:tk,font:{size:9}}},x:{grid:{color:grd},ticks:{color:tk,font:{size:9}}}}
     }
   });
 });
