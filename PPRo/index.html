@@ -36,6 +36,7 @@ a.btn-alerta:hover{background:rgba(239,68,68,.3);color:#fff}
 <script src="../Produccion/produccion_aggregates_generated.js"></script>
 <script src="../Produccion/calculos_dashboard_produccion.js"></script>
 <script src="../Produccion/lote_info_pd02.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script type="text/babel">
 const{useEffect,useRef,useState,useMemo}=React;
@@ -478,6 +479,8 @@ const [selectedRegistro,setSelectedRegistro]=useState("TODOS");
 const [selectedProdTab,setSelectedProdTab]=useState("TODAS");
 const [sidebarProdOpen,setSidebarProdOpen]=useState(true);
 const [sidebarQualityOpen,setSidebarQualityOpen]=useState(false);
+const [pdfModalOpen,setPdfModalOpen]=useState(false);
+const [pdfGenerating,setPdfGenerating]=useState(false);
 const computedSheets=useMemo(()=>{
   const clone=JSON.parse(JSON.stringify(SHEETS));
   const agg=AGGREGATES_BY_TAB[selectedTab]||{};
@@ -1299,6 +1302,107 @@ const e8=document.getElementById("ch8");
 if(e8)window._c.c8=new Chart(e8,{type:"doughnut",data:{labels:["Conforme","Advertencia","No Conforme","Sin Datos/Maestro"],datasets:[{data:[okN,wN,aL,noD],backgroundColor:["rgba(34,197,94,.8)","rgba(245,158,11,.8)","rgba(239,68,68,.8)","rgba(100,116,139,.4)"],borderColor:["#16a34a","#d97706","#b91c1c","#475569"],borderWidth:2}]},options:{responsive:true,plugins:{legend:{labels:{color:"#94a3b8",font:{size:10}}},datalabels:doughnutLabelOptions()}}});
 },[selectedTab,selectedRegistro,activeSheets.length,trendSheets]);
 
+const generarInformePDF=async()=>{
+  if(pdfGenerating)return;
+  setPdfGenerating(true);
+  try{
+    const{jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const mg=25.4,pw=210,ph=297,cw=pw-mg*2,bsz=11,lh=7.7,ind=12.7;
+    let y=mg;
+    const chkPg=(h=lh)=>{if(y+h>ph-mg){doc.addPage();y=mg;}};
+    const addPara=(text,opts={})=>{
+      const{italic=false,size=bsz,noInd=false}=opts;
+      doc.setFont("helvetica",italic?"italic":"normal");
+      doc.setFontSize(size);
+      const mw=cw-(noInd?0:ind);
+      const lines=doc.splitTextToSize(text,mw);
+      lines.forEach((line,i)=>{chkPg();doc.text(line,mg+(i===0&&!noInd?ind:0),y);y+=lh;});
+      y+=3;
+    };
+    const addH=(text,lvl=1)=>{
+      const sz={1:16,2:13,3:12}[lvl]||bsz;
+      chkPg(sz*0.35+8);
+      doc.setFont("helvetica","bold");
+      doc.setFontSize(sz);
+      const lines=doc.splitTextToSize(text,cw);
+      lines.forEach(line=>{chkPg();doc.text(line,lvl===1?pw/2:mg,y,{align:lvl===1?'center':'left'});y+=lh;});
+      y+=4;
+    };
+    /* PORTADA */
+    y=90;
+    addH("Informe de Control de Calidad",1);
+    addH("FSSC 22000 v6 — INGAMA Beneficiadora",1);
+    y+=4;
+    doc.setFont("helvetica","normal");doc.setFontSize(12);
+    [
+      selectedTab==="TODAS"?"Alcance: Todos los lotes activos":`Lote/Pestaña: ${selectedTab}`,
+      selectedRegistro!=="TODOS"?`Registro específico: ${selectedRegistro}`:"Registros: Todos los activos",
+      new Date().toLocaleDateString('es-BO',{year:'numeric',month:'long',day:'numeric'}),
+      "Sistema de Gestión de Inocuidad Alimentaria FSSC 22000 v6"
+    ].forEach(line=>{doc.text(line,pw/2,y,{align:"center"});y+=lh;});
+    /* PAG 2: ANÁLISIS */
+    doc.addPage();y=mg;
+    addH("Análisis de Tendencias con Límites Críticos",1);
+    addPara(`El presente informe contiene el análisis de los registros de control de calidad del sistema FSSC 22000 v6 de INGAMA Beneficiadora para ${selectedTab==="TODAS"?"todos los lotes activos":`el lote ${selectedTab}`}. Cada sección incluye la tendencia gráfica del registro seguida de un párrafo interpretativo que clasifica el estado de conformidad según los límites críticos establecidos.`);
+    const sheetsExp=trendSheets.filter(s=>s.matchTab&&(selectedRegistro==="TODOS"||s.codigo===selectedRegistro));
+    let figN=0;
+    for(const sheet of sheetsExp){
+      figN++;
+      const ctrlsN=(sheet.controles||[]).filter(c=>typeof c.valor==="number");
+      const fueraC=ctrlsN.filter(c=>fuera(c));
+      const cercaC=ctrlsN.filter(c=>cerca(c));
+      chkPg(40);
+      addH(`${sheet.codigo} — ${sheet.nombre}`,2);
+      /* GRÁFICO */
+      const cv=document.getElementById(`trend-${sheet.id}-${canonicalTabName(selectedTab)}`);
+      if(cv&&cv.width>0&&cv.height>0){
+        const imgD=cv.toDataURL('image/png');
+        const ratio=cv.height/cv.width;
+        const iW=cw,iH=iW*ratio;
+        chkPg(iH+20);
+        doc.addImage(imgD,'PNG',mg,y,iW,iH);
+        y+=iH+3;
+        const cap=`Figura ${figN}. Tendencia histórica de controles críticos — ${sheet.codigo}: ${sheet.nombre}${selectedTab!=="TODAS"?` (Lote: ${selectedTab})`:", todos los lotes"}.`;
+        doc.setFont("helvetica","italic");doc.setFontSize(10);
+        doc.splitTextToSize(cap,cw).forEach(line=>{chkPg(5.5);doc.text(line,mg,y);y+=5.5;});
+        y+=5;
+      }
+      /* PÁRRAFO INTERPRETATIVO */
+      let par="";
+      if(fueraC.length){
+        const det=fueraC.map(c=>`${c.name} con valor ${c.valor}${c.unidad} (límite ${c.op==="max"?"<":"≥"}${c.limite}${typeof c.limite==="number"?c.unidad:""})`).join("; ");
+        par=`El registro ${sheet.codigo} (${sheet.nombre}) presentó no conformidades en ${fueraC.length===1?"un":fueraC.length} control(es): ${det}. Estos resultados requieren la aplicación inmediata de acciones correctivas conforme al procedimiento establecido en el sistema de gestión de inocuidad FSSC 22000 v6 de INGAMA Beneficiadora, debiendo documentarse en los registros correspondientes.`;
+      }else if(cercaC.length){
+        const det=cercaC.map(c=>`${c.name}: ${c.valor}${c.unidad}`).join(", ");
+        par=`El registro ${sheet.codigo} (${sheet.nombre}) opera dentro de los parámetros de inocuidad establecidos; sin embargo, ${cercaC.length===1?"un control presentó valores":`${cercaC.length} controles presentaron valores`} próximos al límite crítico: ${det}. Se recomienda el monitoreo continuo y la aplicación de medidas preventivas conforme a los requisitos del sistema FSSC 22000 v6.`;
+      }else if(ctrlsN.length){
+        par=`El registro ${sheet.codigo} (${sheet.nombre}) demostró plena conformidad en todos los controles críticos evaluados${selectedTab!=="TODAS"?` para el lote ${selectedTab}`:""}. Los valores registrados se mantuvieron dentro de los límites establecidos en el sistema FSSC 22000 v6 de INGAMA Beneficiadora, sin evidencia de desviaciones que comprometan la inocuidad del producto.`;
+      }else{
+        par=`El registro ${sheet.codigo} (${sheet.nombre}) no presenta datos numéricos disponibles para el período analizado. Se recomienda verificar la disponibilidad de información en las planillas de control correspondientes.`;
+      }
+      addPara(par);
+    }
+    /* REFERENCIAS */
+    chkPg(60);y+=8;
+    addH("Referencias",1);
+    [
+      "Food Safety System Certification (FSSC). (2023). FSSC 22000 Scheme version 6. Foundation FSSC 22000.",
+      "ISO. (2018). ISO 22000:2018 — Food safety management systems: Requirements for any organization in the food chain. International Organization for Standardization.",
+      "INGAMA Beneficiadora. (2026). Registros de control de calidad FSSC 22000 v6 [Base de datos interna del sistema de gestión]. INGAMA."
+    ].forEach(ref=>{
+      const rl=doc.splitTextToSize(ref,cw-ind);
+      rl.forEach((line,li)=>{chkPg();doc.text(line,li===0?mg:mg+ind,y);y+=lh;});
+      y+=3;
+    });
+    /* GUARDAR */
+    const now=new Date();
+    const ds=`${now.getFullYear()}${String(now.getMonth()+1).padStart(2,"0")}${String(now.getDate()).padStart(2,"0")}`;
+    doc.save(`INGAMA_Calidad_${(selectedRegistro!=="TODOS"?selectedRegistro:"todos").replace(/[^A-Za-z0-9]/g,"_")}_${(selectedTab!=="TODAS"?selectedTab:"todos-lotes").replace(/\s/g,"-")}_${ds}.pdf`);
+  }catch(e){console.error("PDF error:",e);alert("Error al generar PDF: "+(e.message||String(e)));}
+  setPdfGenerating(false);
+};
+
 return(
 <div className="min-h-screen relative">
 
@@ -1566,6 +1670,9 @@ return(
     <div className="text-right mono text-xs space-y-1">
       <div className="text-green-400 font-bold">SISTEMA ACTIVO</div>
       <div className="text-slate-500">Ultima actualizacion: 31/03/2026</div>
+      <button onClick={()=>setPdfModalOpen(true)} disabled={pdfGenerating} className="mt-2 px-3 py-1.5 text-xs rounded-lg bg-cyan-800/70 hover:bg-cyan-700 border border-cyan-600/50 text-cyan-100 font-bold disabled:opacity-50" style={{fontFamily:"inherit"}}>
+        {pdfGenerating?"Generando PDF...":"⬇ Exportar PDF"}
+      </button>
     </div>
   </div>
 
@@ -1798,6 +1905,20 @@ return(
       </div>
     </div>
   </div>
+{pdfModalOpen&&(<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={()=>!pdfGenerating&&setPdfModalOpen(false)}>
+  <div className="bg-slate-900 border border-cyan-700/60 rounded-xl p-7 max-w-md w-full mx-4 shadow-2xl" onClick={e=>e.stopPropagation()}>
+    <h3 className="text-lg font-bold text-cyan-400 mb-5">Exportar Informe PDF &#x2014; APA 7.ª ed.</h3>
+    <div className="space-y-2 mb-5">
+      <p className="text-sm text-slate-300">Alcance registros: <span className="font-bold text-cyan-300">{selectedRegistro==="TODOS"?"Todos los activos":selectedRegistro}</span></p>
+      <p className="text-sm text-slate-300">Pestaña/Lote: <span className="font-bold text-cyan-300">{selectedTab}</span></p>
+      <p className="text-xs text-slate-500 mt-3">El PDF incluirá: portada, gráficos de tendencia centrados con caption APA, párrafo interpretativo por registro (conforme / advertencia / no conformidad) y referencias bibliográficas.</p>
+    </div>
+    <div className="flex gap-3 justify-end">
+      <button onClick={()=>setPdfModalOpen(false)} disabled={pdfGenerating} className="px-4 py-2 text-sm rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 disabled:opacity-40">Cancelar</button>
+      <button onClick={()=>{setPdfModalOpen(false);generarInformePDF();}} disabled={pdfGenerating} className="px-4 py-2 text-sm rounded-lg bg-cyan-700 hover:bg-cyan-600 text-white font-bold disabled:opacity-40">{pdfGenerating?"Generando...":"⬇ Generar y descargar"}</button>
+    </div>
+  </div>
+</div>)}
 </div>
 )}
 </div>);}
