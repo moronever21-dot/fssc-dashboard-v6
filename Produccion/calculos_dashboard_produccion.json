@@ -1,499 +1,693 @@
 {
-  "version": "2026-04-03-modulos",
+  "version": "2026-04-07-parsers-reales",
   "estado": "operativo-por-lote",
   "origen": "produccion_aggregates_generated.json",
   "lotes_disponibles": [
-    "AA 01-26",
-    "AA 02-26",
+    "RG 01-CV",
+    "RG 02-CV",
     "BSI 01",
     "DA 01-CV",
-    "RG 01-CV",
-    "RG 02-CV"
-  ],
-  "modulos": [
-    {
-      "nombre": "Modulo de Rendimiento (Masa y Dinero)",
-      "kpis": [
-        {
-          "nombre": "Rendimiento de Pre-Limpieza",
-          "formula": "(Kg Salida RC.PD.03 / Kg Entrada RC.PD.02) * 100",
-          "visualizacion": "Gauge"
-        },
-        {
-          "nombre": "Rendimiento Final por Lote",
-          "formula": "(Kg Sellados RC.PD.11 / Kg Entrada RC.PD.02) * 100",
-          "visualizacion": "Scorecard"
-        },
-        {
-          "nombre": "Cascada de Merma Total",
-          "formula": "PD.02 inicio, PD.05 merma cilindros, PD.09 merma horno, PD.11 final",
-          "visualizacion": "Waterfall"
-        }
-      ]
-    },
-    {
-      "nombre": "Modulo de Calidad e Inocuidad (Seguridad Alimentaria)",
-      "kpis": [
-        {
-          "nombre": "Control de Humedad Critica (PCC)",
-          "formula": "Humedad RC.PD.07 <= 10%",
-          "visualizacion": "Linea con alerta roja"
-        },
-        {
-          "nombre": "Indice de Dano por Corte",
-          "formula": "Promedio % Corte RC.PD.08 por lote",
-          "visualizacion": "Barras, alerta > 5%"
-        },
-        {
-          "nombre": "Estabilidad de Temperatura de Secado",
-          "formula": "Temperatura RC.PD.09 alrededor de 75C",
-          "visualizacion": "Control Chart"
-        }
-      ]
-    },
-    {
-      "nombre": "Modulo de Clasificacion y Despacho (Comercial)",
-      "kpis": [
-        {
-          "nombre": "Mix de Calidades",
-          "formula": "Medium/Midget/Tiny de RC.PD.11",
-          "visualizacion": "Pie Chart"
-        },
-        {
-          "nombre": "Conciliacion Almacen vs Carga",
-          "formula": "Stock Inicial RC.PD.12 - Carga RC.PD.13",
-          "visualizacion": "Tabla de Alertas"
-        }
-      ]
-    }
+    "AA 01-26",
+    "AA 02-26"
   ],
   "por_lote": {
-    "AA 01-26": {
-      "inputs": {
-        "kg_entrada_pd02": {
-          "valor": 801.0,
-          "fuente": "Columna 8"
-        },
-        "kg_salida_pd03": {
-          "valor": 2.64,
-          "fuente": "REGISTRO PRE - LIMPIEZA Y CLASIFICADO"
-        },
-        "kg_sellados_pd11": {
-          "valor": 0.21,
-          "fuente": "REGISTRO CONTROL DE SELLADO"
-        },
-        "merma_cilindros_pd05_kg": {
-          "valor": 12600.0,
-          "fuente": "MERMA Kg"
-        },
-        "merma_horno_pd09_kg": {
-          "valor": 0.0,
-          "fuente": "Columna 9"
-        },
-        "humedad_pd07_pct": {
-          "valor": 0.0,
-          "fuente": "Columna 29"
-        },
-        "temperatura_pd09_c": {
-          "valor": 0.0,
-          "fuente": "75 °C 75 - 80 °C FT"
-        },
-        "corte_pd08_pct": {
-          "valor": 46.5,
-          "fuente": "Columna 12"
-        },
-        "medium_pd11": {
-          "valor": 15.0,
-          "fuente": "Columna 10"
-        },
-        "midget_pd11": {
-          "valor": 0.21,
-          "fuente": "Columna 11"
-        },
-        "tiny_pd11": {
-          "valor": -14.0,
-          "fuente": "Columna 12"
-        },
-        "stock_pd12": {
-          "valor": 137.0,
-          "fuente": "Columna 21"
-        },
-        "carga_pd13": {
-          "valor": null,
-          "fuente": ""
-        }
-      },
-      "kpis": {
-        "rendimiento_pre_limpieza_pct": 0.33,
-        "rendimiento_final_lote_pct": 0.03,
-        "pcc_humedad_estado": "VERDE",
-        "indice_dano_corte_pct": 46.5,
-        "indice_dano_corte_alerta": "ROJO",
-        "estabilidad_temperatura_estado": "VERDE",
-        "conciliacion_almacen_carga_delta": null
-      },
-      "waterfall_mermas": {
-        "inicio_pd02_kg": 801.0,
-        "menos_merma_cilindros_pd05_kg": -12600.0,
-        "menos_merma_horno_pd09_kg": -0.0,
-        "final_pd11_kg": 0.21
-      }
-    },
-    "AA 02-26": {
-      "inputs": {
-        "kg_entrada_pd02": {
-          "valor": 839.0,
-          "fuente": "Columna 8"
-        },
-        "kg_salida_pd03": {
-          "valor": 3.12,
-          "fuente": "REGISTRO PRE - LIMPIEZA Y CLASIFICADO"
-        },
-        "kg_sellados_pd11": {
-          "valor": 0.21,
-          "fuente": "REGISTRO CONTROL DE SELLADO"
-        },
-        "merma_cilindros_pd05_kg": {
-          "valor": 9257.0,
-          "fuente": "MERMA Kg"
-        },
-        "merma_horno_pd09_kg": {
-          "valor": 0.0,
-          "fuente": "Columna 9"
-        },
-        "humedad_pd07_pct": {
-          "valor": 0.0,
-          "fuente": "Columna 29"
-        },
-        "temperatura_pd09_c": {
-          "valor": 0.0,
-          "fuente": "75 °C 75 - 80 °C FT"
-        },
-        "corte_pd08_pct": {
-          "valor": 21.0,
-          "fuente": "Columna 12"
-        },
-        "medium_pd11": {
-          "valor": 41.0,
-          "fuente": "Columna 10"
-        },
-        "midget_pd11": {
-          "valor": 0.21,
-          "fuente": "Columna 11"
-        },
-        "tiny_pd11": {
-          "valor": -14.0,
-          "fuente": "Columna 12"
-        },
-        "stock_pd12": {
-          "valor": 153.0,
-          "fuente": "Columna 21"
-        },
-        "carga_pd13": {
-          "valor": 900.0,
-          "fuente": "REGISTRO CONOCIMIENTO DE CARGA"
-        }
-      },
-      "kpis": {
-        "rendimiento_pre_limpieza_pct": 0.37,
-        "rendimiento_final_lote_pct": 0.02,
-        "pcc_humedad_estado": "VERDE",
-        "indice_dano_corte_pct": 21.0,
-        "indice_dano_corte_alerta": "ROJO",
-        "estabilidad_temperatura_estado": "VERDE",
-        "conciliacion_almacen_carga_delta": -747.0
-      },
-      "waterfall_mermas": {
-        "inicio_pd02_kg": 839.0,
-        "menos_merma_cilindros_pd05_kg": -9257.0,
-        "menos_merma_horno_pd09_kg": -0.0,
-        "final_pd11_kg": 0.21
-      }
-    },
-    "BSI 01": {
-      "inputs": {
-        "kg_entrada_pd02": {
-          "valor": 791.0,
-          "fuente": "Columna 8"
-        },
-        "kg_salida_pd03": {
-          "valor": 5.46,
-          "fuente": "REGISTRO PRE - LIMPIEZA Y CLASIFICADO"
-        },
-        "kg_sellados_pd11": {
-          "valor": 0.21,
-          "fuente": "REGISTRO CONTROL DE SELLADO"
-        },
-        "merma_cilindros_pd05_kg": {
-          "valor": 8501.0,
-          "fuente": "MERMA Kg"
-        },
-        "merma_horno_pd09_kg": {
-          "valor": 0.0,
-          "fuente": "Columna 9"
-        },
-        "humedad_pd07_pct": {
-          "valor": 5.0,
-          "fuente": "Columna 29"
-        },
-        "temperatura_pd09_c": {
-          "valor": 0.0,
-          "fuente": "75 °C 75 - 80 °C FT"
-        },
-        "corte_pd08_pct": {
-          "valor": 48.0,
-          "fuente": "Columna 12"
-        },
-        "medium_pd11": {
-          "valor": 51.0,
-          "fuente": "Columna 10"
-        },
-        "midget_pd11": {
-          "valor": 0.21,
-          "fuente": "Columna 11"
-        },
-        "tiny_pd11": {
-          "valor": -14.0,
-          "fuente": "Columna 12"
-        },
-        "stock_pd12": {
-          "valor": 89.0,
-          "fuente": "Columna 21"
-        },
-        "carga_pd13": {
-          "valor": null,
-          "fuente": ""
-        }
-      },
-      "kpis": {
-        "rendimiento_pre_limpieza_pct": 0.69,
-        "rendimiento_final_lote_pct": 0.03,
-        "pcc_humedad_estado": "VERDE",
-        "indice_dano_corte_pct": 48.0,
-        "indice_dano_corte_alerta": "ROJO",
-        "estabilidad_temperatura_estado": "VERDE",
-        "conciliacion_almacen_carga_delta": null
-      },
-      "waterfall_mermas": {
-        "inicio_pd02_kg": 791.0,
-        "menos_merma_cilindros_pd05_kg": -8501.0,
-        "menos_merma_horno_pd09_kg": -0.0,
-        "final_pd11_kg": 0.21
-      }
-    },
-    "DA 01-CV": {
-      "inputs": {
-        "kg_entrada_pd02": {
-          "valor": 840.0,
-          "fuente": "Columna 8"
-        },
-        "kg_salida_pd03": {
-          "valor": 5.52,
-          "fuente": "REGISTRO PRE - LIMPIEZA Y CLASIFICADO"
-        },
-        "kg_sellados_pd11": {
-          "valor": 0.21,
-          "fuente": "REGISTRO CONTROL DE SELLADO"
-        },
-        "merma_cilindros_pd05_kg": {
-          "valor": 9170.0,
-          "fuente": "MERMA Kg"
-        },
-        "merma_horno_pd09_kg": {
-          "valor": 0.0,
-          "fuente": "Columna 9"
-        },
-        "humedad_pd07_pct": {
-          "valor": 0.0,
-          "fuente": "Columna 29"
-        },
-        "temperatura_pd09_c": {
-          "valor": 0.0,
-          "fuente": "75 °C 75 - 80 °C FT"
-        },
-        "corte_pd08_pct": {
-          "valor": 51.5,
-          "fuente": "Columna 12"
-        },
-        "medium_pd11": {
-          "valor": 17.0,
-          "fuente": "Columna 10"
-        },
-        "midget_pd11": {
-          "valor": 0.21,
-          "fuente": "Columna 11"
-        },
-        "tiny_pd11": {
-          "valor": -14.0,
-          "fuente": "Columna 12"
-        },
-        "stock_pd12": {
-          "valor": 148.0,
-          "fuente": "Columna 21"
-        },
-        "carga_pd13": {
-          "valor": null,
-          "fuente": ""
-        }
-      },
-      "kpis": {
-        "rendimiento_pre_limpieza_pct": 0.66,
-        "rendimiento_final_lote_pct": 0.02,
-        "pcc_humedad_estado": "VERDE",
-        "indice_dano_corte_pct": 51.5,
-        "indice_dano_corte_alerta": "ROJO",
-        "estabilidad_temperatura_estado": "VERDE",
-        "conciliacion_almacen_carga_delta": null
-      },
-      "waterfall_mermas": {
-        "inicio_pd02_kg": 840.0,
-        "menos_merma_cilindros_pd05_kg": -9170.0,
-        "menos_merma_horno_pd09_kg": -0.0,
-        "final_pd11_kg": 0.21
-      }
-    },
     "RG 01-CV": {
       "inputs": {
         "kg_entrada_pd02": {
-          "valor": 812.0,
-          "fuente": "Columna 8"
+          "valor": 1624.0,
+          "fuente": "Columna 8 – RC.PD.02"
         },
-        "kg_salida_pd03": {
-          "valor": 4.86,
-          "fuente": "REGISTRO PRE - LIMPIEZA Y CLASIFICADO"
+        "kg_ingreso_cil_pd05": {
+          "valor": null,
+          "fuente": "Kg Ingreso Cilindro – RC.PD.05"
         },
-        "kg_sellados_pd11": {
-          "valor": 0.21,
-          "fuente": "REGISTRO CONTROL DE SELLADO"
+        "humedad_entrada_pd05_pct": {
+          "valor": 22.1111,
+          "fuente": "% Humedad Entrada – RC.PD.05"
         },
-        "merma_cilindros_pd05_kg": {
-          "valor": 6410.0,
-          "fuente": "MERMA Kg"
-        },
-        "merma_horno_pd09_kg": {
-          "valor": 11.83,
-          "fuente": "Columna 9"
-        },
-        "humedad_pd07_pct": {
-          "valor": 0.0,
-          "fuente": "Columna 29"
-        },
-        "temperatura_pd09_c": {
-          "valor": 11.82,
-          "fuente": "75 °C 75 - 80 °C FT"
+        "humedad_salida_pd05_pct": {
+          "valor": 15.5556,
+          "fuente": "% Humedad Salida – RC.PD.05"
         },
         "corte_pd08_pct": {
-          "valor": 49.2,
-          "fuente": "Columna 12"
+          "valor": 5.7,
+          "fuente": "% Corte – RC.PD.08"
+        },
+        "medium_pd08_kg": {
+          "valor": 710.0,
+          "fuente": "Kg MEDIUM – RC.PD.08"
+        },
+        "midget_pd08_kg": {
+          "valor": 946.0,
+          "fuente": "Kg MIDGET – RC.PD.08"
+        },
+        "tiny_pd08_kg": {
+          "valor": 22.0,
+          "fuente": "Kg TINY – RC.PD.08"
+        },
+        "kg_clasificada_pd08": {
+          "valor": 3441.7,
+          "fuente": "Kg Total Clasificada – RC.PD.08"
+        },
+        "temperatura_pd09_c": {
+          "valor": 65.7455,
+          "fuente": "Temp Deshidratacion – RC.PD.09"
+        },
+        "humedad_pd07_pct": {
+          "valor": 7.0737,
+          "fuente": "% Humedad Final – RC.PD.09"
+        },
+        "cajas_medium_pd11": {
+          "valor": 235.0,
+          "fuente": "Cajas MEDIUM sum – RC.PD.11"
+        },
+        "cajas_midget_pd11": {
+          "valor": 653.0,
+          "fuente": "Cajas MIDGET sum – RC.PD.11"
+        },
+        "cajas_tiny_pd11": {
+          "valor": 55.0,
+          "fuente": "Cajas TINY sum – RC.PD.11"
         },
         "medium_pd11": {
-          "valor": 18.0,
-          "fuente": "Columna 10"
+          "valor": 235.0,
+          "fuente": "Cajas MEDIUM sum – RC.PD.11"
         },
         "midget_pd11": {
-          "valor": 0.21,
-          "fuente": "Columna 11"
+          "valor": 653.0,
+          "fuente": "Cajas MIDGET sum – RC.PD.11"
         },
         "tiny_pd11": {
-          "valor": -13.0,
-          "fuente": "Columna 12"
+          "valor": 55.0,
+          "fuente": "Cajas TINY sum – RC.PD.11"
+        },
+        "kg_sellados_pd11": {
+          "valor": 19020.0,
+          "fuente": "Kg Sellados sum – RC.PD.11"
+        },
+        "total_cajas_pd11": {
+          "valor": 897.0,
+          "fuente": "Total Cajas sum – RC.PD.11"
         },
         "stock_pd12": {
-          "valor": 32.0,
-          "fuente": "Columna 21"
+          "valor": null,
+          "fuente": "RC.PD.12 – pendiente parser"
         },
         "carga_pd13": {
-          "valor": 800.0,
-          "fuente": "REGISTRO CONOCIMIENTO DE CARGA"
+          "valor": null,
+          "fuente": "RC.PD.13 – pendiente parser"
+        },
+        "merma_cilindros_pd05_kg": {
+          "valor": null,
+          "fuente": "Estimado: PD02 - PD08"
+        },
+        "merma_horno_pd09_kg": {
+          "valor": null,
+          "fuente": "Estimado: PD08 - PD11"
         }
       },
       "kpis": {
-        "rendimiento_pre_limpieza_pct": 0.6,
-        "rendimiento_final_lote_pct": 0.03,
+        "rendimiento_clasificacion_pct": null,
+        "rendimiento_pre_limpieza_pct": null,
+        "rendimiento_final_lote_pct": null,
         "pcc_humedad_estado": "VERDE",
-        "indice_dano_corte_pct": 49.2,
-        "indice_dano_corte_alerta": "ROJO",
+        "indice_dano_corte_pct": 5.7,
+        "indice_dano_corte_alerta": "AMARILLO",
         "estabilidad_temperatura_estado": "VERDE",
-        "conciliacion_almacen_carga_delta": -768.0
+        "conciliacion_almacen_carga_delta": null
       },
       "waterfall_mermas": {
-        "inicio_pd02_kg": 812.0,
-        "menos_merma_cilindros_pd05_kg": -6410.0,
-        "menos_merma_horno_pd09_kg": -11.83,
-        "final_pd11_kg": 0.21
+        "inicio_pd02_kg": 1624.0,
+        "clasificada_pd08_kg": 3441.7,
+        "menos_merma_cilindros_pd05_kg": null,
+        "menos_merma_horno_pd09_kg": null,
+        "final_pd11_kg": 19020.0
       }
     },
     "RG 02-CV": {
       "inputs": {
         "kg_entrada_pd02": {
-          "valor": 830.0,
-          "fuente": "Columna 8"
+          "valor": 1660.0,
+          "fuente": "Columna 8 – RC.PD.02"
         },
-        "kg_salida_pd03": {
-          "valor": 5.46,
-          "fuente": "REGISTRO PRE - LIMPIEZA Y CLASIFICADO"
+        "kg_ingreso_cil_pd05": {
+          "valor": 34500.0,
+          "fuente": "Kg Ingreso Cilindro – RC.PD.05"
         },
-        "kg_sellados_pd11": {
-          "valor": 0.21,
-          "fuente": "REGISTRO CONTROL DE SELLADO"
+        "humedad_entrada_pd05_pct": {
+          "valor": 27.0,
+          "fuente": "% Humedad Entrada – RC.PD.05"
         },
-        "merma_cilindros_pd05_kg": {
-          "valor": 10802.0,
-          "fuente": "MERMA Kg"
-        },
-        "merma_horno_pd09_kg": {
-          "valor": 0.0,
-          "fuente": "Columna 9"
-        },
-        "humedad_pd07_pct": {
-          "valor": 28.0,
-          "fuente": "Columna 29"
-        },
-        "temperatura_pd09_c": {
-          "valor": 0.0,
-          "fuente": "75 °C 75 - 80 °C FT"
+        "humedad_salida_pd05_pct": {
+          "valor": 16.5,
+          "fuente": "% Humedad Salida – RC.PD.05"
         },
         "corte_pd08_pct": {
-          "valor": 50.4,
-          "fuente": "Columna 12"
+          "valor": 3.5,
+          "fuente": "% Corte – RC.PD.08"
+        },
+        "medium_pd08_kg": {
+          "valor": null,
+          "fuente": "Kg MEDIUM – RC.PD.08"
+        },
+        "midget_pd08_kg": {
+          "valor": null,
+          "fuente": "Kg MIDGET – RC.PD.08"
+        },
+        "tiny_pd08_kg": {
+          "valor": null,
+          "fuente": "Kg TINY – RC.PD.08"
+        },
+        "kg_clasificada_pd08": {
+          "valor": null,
+          "fuente": "Kg Total Clasificada – RC.PD.08"
+        },
+        "temperatura_pd09_c": {
+          "valor": 63.6842,
+          "fuente": "Temp Deshidratacion – RC.PD.09"
+        },
+        "humedad_pd07_pct": {
+          "valor": 5.3308,
+          "fuente": "% Humedad Final – RC.PD.09"
+        },
+        "cajas_medium_pd11": {
+          "valor": 310.0,
+          "fuente": "Cajas MEDIUM sum – RC.PD.11"
+        },
+        "cajas_midget_pd11": {
+          "valor": 489.0,
+          "fuente": "Cajas MIDGET sum – RC.PD.11"
+        },
+        "cajas_tiny_pd11": {
+          "valor": 51.0,
+          "fuente": "Cajas TINY sum – RC.PD.11"
         },
         "medium_pd11": {
-          "valor": 30.0,
-          "fuente": "Columna 10"
+          "valor": 310.0,
+          "fuente": "Cajas MEDIUM sum – RC.PD.11"
         },
         "midget_pd11": {
-          "valor": 0.21,
-          "fuente": "Columna 11"
+          "valor": 489.0,
+          "fuente": "Cajas MIDGET sum – RC.PD.11"
         },
         "tiny_pd11": {
-          "valor": -14.0,
-          "fuente": "Columna 12"
+          "valor": 51.0,
+          "fuente": "Cajas TINY sum – RC.PD.11"
+        },
+        "kg_sellados_pd11": {
+          "valor": 17080.0,
+          "fuente": "Kg Sellados sum – RC.PD.11"
+        },
+        "total_cajas_pd11": {
+          "valor": 830.0,
+          "fuente": "Total Cajas sum – RC.PD.11"
         },
         "stock_pd12": {
-          "valor": 61.0,
-          "fuente": "Columna 21"
+          "valor": null,
+          "fuente": "RC.PD.12 – pendiente parser"
         },
         "carga_pd13": {
           "valor": null,
-          "fuente": ""
+          "fuente": "RC.PD.13 – pendiente parser"
+        },
+        "merma_cilindros_pd05_kg": {
+          "valor": null,
+          "fuente": "Estimado: PD02 - PD08"
+        },
+        "merma_horno_pd09_kg": {
+          "valor": null,
+          "fuente": "Estimado: PD08 - PD11"
         }
       },
       "kpis": {
-        "rendimiento_pre_limpieza_pct": 0.66,
-        "rendimiento_final_lote_pct": 0.02,
-        "pcc_humedad_estado": "ROJO",
-        "indice_dano_corte_pct": 50.4,
-        "indice_dano_corte_alerta": "ROJO",
+        "rendimiento_clasificacion_pct": null,
+        "rendimiento_pre_limpieza_pct": null,
+        "rendimiento_final_lote_pct": null,
+        "pcc_humedad_estado": "VERDE",
+        "indice_dano_corte_pct": 3.5,
+        "indice_dano_corte_alerta": "VERDE",
         "estabilidad_temperatura_estado": "VERDE",
         "conciliacion_almacen_carga_delta": null
       },
       "waterfall_mermas": {
-        "inicio_pd02_kg": 830.0,
-        "menos_merma_cilindros_pd05_kg": -10802.0,
-        "menos_merma_horno_pd09_kg": -0.0,
-        "final_pd11_kg": 0.21
+        "inicio_pd02_kg": 1660.0,
+        "clasificada_pd08_kg": null,
+        "menos_merma_cilindros_pd05_kg": null,
+        "menos_merma_horno_pd09_kg": null,
+        "final_pd11_kg": 17080.0
+      }
+    },
+    "BSI 01": {
+      "inputs": {
+        "kg_entrada_pd02": {
+          "valor": 1582.0,
+          "fuente": "Columna 8 – RC.PD.02"
+        },
+        "kg_ingreso_cil_pd05": {
+          "valor": 34540.0,
+          "fuente": "Kg Ingreso Cilindro – RC.PD.05"
+        },
+        "humedad_entrada_pd05_pct": {
+          "valor": 25.0,
+          "fuente": "% Humedad Entrada – RC.PD.05"
+        },
+        "humedad_salida_pd05_pct": {
+          "valor": 17.5,
+          "fuente": "% Humedad Salida – RC.PD.05"
+        },
+        "corte_pd08_pct": {
+          "valor": 7.0,
+          "fuente": "% Corte – RC.PD.08"
+        },
+        "medium_pd08_kg": {
+          "valor": null,
+          "fuente": "Kg MEDIUM – RC.PD.08"
+        },
+        "midget_pd08_kg": {
+          "valor": null,
+          "fuente": "Kg MIDGET – RC.PD.08"
+        },
+        "tiny_pd08_kg": {
+          "valor": null,
+          "fuente": "Kg TINY – RC.PD.08"
+        },
+        "kg_clasificada_pd08": {
+          "valor": null,
+          "fuente": "Kg Total Clasificada – RC.PD.08"
+        },
+        "temperatura_pd09_c": {
+          "valor": null,
+          "fuente": "Temp Deshidratacion – RC.PD.09"
+        },
+        "humedad_pd07_pct": {
+          "valor": null,
+          "fuente": "% Humedad Final – RC.PD.09"
+        },
+        "cajas_medium_pd11": {
+          "valor": 321.0,
+          "fuente": "Cajas MEDIUM sum – RC.PD.11"
+        },
+        "cajas_midget_pd11": {
+          "valor": 551.0,
+          "fuente": "Cajas MIDGET sum – RC.PD.11"
+        },
+        "cajas_tiny_pd11": {
+          "valor": 29.0,
+          "fuente": "Cajas TINY sum – RC.PD.11"
+        },
+        "medium_pd11": {
+          "valor": 321.0,
+          "fuente": "Cajas MEDIUM sum – RC.PD.11"
+        },
+        "midget_pd11": {
+          "valor": 551.0,
+          "fuente": "Cajas MIDGET sum – RC.PD.11"
+        },
+        "tiny_pd11": {
+          "valor": 29.0,
+          "fuente": "Cajas TINY sum – RC.PD.11"
+        },
+        "kg_sellados_pd11": {
+          "valor": 18020.0,
+          "fuente": "Kg Sellados sum – RC.PD.11"
+        },
+        "total_cajas_pd11": {
+          "valor": 901.0,
+          "fuente": "Total Cajas sum – RC.PD.11"
+        },
+        "stock_pd12": {
+          "valor": null,
+          "fuente": "RC.PD.12 – pendiente parser"
+        },
+        "carga_pd13": {
+          "valor": null,
+          "fuente": "RC.PD.13 – pendiente parser"
+        },
+        "merma_cilindros_pd05_kg": {
+          "valor": null,
+          "fuente": "Estimado: PD02 - PD08"
+        },
+        "merma_horno_pd09_kg": {
+          "valor": null,
+          "fuente": "Estimado: PD08 - PD11"
+        }
+      },
+      "kpis": {
+        "rendimiento_clasificacion_pct": null,
+        "rendimiento_pre_limpieza_pct": null,
+        "rendimiento_final_lote_pct": null,
+        "pcc_humedad_estado": "SIN DATOS",
+        "indice_dano_corte_pct": 7.0,
+        "indice_dano_corte_alerta": "AMARILLO",
+        "estabilidad_temperatura_estado": "SIN DATOS",
+        "conciliacion_almacen_carga_delta": null
+      },
+      "waterfall_mermas": {
+        "inicio_pd02_kg": 1582.0,
+        "clasificada_pd08_kg": null,
+        "menos_merma_cilindros_pd05_kg": null,
+        "menos_merma_horno_pd09_kg": null,
+        "final_pd11_kg": 18020.0
+      }
+    },
+    "DA 01-CV": {
+      "inputs": {
+        "kg_entrada_pd02": {
+          "valor": 1680.0,
+          "fuente": "Columna 8 – RC.PD.02"
+        },
+        "kg_ingreso_cil_pd05": {
+          "valor": 29540.0,
+          "fuente": "Kg Ingreso Cilindro – RC.PD.05"
+        },
+        "humedad_entrada_pd05_pct": {
+          "valor": 23.5,
+          "fuente": "% Humedad Entrada – RC.PD.05"
+        },
+        "humedad_salida_pd05_pct": {
+          "valor": 17.5,
+          "fuente": "% Humedad Salida – RC.PD.05"
+        },
+        "corte_pd08_pct": {
+          "valor": 5.1,
+          "fuente": "% Corte – RC.PD.08"
+        },
+        "medium_pd08_kg": {
+          "valor": null,
+          "fuente": "Kg MEDIUM – RC.PD.08"
+        },
+        "midget_pd08_kg": {
+          "valor": null,
+          "fuente": "Kg MIDGET – RC.PD.08"
+        },
+        "tiny_pd08_kg": {
+          "valor": null,
+          "fuente": "Kg TINY – RC.PD.08"
+        },
+        "kg_clasificada_pd08": {
+          "valor": null,
+          "fuente": "Kg Total Clasificada – RC.PD.08"
+        },
+        "temperatura_pd09_c": {
+          "valor": 64.2899,
+          "fuente": "Temp Deshidratacion – RC.PD.09"
+        },
+        "humedad_pd07_pct": {
+          "valor": 3.3252,
+          "fuente": "% Humedad Final – RC.PD.09"
+        },
+        "cajas_medium_pd11": {
+          "valor": 375.0,
+          "fuente": "Cajas MEDIUM sum – RC.PD.11"
+        },
+        "cajas_midget_pd11": {
+          "valor": 577.0,
+          "fuente": "Cajas MIDGET sum – RC.PD.11"
+        },
+        "cajas_tiny_pd11": {
+          "valor": 61.0,
+          "fuente": "Cajas TINY sum – RC.PD.11"
+        },
+        "medium_pd11": {
+          "valor": 375.0,
+          "fuente": "Cajas MEDIUM sum – RC.PD.11"
+        },
+        "midget_pd11": {
+          "valor": 577.0,
+          "fuente": "Cajas MIDGET sum – RC.PD.11"
+        },
+        "tiny_pd11": {
+          "valor": 61.0,
+          "fuente": "Cajas TINY sum – RC.PD.11"
+        },
+        "kg_sellados_pd11": {
+          "valor": 20300.0,
+          "fuente": "Kg Sellados sum – RC.PD.11"
+        },
+        "total_cajas_pd11": {
+          "valor": 976.0,
+          "fuente": "Total Cajas sum – RC.PD.11"
+        },
+        "stock_pd12": {
+          "valor": null,
+          "fuente": "RC.PD.12 – pendiente parser"
+        },
+        "carga_pd13": {
+          "valor": null,
+          "fuente": "RC.PD.13 – pendiente parser"
+        },
+        "merma_cilindros_pd05_kg": {
+          "valor": null,
+          "fuente": "Estimado: PD02 - PD08"
+        },
+        "merma_horno_pd09_kg": {
+          "valor": null,
+          "fuente": "Estimado: PD08 - PD11"
+        }
+      },
+      "kpis": {
+        "rendimiento_clasificacion_pct": null,
+        "rendimiento_pre_limpieza_pct": null,
+        "rendimiento_final_lote_pct": null,
+        "pcc_humedad_estado": "VERDE",
+        "indice_dano_corte_pct": 5.1,
+        "indice_dano_corte_alerta": "AMARILLO",
+        "estabilidad_temperatura_estado": "VERDE",
+        "conciliacion_almacen_carga_delta": null
+      },
+      "waterfall_mermas": {
+        "inicio_pd02_kg": 1680.0,
+        "clasificada_pd08_kg": null,
+        "menos_merma_cilindros_pd05_kg": null,
+        "menos_merma_horno_pd09_kg": null,
+        "final_pd11_kg": 20300.0
+      }
+    },
+    "AA 01-26": {
+      "inputs": {
+        "kg_entrada_pd02": {
+          "valor": 1602.0,
+          "fuente": "Columna 8 – RC.PD.02"
+        },
+        "kg_ingreso_cil_pd05": {
+          "valor": 31020.0,
+          "fuente": "Kg Ingreso Cilindro – RC.PD.05"
+        },
+        "humedad_entrada_pd05_pct": {
+          "valor": 24.3,
+          "fuente": "% Humedad Entrada – RC.PD.05"
+        },
+        "humedad_salida_pd05_pct": {
+          "valor": 15.6,
+          "fuente": "% Humedad Salida – RC.PD.05"
+        },
+        "corte_pd08_pct": {
+          "valor": 3.5,
+          "fuente": "% Corte – RC.PD.08"
+        },
+        "medium_pd08_kg": {
+          "valor": null,
+          "fuente": "Kg MEDIUM – RC.PD.08"
+        },
+        "midget_pd08_kg": {
+          "valor": null,
+          "fuente": "Kg MIDGET – RC.PD.08"
+        },
+        "tiny_pd08_kg": {
+          "valor": null,
+          "fuente": "Kg TINY – RC.PD.08"
+        },
+        "kg_clasificada_pd08": {
+          "valor": null,
+          "fuente": "Kg Total Clasificada – RC.PD.08"
+        },
+        "temperatura_pd09_c": {
+          "valor": 62.8824,
+          "fuente": "Temp Deshidratacion – RC.PD.09"
+        },
+        "humedad_pd07_pct": {
+          "valor": 6.5636,
+          "fuente": "% Humedad Final – RC.PD.09"
+        },
+        "cajas_medium_pd11": {
+          "valor": 326.0,
+          "fuente": "Cajas MEDIUM sum – RC.PD.11"
+        },
+        "cajas_midget_pd11": {
+          "valor": 524.0,
+          "fuente": "Cajas MIDGET sum – RC.PD.11"
+        },
+        "cajas_tiny_pd11": {
+          "valor": 29.0,
+          "fuente": "Cajas TINY sum – RC.PD.11"
+        },
+        "medium_pd11": {
+          "valor": 326.0,
+          "fuente": "Cajas MEDIUM sum – RC.PD.11"
+        },
+        "midget_pd11": {
+          "valor": 524.0,
+          "fuente": "Cajas MIDGET sum – RC.PD.11"
+        },
+        "tiny_pd11": {
+          "valor": 29.0,
+          "fuente": "Cajas TINY sum – RC.PD.11"
+        },
+        "kg_sellados_pd11": {
+          "valor": 17580.0,
+          "fuente": "Kg Sellados sum – RC.PD.11"
+        },
+        "total_cajas_pd11": {
+          "valor": 879.0,
+          "fuente": "Total Cajas sum – RC.PD.11"
+        },
+        "stock_pd12": {
+          "valor": null,
+          "fuente": "RC.PD.12 – pendiente parser"
+        },
+        "carga_pd13": {
+          "valor": null,
+          "fuente": "RC.PD.13 – pendiente parser"
+        },
+        "merma_cilindros_pd05_kg": {
+          "valor": null,
+          "fuente": "Estimado: PD02 - PD08"
+        },
+        "merma_horno_pd09_kg": {
+          "valor": null,
+          "fuente": "Estimado: PD08 - PD11"
+        }
+      },
+      "kpis": {
+        "rendimiento_clasificacion_pct": null,
+        "rendimiento_pre_limpieza_pct": null,
+        "rendimiento_final_lote_pct": null,
+        "pcc_humedad_estado": "VERDE",
+        "indice_dano_corte_pct": 3.5,
+        "indice_dano_corte_alerta": "VERDE",
+        "estabilidad_temperatura_estado": "VERDE",
+        "conciliacion_almacen_carga_delta": null
+      },
+      "waterfall_mermas": {
+        "inicio_pd02_kg": 1602.0,
+        "clasificada_pd08_kg": null,
+        "menos_merma_cilindros_pd05_kg": null,
+        "menos_merma_horno_pd09_kg": null,
+        "final_pd11_kg": 17580.0
+      }
+    },
+    "AA 02-26": {
+      "inputs": {
+        "kg_entrada_pd02": {
+          "valor": 1678.0,
+          "fuente": "Columna 8 – RC.PD.02"
+        },
+        "kg_ingreso_cil_pd05": {
+          "valor": 35320.0,
+          "fuente": "Kg Ingreso Cilindro – RC.PD.05"
+        },
+        "humedad_entrada_pd05_pct": {
+          "valor": 24.0,
+          "fuente": "% Humedad Entrada – RC.PD.05"
+        },
+        "humedad_salida_pd05_pct": {
+          "valor": 15.6667,
+          "fuente": "% Humedad Salida – RC.PD.05"
+        },
+        "corte_pd08_pct": {
+          "valor": null,
+          "fuente": "% Corte – RC.PD.08"
+        },
+        "medium_pd08_kg": {
+          "valor": null,
+          "fuente": "Kg MEDIUM – RC.PD.08"
+        },
+        "midget_pd08_kg": {
+          "valor": null,
+          "fuente": "Kg MIDGET – RC.PD.08"
+        },
+        "tiny_pd08_kg": {
+          "valor": null,
+          "fuente": "Kg TINY – RC.PD.08"
+        },
+        "kg_clasificada_pd08": {
+          "valor": null,
+          "fuente": "Kg Total Clasificada – RC.PD.08"
+        },
+        "temperatura_pd09_c": {
+          "valor": 66.4737,
+          "fuente": "Temp Deshidratacion – RC.PD.09"
+        },
+        "humedad_pd07_pct": {
+          "valor": 6.3,
+          "fuente": "% Humedad Final – RC.PD.09"
+        },
+        "cajas_medium_pd11": {
+          "valor": 360.0,
+          "fuente": "Cajas MEDIUM sum – RC.PD.11"
+        },
+        "cajas_midget_pd11": {
+          "valor": 550.0,
+          "fuente": "Cajas MIDGET sum – RC.PD.11"
+        },
+        "cajas_tiny_pd11": {
+          "valor": 93.0,
+          "fuente": "Cajas TINY sum – RC.PD.11"
+        },
+        "medium_pd11": {
+          "valor": 360.0,
+          "fuente": "Cajas MEDIUM sum – RC.PD.11"
+        },
+        "midget_pd11": {
+          "valor": 550.0,
+          "fuente": "Cajas MIDGET sum – RC.PD.11"
+        },
+        "tiny_pd11": {
+          "valor": 93.0,
+          "fuente": "Cajas TINY sum – RC.PD.11"
+        },
+        "kg_sellados_pd11": {
+          "valor": 20160.0,
+          "fuente": "Kg Sellados sum – RC.PD.11"
+        },
+        "total_cajas_pd11": {
+          "valor": 929.0,
+          "fuente": "Total Cajas sum – RC.PD.11"
+        },
+        "stock_pd12": {
+          "valor": null,
+          "fuente": "RC.PD.12 – pendiente parser"
+        },
+        "carga_pd13": {
+          "valor": null,
+          "fuente": "RC.PD.13 – pendiente parser"
+        },
+        "merma_cilindros_pd05_kg": {
+          "valor": null,
+          "fuente": "Estimado: PD02 - PD08"
+        },
+        "merma_horno_pd09_kg": {
+          "valor": null,
+          "fuente": "Estimado: PD08 - PD11"
+        }
+      },
+      "kpis": {
+        "rendimiento_clasificacion_pct": null,
+        "rendimiento_pre_limpieza_pct": null,
+        "rendimiento_final_lote_pct": null,
+        "pcc_humedad_estado": "VERDE",
+        "indice_dano_corte_pct": null,
+        "indice_dano_corte_alerta": "SIN DATOS",
+        "estabilidad_temperatura_estado": "VERDE",
+        "conciliacion_almacen_carga_delta": null
+      },
+      "waterfall_mermas": {
+        "inicio_pd02_kg": 1678.0,
+        "clasificada_pd08_kg": null,
+        "menos_merma_cilindros_pd05_kg": null,
+        "menos_merma_horno_pd09_kg": null,
+        "final_pd11_kg": 20160.0
       }
     }
-  },
-  "nota": "Al elegir un lote (RG 01-CV, BSI 01, etc.), el dashboard debe leer esta seccion por_lote[lote] y mostrar los KPIs y graficos correspondientes."
+  }
 }
