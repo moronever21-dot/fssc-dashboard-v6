@@ -571,9 +571,9 @@ const sheetView=useMemo(()=>computedSheets.map((s)=>{
   };
 }),[computedSheets,selectedTab]);
 
-const scopedSheets=selectedRegistro==="TODOS"
+const scopedSheets=useMemo(()=>selectedRegistro==="TODOS"
   ? sheetView
-  : sheetView.filter(s=>s.codigo===selectedRegistro);
+  : sheetView.filter(s=>s.codigo===selectedRegistro),[sheetView,selectedRegistro]);
 
 const activeSheets=scopedSheets.filter(s=>s.matchTab);
 
@@ -587,7 +587,7 @@ const conf=conD.filter(s=>!s.controles.some(fuera)).length;
 const cPct=conD.length?Math.round(conf/conD.length*100):0;
 const registrosDisponibles=activeSheets.map(s=>s.codigo);
 const selectedRecordObj=selectedRegistro==="TODOS"?null:sheetView.find(s=>s.codigo===selectedRegistro);
-const trendSheets=scopedSheets.map(s=>{
+const trendSheets=useMemo(()=>scopedSheets.map(s=>{
   const hasHist=(s.controles||[]).some(c=>typeof c.valor==="number"&&c.hist&&Array.isArray(c.hist.data)&&c.hist.data.length);
   const hasAggregateTrend=(s.controles||[]).some(c=>c.histSource==="aggregate");
   /* Hay datos numericos en AGGREGATES_BY_TAB para este registro en algun lote */
@@ -596,7 +596,7 @@ const trendSheets=scopedSheets.map(s=>{
     return shAgg&&shAgg.controles&&Object.values(shAgg.controles).some(c=>typeof c.valor==="number");
   });
   return {...s,hasHist,hasAggregateTrend,hasMultiLotData};
-});
+}),[scopedSheets]);
 const aggregateTabOrder=useMemo(()=>Object.keys(AGGREGATES_BY_TAB),[]);
 const knownTabs=useMemo(()=>{
   const ordered=[];
@@ -1102,6 +1102,11 @@ const h2r=(hex,a)=>{const rv=parseInt(hex.slice(1,3),16),gv=parseInt(hex.slice(3
 trendSheets.forEach((sheet)=>{
   const cv=document.getElementById(`trend-${sheet.id}`);
   if(!cv) return;
+  /* Destruir chart previo en este canvas via registro Chart.js (evita charts residuales del modo TODAS) */
+  const prevChart=Chart.getChart(cv);
+  if(prevChart){try{prevChart.destroy();}catch(e){}}
+  const ctx2=cv.getContext("2d");
+  if(ctx2){ctx2.save();ctx2.setTransform(1,0,0,1,0,0);ctx2.clearRect(0,0,cv.width||300,cv.height||185);ctx2.restore();}
   if(!sheet.matchTab) return;
 
   /* ================================================================
@@ -1169,7 +1174,31 @@ trendSheets.forEach((sheet)=>{
   const histControls=(sheet.controles||[]).filter(c=>
     typeof c.valor==="number"&&c.hist&&Array.isArray(c.hist.data)&&c.hist.data.length
   );
-  if(!histControls.length) return;
+  if(!histControls.length){
+    /* Fallback: sin hist disponible para este lote → mostrar valor actual como barra */
+    const valControls=(sheet.controles||[]).filter(c=>typeof c.valor==="number");
+    if(!valControls.length) return;
+    const vSlice=valControls.slice(0,3);
+    const bgs=vSlice.map(c=>{
+      const pc=ptCol(c.valor,c.limite,c.op);
+      return pc==="#ef4444"?"rgba(239,68,68,0.80)":pc==="#f59e0b"?"rgba(245,158,11,0.80)":"rgba(34,197,94,0.65)";
+    });
+    window._c[`trend_${sheet.id}`]=new Chart(cv,{
+      type:"bar",
+      data:{labels:vSlice.map(c=>c.name),datasets:[{
+        label:"Valor actual \u2022 "+selectedTab,
+        data:vSlice.map(c=>c.valor),
+        backgroundColor:bgs,borderColor:bgs.map(b=>b.replace("0.80","1").replace("0.65","0.9")),
+        borderWidth:1.5,borderRadius:4,
+        datalabels:{...chartDataLabelOptions({suffix:"",decimals:2}),display:true,align:"end"}
+      }]},
+      options:{responsive:true,
+        plugins:{legend:{...leg,display:false},datalabels:chartDataLabelOptions({suffix:"",decimals:2})},
+        scales:{y:{grid:{color:grd},ticks:{color:tk}},x:{grid:{color:grd},ticks:{color:tk,font:{size:9}}}}
+      }
+    });
+    return;
+  }
   const labels=histControls[0].hist.labels||histControls[0].hist.data.map((_,i)=>`M${i+1}`);
   const nPts=histControls[0].hist.data.length;
   const useBar=nPts<=4;
