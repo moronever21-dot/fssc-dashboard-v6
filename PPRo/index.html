@@ -1143,14 +1143,16 @@ trendSheets.forEach((sheet)=>{
         return`rgba(${base},${hi(lot)?0.82:0.30})`;
       });
       const bds=bgs.map((b,i)=>b.replace(/[\d.]+\)$/,hi(validLots[i])?"1)":"0.45)"));
-      datasets.push({label:c.name,data,backgroundColor:bgs,borderColor:bds,borderWidth:1.5,borderRadius:4,datalabels:{display:false}});
+      datasets.push({label:c.name,data,backgroundColor:bgs,borderColor:bds,borderWidth:1.5,borderRadius:4,
+        datalabels:{...chartDataLabelOptions({suffix:c.unidad||"",decimals:2}),display:true,align:"end"}});
       /* Linea de limite en barras horizontales */
       if(typeof c.limite==="number") datasets.push(limLine(validLots.length,c.limite,`Lím ${c.name}`,"#ef4444"));
     } else {
       /* Multiples metricas: barras agrupadas con paleta + highlight */
       const bgs=validLots.map(lot=>h2r(col,hi(lot)?0.82:0.25));
       const bds=validLots.map(lot=>h2r(col,hi(lot)?1:0.4));
-      datasets.push({label:c.name,data,backgroundColor:bgs,borderColor:bds,borderWidth:1.5,borderRadius:3,datalabels:{display:false}});
+      datasets.push({label:c.name,data,backgroundColor:bgs,borderColor:bds,borderWidth:1.5,borderRadius:3,
+        datalabels:{...chartDataLabelOptions({suffix:c.unidad||"",decimals:2}),display:true}});
       if(typeof c.limite==="number") datasets.push({...limLine(validLots.length,c.limite,`Lím ${c.name}`,"#ef4444"),type:"line"});
     }
   });
