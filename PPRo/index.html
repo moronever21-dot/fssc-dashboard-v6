@@ -1105,6 +1105,7 @@ trendSheets.forEach((sheet)=>{
   /* Destruir chart previo en este canvas via registro Chart.js (evita charts residuales del modo TODAS) */
   const prevChart=Chart.getChart(cv);
   if(prevChart){try{prevChart.destroy();}catch(e){}}
+  cv.width=cv.width; /* reset forzado canvas+Chart.js registry */
   const ctx2=cv.getContext("2d");
   if(ctx2){ctx2.save();ctx2.setTransform(1,0,0,1,0,0);ctx2.clearRect(0,0,cv.width||300,cv.height||185);ctx2.restore();}
   if(!sheet.matchTab) return;
@@ -1201,34 +1202,21 @@ trendSheets.forEach((sheet)=>{
   }
   const labels=histControls[0].hist.labels||histControls[0].hist.data.map((_,i)=>`M${i+1}`);
   const nPts=histControls[0].hist.data.length;
-  const useBar=nPts<=4;
   const datasets=[];
   histControls.slice(0,3).forEach((c,idx)=>{
     const col=palette[idx%palette.length];
     const hasLim=typeof c.limite==="number";
-    if(useBar){
-      const bColors=c.hist.data.map(v=>{
-        const pc=hasLim?ptCol(v,c.limite,c.op):"#22c55e";
-        return pc==="#ef4444"?"rgba(239,68,68,0.80)":pc==="#f59e0b"?"rgba(245,158,11,0.80)":"rgba(34,197,94,0.65)";
-      });
-      datasets.push({label:c.name,data:c.hist.data,backgroundColor:bColors,
-        borderColor:bColors.map(x=>x.replace("0.80","1").replace("0.65","0.9")),
-        borderWidth:1.5,borderRadius:4,
-        datalabels:{...chartDataLabelOptions({suffix:c.unidad||"",decimals:2}),display:true}});
-      if(hasLim) datasets.push({...limLine(nPts,c.limite,`Lím ${c.name}`,"#ef4444"),type:"line"});
-    } else {
-      const fillOpt=hasLim&&c.op==="max"?{target:{value:c.limite},above:"rgba(239,68,68,0.09)",below:"transparent"}:
-                    hasLim&&c.op==="min"?{target:{value:c.limite},below:"rgba(239,68,68,0.09)",above:"transparent"}:false;
-      datasets.push({label:c.name,data:c.hist.data,borderColor:col,backgroundColor:col+"22",
-        tension:.35,borderWidth:2,fill:fillOpt,
-        pointBackgroundColor:c.hist.data.map(v=>ptCol(v,c.limite,c.op)),
-        pointRadius:4,pointHoverRadius:6,
-        datalabels:{...chartDataLabelOptions({suffix:c.unidad||"",decimals:2}),display:true}});
-      if(hasLim) datasets.push(limLine(nPts,c.limite,`Lím ${c.name}`,"#ef4444"));
-    }
+    const fillOpt=hasLim&&c.op==="max"?{target:{value:c.limite},above:"rgba(239,68,68,0.09)",below:"transparent"}:
+                  hasLim&&c.op==="min"?{target:{value:c.limite},below:"rgba(239,68,68,0.09)",above:"transparent"}:false;
+    datasets.push({label:c.name,data:c.hist.data,borderColor:col,backgroundColor:col+"22",
+      tension:.35,borderWidth:2,fill:fillOpt,
+      pointBackgroundColor:c.hist.data.map(v=>ptCol(v,c.limite,c.op)),
+      pointRadius:4,pointHoverRadius:6,
+      datalabels:{...chartDataLabelOptions({suffix:c.unidad||"",decimals:2}),display:true}});
+    if(hasLim) datasets.push(limLine(nPts,c.limite,`Lím ${c.name}`,"#ef4444"));
   });
   window._c[`trend_${sheet.id}`]=new Chart(cv,{
-    type:useBar?"bar":"line",
+    type:"line",
     data:{labels,datasets},
     options:{responsive:true,
       plugins:{legend:leg,datalabels:chartDataLabelOptions({suffix:"",decimals:2})},
