@@ -7,7 +7,6 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 body{background:#080e1a;font-family:'Segoe UI',sans-serif}
 .grid-bg{background-image:linear-gradient(rgba(6,182,212,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(6,182,212,.04) 1px,transparent 1px);background-size:36px 36px}
@@ -479,9 +478,6 @@ const [selectedRegistro,setSelectedRegistro]=useState("TODOS");
 const [selectedProdTab,setSelectedProdTab]=useState("TODAS");
 const [sidebarProdOpen,setSidebarProdOpen]=useState(true);
 const [sidebarQualityOpen,setSidebarQualityOpen]=useState(false);
-const [showExportModal,setShowExportModal]=useState(false);
-const [exportScope,setExportScope]=useState("lote"); /* 'lote' | 'todas' */
-const [exportLoading,setExportLoading]=useState(false);
 const computedSheets=useMemo(()=>{
   const clone=JSON.parse(JSON.stringify(SHEETS));
   const agg=AGGREGATES_BY_TAB[selectedTab]||{};
@@ -1303,139 +1299,6 @@ const e8=document.getElementById("ch8");
 if(e8)window._c.c8=new Chart(e8,{type:"doughnut",data:{labels:["Conforme","Advertencia","No Conforme","Sin Datos/Maestro"],datasets:[{data:[okN,wN,aL,noD],backgroundColor:["rgba(34,197,94,.8)","rgba(245,158,11,.8)","rgba(239,68,68,.8)","rgba(100,116,139,.4)"],borderColor:["#16a34a","#d97706","#b91c1c","#475569"],borderWidth:2}]},options:{responsive:true,plugins:{legend:{labels:{color:"#94a3b8",font:{size:10}}},datalabels:doughnutLabelOptions()}}});
 },[selectedTab,selectedRegistro,activeSheets.length,trendSheets]);
 
-/* ================================================================
-   GENERAR INFORME PDF — formato APA 7ma edición
-================================================================ */
-const generatePDF=async()=>{
-  if(!window.html2pdf){alert("La librería html2pdf no está disponible. Verifica tu conexión.");return;}
-  setExportLoading(true);
-  try{
-    const fechaHoy=new Date().toLocaleDateString("es-BO",{day:"2-digit",month:"long",year:"numeric"});
-    const isLote=exportScope==="lote";
-    const scopeLabel=isLote?("Lote "+selectedTab):"Todos los Lotes Procesados";
-    const lotAlias=isLote?(qualityDisplayName(selectedTab)||selectedTab):"Consolidado General";
-    const lotInfo=isLote?qualityLotInfo:{loteProveedor:"—",loteTrazabilidad:"—",exportado:"—"};
-
-    /* Capturar imágenes de los gráficos de tendencia activos */
-    const chartImages={};
-    SHEETS.forEach(s=>{
-      const cvId=isLote?`trend-${s.id}-${canonicalTabName(selectedTab)}`:`trend-${s.id}-${canonicalTabName("TODAS")}`;
-      const cv=document.getElementById(cvId);
-      if(cv){try{chartImages[s.id]=cv.toDataURL("image/png",0.9);}catch(e){}}
-    });
-
-    /* Datos a incluir según alcance */
-    const sheetsToReport=isLote?trendSheets.filter(s=>s.matchTab):SHEETS.map(s=>{
-      const ts=trendSheets.find(t=>t.id===s.id)||s;
-      return ts;
-    });
-
-    const statusOf=s=>{const st=stSheet(s);return st==="alert"?"No Conforme":st==="warn"?"Advertencia":"Conforme";};
-    const statusColor=s=>{const st=stSheet(s);return st==="alert"?"#c0392b":st==="warn"?"#d68910":"#1e8449";};
-
-    const buildTableRows=s=>(s.controles||[]).filter(c=>typeof c.valor==="number").map(c=>{
-      const est=fuera(c)?"No Conforme":cerca(c)?"Advertencia":"Conforme";
-      const color=fuera(c)?"#c0392b":cerca(c)?"#d68910":"#1e8449";
-      const limStr=typeof c.limite==="number"?(c.op==="max"?"< ":c.op==="min"?">= ":"")+c.limite+(c.unidad||""):"—";
-      return `<tr><td style="padding:4px 8px;border:1px solid #ccc">${c.name}</td><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">${c.valor}${c.unidad||""}</td><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">${limStr}</td><td style="padding:4px 8px;border:1px solid #ccc;text-align:center;color:${color};font-weight:bold">${est}</td></tr>`;
-    }).join("");
-
-    const buildRegistroSection=(s,idx)=>{
-      const st=statusOf(s);
-      const sc=statusColor(s);
-      const img=chartImages[s.id]?`<p style="margin-top:8pt;margin-bottom:4pt;font-size:10pt;font-style:italic;text-align:center"><em>Figura ${idx+1}.</em> Tendencia histórica — ${s.codigo}</p><img src="${chartImages[s.id]}" style="max-width:100%;height:auto;display:block;margin:0 auto 10pt auto;border:1px solid #ddd" alt="Figura ${idx+1}"/>`:
-        `<p style="font-size:10pt;color:#888;font-style:italic;margin:8pt 0">Gráfico no disponible para este alcance.</p>`;
-      const rows=buildTableRows(s);
-      const tableHtml=rows?`<table style="width:100%;border-collapse:collapse;font-size:10pt;margin:10pt 0"><thead><tr style="background:#f2f2f2"><th style="padding:5px 8px;border:1px solid #ccc;text-align:left">Control</th><th style="padding:5px 8px;border:1px solid #ccc">Valor</th><th style="padding:5px 8px;border:1px solid #ccc">Límite</th><th style="padding:5px 8px;border:1px solid #ccc">Estado</th></tr></thead><tbody>${rows}</tbody></table>`:`<p style="font-size:10pt;color:#888;font-style:italic">Sin controles numéricos disponibles.</p>`;
-      return `<div style="page-break-inside:avoid;margin-bottom:18pt"><h3 style="font-family:'Times New Roman',serif;font-size:12pt;font-weight:bold;font-style:italic;text-align:left;margin:0 0 4pt 0">${s.codigo}. ${s.nombre}</h3><p style="font-size:10pt;margin:2pt 0">Estado general: <strong style="color:${sc}">${st}</strong> — Responsable: ${s.responsable||"N/D"} — Última fecha: ${s.ultimaFecha||"N/D"}</p>${tableHtml}${img}</div>`;
-    };
-
-    const alertasSection=sheetsToReport.filter(s=>s.controles&&s.controles.some(fuera));
-    const alertasHtml=alertasSection.length?alertasSection.map(s=>{
-      const cs=s.controles.filter(fuera).map(c=>`<li>${c.name}: ${c.valor}${c.unidad||""} (límite: ${c.op==="max"?"< ":">= "}${c.limite}${c.unidad||""})</li>`).join("");
-      return `<p style="margin:4pt 0"><strong>${s.codigo}</strong>: <em>${s.nombre}</em><br/><ul style="margin:2pt 0 2pt 18pt;padding:0">${cs}</ul></p>`;
-    }).join(""):"<p style=\"font-style:italic;color:#555\">No se registraron no conformidades para el alcance seleccionado.</p>";
-
-    const registrosSections=sheetsToReport.map((s,i)=>buildRegistroSection(s,i)).join("");
-    const totalConf=sheetsToReport.filter(s=>!s.noData&&!s.listadoMaestro&&!s.controles.some(fuera)).length;
-    const totalEval=sheetsToReport.filter(s=>!s.noData&&!s.listadoMaestro).length;
-    const pctConf=totalEval?Math.round((totalConf/totalEval)*100):0;
-
-    const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><style>
-      *{box-sizing:border-box}
-      body{font-family:"Times New Roman",serif;font-size:12pt;line-height:2;color:#000;
-           margin:0;padding:0;}
-      .page{width:21.59cm;padding:2.54cm;margin:0 auto;}
-      h1{font-size:14pt;font-weight:bold;text-align:center;line-height:1.5;margin:0 0 0 0}
-      h2{font-size:12pt;font-weight:bold;text-align:center;line-height:2;margin:24pt 0 0 0}
-      .section-header{font-size:12pt;font-weight:bold;text-align:left;margin:18pt 0 6pt 0;border-bottom:1px solid #999;padding-bottom:2pt}
-      p{margin:0 0 0 0;text-indent:1.27cm}
-      p.noindent{text-indent:0}
-      .running-head{font-size:10pt;text-align:right;color:#555;margin-bottom:12pt}
-      .title-page{text-align:center;padding-top:3cm;}
-      table{font-family:"Times New Roman",serif}
-      @page{margin:2.54cm}
-    </style></head><body><div class="page">
-
-    <div class="running-head">INGAMA — Informe de Calidad FSSC 22000 &nbsp;&nbsp;&nbsp; ${fechaHoy}</div>
-
-    <div class="title-page">
-      <h1>Informe Técnico de Control de Calidad<br>FSSC 22000 v6 — INGAMA Beneficiadora</h1>
-      <p class="noindent" style="margin-top:24pt;text-indent:0">${scopeLabel}</p>
-      <p class="noindent" style="text-indent:0">Lote de trazabilidad: ${lotInfo.loteTrazabilidad}</p>
-      <p class="noindent" style="text-indent:0">Lote de proveedor: ${lotInfo.loteProveedor}</p>
-      <p class="noindent" style="text-indent:0">Exportado: ${lotInfo.exportado}</p>
-      <p class="noindent" style="margin-top:36pt;text-indent:0;font-style:italic">Fecha de emisión: ${fechaHoy}</p>
-      <p class="noindent" style="text-indent:0">Identificador de lote en sistema: ${lotAlias}</p>
-    </div>
-
-    <div style="page-break-before:always">
-      <h2>Resumen</h2>
-      <p style="text-indent:1.27cm">El presente informe técnico documenta los resultados del sistema de control de calidad FSSC 22000 v6 aplicado en las operaciones de beneficiado de almendra en la empresa INGAMA, correspondiente a ${scopeLabel}. Se evaluaron un total de ${totalEval} registros de control (RC), de los cuales ${totalConf} se encontraron en estado conforme, representando el ${pctConf}% de cumplimiento general del sistema. Se identificaron ${alertasSection.length} registro(s) con no conformidades activas que requieren atención inmediata, y ${sheetsToReport.filter(s=>!s.noData&&!s.listadoMaestro&&!s.controles.some(fuera)&&s.controles.some(cerca)).length} registro(s) con advertencias de proximidad al límite crítico. Los resultados detallados por registro, incluyendo tendencias históricas y valores de control, se presentan en las secciones siguientes en cumplimiento con los lineamientos del estándar FSSC 22000 v6.</p>
-    </div>
-
-    <div style="margin-top:18pt">
-      <div class="section-header">No Conformidades Activas</div>
-      <div style="line-height:1.5;text-indent:0;font-size:11pt">${alertasHtml}</div>
-    </div>
-
-    <div style="margin-top:18pt;page-break-before:always">
-      <div class="section-header">Resultados por Registro de Control</div>
-      ${registrosSections}
-    </div>
-
-    <div style="margin-top:24pt;page-break-before:always">
-      <div class="section-header">Referencias</div>
-      <p style="text-indent:-1.27cm;padding-left:1.27cm;line-height:2">FSSC. (2023). <em>FSSC 22000 Food Safety System Certification — Version 6.0</em>. Foundation FSSC 22000. https://www.fssc22000.com/scheme/fssc-22000-version-6/</p>
-      <p style="text-indent:-1.27cm;padding-left:1.27cm;line-height:2;margin-top:0">INGAMA. (${new Date().getFullYear()}). <em>Sistema de control de calidad y registros operativos de beneficiado de almendra</em> [Registros internos]. INGAMA Beneficiadora.</p>
-    </div>
-
-    </div></body></html>`;
-
-    const container=document.createElement("div");
-    container.style.cssText="position:fixed;top:-9999px;left:-9999px;width:21.59cm;background:white;z-index:9999";
-    container.innerHTML=html;
-    document.body.appendChild(container);
-
-    const filename=`Informe_Calidad_FSSC22000_INGAMA_${isLote?canonicalTabName(selectedTab):"TODOS"}_${new Date().toISOString().slice(0,10)}.pdf`;
-    await window.html2pdf().set({
-      margin:[2.54,2.54,2.54,2.54],
-      filename,
-      image:{type:"jpeg",quality:0.92},
-      html2canvas:{scale:2,useCORS:true,logging:false},
-      jsPDF:{unit:"cm",format:"letter",orientation:"portrait"},
-      pagebreak:{mode:["avoid-all","css"],before:".page-break"}
-    }).from(container).save();
-
-    document.body.removeChild(container);
-  }catch(err){
-    alert("Error al generar el PDF: "+String(err&&err.message?err.message:err));
-  }finally{
-    setExportLoading(false);
-    setShowExportModal(false);
-  }
-};
-
 return(
 <div className="min-h-screen relative">
 
@@ -1703,7 +1566,6 @@ return(
     <div className="text-right mono text-xs space-y-1">
       <div className="text-green-400 font-bold">SISTEMA ACTIVO</div>
       <div className="text-slate-500">Ultima actualizacion: 31/03/2026</div>
-      <button onClick={()=>setShowExportModal(true)} className="mt-2 px-3 py-1.5 rounded border border-cyan-600 bg-cyan-900/30 text-cyan-300 hover:bg-cyan-800/50 text-xs font-bold transition-all">&#8595; Exportar Informe PDF</button>
     </div>
   </div>
 
@@ -1938,49 +1800,6 @@ return(
   </div>
 </div>
 )}
-
-{/* ===== MODAL EXPORTAR PDF ===== */}
-{showExportModal&&(
-<div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/75" onClick={()=>{if(!exportLoading)setShowExportModal(false);}}>
-  <div className="bg-slate-900 border border-cyan-700/60 rounded-xl shadow-2xl w-full max-w-md mx-4 p-6" onClick={e=>e.stopPropagation()}>
-    <h2 className="text-base font-bold text-cyan-300 mb-1 tracking-tight">Exportar Informe de Calidad — PDF</h2>
-    <p className="text-xs text-slate-400 mb-5">Formato APA 7.ª edición — descargable</p>
-    <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Alcance del informe</p>
-    <div className="flex flex-col gap-2 mb-5">
-      <label className={"flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all "+(exportScope==="lote"?"border-cyan-500 bg-cyan-900/30":"border-slate-700 bg-slate-800/40 hover:border-slate-500")}>
-        <input type="radio" name="pdfscope" value="lote" checked={exportScope==="lote"} onChange={()=>setExportScope("lote")} className="mt-0.5 accent-cyan-400"/>
-        <div>
-          <p className="text-sm font-bold text-slate-100">Lote activo: {qualityDisplayName(selectedTab)||selectedTab}</p>
-          <p className="text-xs text-slate-500 mt-0.5">Informe con datos del lote seleccionado en el panel lateral</p>
-        </div>
-      </label>
-      <label className={"flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all "+(exportScope==="todas"?"border-cyan-500 bg-cyan-900/30":"border-slate-700 bg-slate-800/40 hover:border-slate-500")}>
-        <input type="radio" name="pdfscope" value="todas" checked={exportScope==="todas"} onChange={()=>setExportScope("todas")} className="mt-0.5 accent-cyan-400"/>
-        <div>
-          <p className="text-sm font-bold text-slate-100">Vista actual (TODAS)</p>
-          <p className="text-xs text-slate-500 mt-0.5">Informe consolidado de todos los registros visibles — puede tardar unos segundos</p>
-        </div>
-      </label>
-    </div>
-    <div className="bg-slate-800/50 border border-slate-700/40 rounded-lg p-3 mb-5 text-xs text-slate-400 space-y-0.5">
-      <p className="font-bold text-slate-300 mb-1">El informe incluye:</p>
-      <p>• Portada con lote, trazabilidad y fecha</p>
-      <p>• Resumen ejecutivo con % cumplimiento</p>
-      <p>• No conformidades activas</p>
-      <p>• Tablas de resultados por RC.CC.xx con semáforo</p>
-      <p>• Gráficos de tendencia (imágenes capturadas)</p>
-      <p>• Referencias en formato APA 7.ª ed.</p>
-    </div>
-    <div className="flex gap-3">
-      <button onClick={()=>setShowExportModal(false)} disabled={exportLoading} className="flex-1 py-2 rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-800 text-sm transition-all disabled:opacity-40">Cancelar</button>
-      <button onClick={()=>generatePDF()} disabled={exportLoading} className="flex-1 py-2 rounded-lg border border-cyan-600 bg-cyan-800/40 text-cyan-200 hover:bg-cyan-700/50 text-sm font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-2">
-        {exportLoading?(<><span className="inline-block w-3.5 h-3.5 border-2 border-cyan-400/30 border-t-cyan-400 rounded-full animate-spin"/>Generando...</>):"⬇ Descargar PDF"}
-      </button>
-    </div>
-  </div>
-</div>
-)}
-
 </div>);}
 
 try{
