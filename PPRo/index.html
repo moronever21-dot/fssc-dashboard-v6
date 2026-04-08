@@ -1411,13 +1411,31 @@ const generarInformePDF=async()=>{
               hiScales.x={ticks:{color:'#94a3b8',font:{size:FS}},grid:{color:'rgba(255,255,255,0.18)'}};
               hiScales.y={ticks:{color:'#94a3b8',font:{size:FS}},grid:{color:'rgba(255,255,255,0.18)'}};
             }
+            /* Datalabels: copiar config viva del chart original (tiene formatter real) */
+            const origDL=ec.options&&ec.options.plugins&&ec.options.plugins.datalabels;
+            const dlCfg=(origDL&&origDL.display!==false)
+              ? Object.assign({},origDL,{
+                  font:Object.assign({},origDL.font||{},{size:FS-2,weight:'bold'}),
+                  padding:origDL.padding!=null?origDL.padding:4
+                })
+              : {
+                  display:true,
+                  color:'#f1f5f9',
+                  font:{size:FS-2,weight:'bold'},
+                  anchor:'end',align:'top',offset:4,padding:3,
+                  formatter:(v)=>{
+                    if(v==null)return '';
+                    if(typeof v==='number')return v%1===0?String(v):v.toFixed(1);
+                    return String(v);
+                  }
+                };
             const hiOpts={
               animation:false,responsive:false,devicePixelRatio:1,
               indexAxis:ec.options&&ec.options.indexAxis?ec.options.indexAxis:undefined,
-              layout:{padding:{top:20,right:30,bottom:10,left:10}},
+              layout:{padding:{top:64,right:40,bottom:10,left:10}},
               plugins:{
                 legend:{display:true,labels:{color:'#cbd5e1',font:{size:FS},boxWidth:32,padding:20}},
-                datalabels:{display:false}
+                datalabels:dlCfg
               },
               scales:hiScales
             };
