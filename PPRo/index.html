@@ -1364,20 +1364,37 @@ const generarInformePDF=async()=>{
       const ctrlsN=(sheet.controles||[]).filter(c=>typeof c.valor==="number");
       const fueraC=ctrlsN.filter(c=>fuera(c));
       const cercaC=ctrlsN.filter(c=>cerca(c));
-      /* PRE-CALCULAR dimensiones imagen para anti-huerfano: titulo nunca queda solo */
+      /* PRE-CALCULAR dimensiones PDF para anti-huerfano */
       const cv=document.getElementById(`trend-${sheet.id}-${canonicalTabName(selectedTab)}`);
       const hasImg=cv&&cv.width>0&&cv.height>0;
-      /* Tamaño imagen: 1 pixel de canvas = 1 pixel de pantalla (96 ppi) → sin upscale → nítido */
-      const scrPxPerMm=96/25.4;
-      const iW=hasImg?Math.min(cw,Math.max(90,cv.width/scrPxPerMm)):0;
-      const iH=hasImg?iW*(cv.height/cv.width):0;
-      /* Verificar espacio: titulo + imagen + caption + primera línea párrafo (bloque mínimo) */
-      const blqMin=lh*2.5+(hasImg?iH+8+lh:lh*2);
+      const aspectR=hasImg?(cv.height/cv.width):0.5;
+      const iW=cw*0.88; /* 88% del ancho, centrado */
+      const iH=hasImg?iW*aspectR:0;
+      const blqMin=lh*2.5+(hasImg?iH+10+lh:lh*2);
       chkPg(blqMin);
       addH(`${sheet.codigo} — ${sheet.nombre}`,2);
-      /* GRÁFICO — captura directa PNG, tamaño proporcional a píxeles reales */
+      /* GRÁFICO — re-render en canvas 1800×H vía Chart.js para máxima nitidez */
       if(hasImg){
-        const imgD=cv.toDataURL('image/png');
+        let imgD=null;
+        const existingChart=Chart.getChart(cv);
+        if(existingChart){
+          try{
+            const HI_W=1800,HI_H=Math.round(HI_W*aspectR);
+            const offC=document.createElement('canvas');
+            offC.width=HI_W;offC.height=HI_H;
+            const rawCfg=existingChart.config;
+            const hiChart=new Chart(offC,{
+              type:rawCfg.type,
+              data:rawCfg.data,
+              options:Object.assign({},rawCfg.options||{},{animation:false,responsive:false,devicePixelRatio:1}),
+              plugins:rawCfg.plugins||[]
+            });
+            imgD=offC.toDataURL('image/png',1.0);
+            hiChart.destroy();
+          }catch(e){imgD=cv.toDataURL('image/png',1.0);}
+        }else{
+          imgD=cv.toDataURL('image/png',1.0);
+        }
         const xImg=mg+(cw-iW)/2;
         chkPg(iH+8);
         doc.addImage(imgD,'PNG',xImg,y,iW,iH);
