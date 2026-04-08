@@ -1392,32 +1392,34 @@ const generarInformePDF=async()=>{
               backgroundColor:ds.backgroundColor,
               borderWidth:3,fill:ds.fill,
               tension:typeof ds.tension==='number'?ds.tension:0.3,
-              pointRadius:5,pointHoverRadius:7,
+              pointRadius:6,pointHoverRadius:9,
               pointBackgroundColor:ds.borderColor,
               indexAxis:ds.indexAxis
             }));
-            /* Reconstruir scales desde la instancia (no serializar opciones) */
+            /* Reconstruir scales — fuentes escaladas a 1600px (≈10pt en PDF a 150mm) */
+            const FS=28; /* px: equivale a ~10pt impreso */
             const hiScales={};
             const origScales=ec.options&&ec.options.scales?ec.options.scales:{};
             Object.keys(origScales).forEach(k=>{
               hiScales[k]={
                 type:origScales[k].type,position:origScales[k].position,
-                ticks:{color:'#94a3b8',font:{size:16}},
-                grid:{color:'rgba(255,255,255,0.15)'},
-                border:{color:'rgba(255,255,255,0.2)'}
+                ticks:{color:'#94a3b8',font:{size:FS},maxRotation:45,minRotation:0},
+                grid:{color:'rgba(255,255,255,0.18)'},
+                border:{color:'rgba(255,255,255,0.25)'}
               };
               if(origScales[k].min!=null)hiScales[k].min=origScales[k].min;
               if(origScales[k].max!=null)hiScales[k].max=origScales[k].max;
             });
             if(!Object.keys(hiScales).length){
-              hiScales.x={ticks:{color:'#94a3b8',font:{size:16}},grid:{color:'rgba(255,255,255,0.15)'}};
-              hiScales.y={ticks:{color:'#94a3b8',font:{size:16}},grid:{color:'rgba(255,255,255,0.15)'}};
+              hiScales.x={ticks:{color:'#94a3b8',font:{size:FS}},grid:{color:'rgba(255,255,255,0.18)'}};
+              hiScales.y={ticks:{color:'#94a3b8',font:{size:FS}},grid:{color:'rgba(255,255,255,0.18)'}};
             }
             const hiOpts={
               animation:false,responsive:false,devicePixelRatio:1,
               indexAxis:ec.options&&ec.options.indexAxis?ec.options.indexAxis:undefined,
+              layout:{padding:{top:20,right:30,bottom:10,left:10}},
               plugins:{
-                legend:{display:true,labels:{color:'#cbd5e1',font:{size:18},boxWidth:24}},
+                legend:{display:true,labels:{color:'#cbd5e1',font:{size:FS},boxWidth:32,padding:20}},
                 datalabels:{display:false}
               },
               scales:hiScales
