@@ -1308,7 +1308,7 @@ const generarInformePDF=async()=>{
   try{
     const{jsPDF}=window.jspdf;
     const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-    const mg=25.4,pw=210,ph=297,cw=pw-mg*2,bsz=11,lh=7.7,ind=12.7;
+    const mg=25.4,pw=210,ph=297,cw=pw-mg*2,bsz=11,lh=8.5,ind=12.7;
     let y=mg;
     const chkPg=(h=lh)=>{if(y+h>ph-mg){doc.addPage();y=mg;}};
     const addPara=(text,opts={})=>{
@@ -1317,7 +1317,19 @@ const generarInformePDF=async()=>{
       doc.setFontSize(size);
       const mw=cw-(noInd?0:ind);
       const lines=doc.splitTextToSize(text,mw);
-      lines.forEach((line,i)=>{chkPg();doc.text(line,mg+(i===0&&!noInd?ind:0),y);y+=lh;});
+      lines.forEach((line,i)=>{
+        chkPg();
+        const isFirst=i===0&&!noInd;
+        const isLast=i===lines.length-1;
+        const xPos=mg+(isFirst?ind:0);
+        const lineW=cw-(isFirst?ind:0);
+        if(!isLast&&line.trim().split(/\s+/).length>2){
+          doc.text(line,xPos,y,{align:'justify',maxWidth:lineW});
+        }else{
+          doc.text(line,xPos,y);
+        }
+        y+=lh;
+      });
       y+=3;
     };
     const addH=(text,lvl=1)=>{
@@ -1354,10 +1366,19 @@ const generarInformePDF=async()=>{
       const cercaC=ctrlsN.filter(c=>cerca(c));
       chkPg(40);
       addH(`${sheet.codigo} — ${sheet.nombre}`,2);
-      /* GRÁFICO */
+      /* GRÁFICO — canvas de alta resolución 3x */
       const cv=document.getElementById(`trend-${sheet.id}-${canonicalTabName(selectedTab)}`);
       if(cv&&cv.width>0&&cv.height>0){
-        const imgD=cv.toDataURL('image/png');
+        const SCALE=3;
+        const offC=document.createElement('canvas');
+        offC.width=cv.width*SCALE;
+        offC.height=cv.height*SCALE;
+        const offCtx=offC.getContext('2d');
+        offCtx.imageSmoothingEnabled=true;
+        offCtx.imageSmoothingQuality='high';
+        offCtx.scale(SCALE,SCALE);
+        offCtx.drawImage(cv,0,0);
+        const imgD=offC.toDataURL('image/png',1.0);
         const ratio=cv.height/cv.width;
         const iW=cw,iH=iW*ratio;
         chkPg(iH+20);
