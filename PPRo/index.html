@@ -1368,20 +1368,68 @@ const generarInformePDF=async()=>{
       const cv=document.getElementById(`trend-${sheet.id}-${canonicalTabName(selectedTab)}`);
       const hasImg=cv&&cv.width>0&&cv.height>0;
       const aspectR=hasImg?(cv.height/cv.width):0.5;
-      const pdfW_est=hasImg?Math.min(cw,cv.width/(120/25.4)):0;
-      const pdfH_est=pdfW_est*aspectR;
-      const blqMin=lh*2.5+(hasImg?pdfH_est+10+lh:lh*2);
+      const pdfW=cw*0.90;
+      const pdfH=pdfW*aspectR;
+      const blqMin=lh*2.5+(hasImg?pdfH+10+lh:lh*2);
       chkPg(blqMin);
       addH(`${sheet.codigo} — ${sheet.nombre}`,2);
-      /* GRÁFICO — captura directa con colores vivos tal como se ve en pantalla */
+      /* GRÁFICO — re-render manual data+opciones limpias a 1600px, fondo oscuro dashboard */
       if(hasImg){
-        /* Tamaño en PDF a 120 dpi: px / (120/25.4). Cap al ancho de columna. */
-        const pdfW=Math.min(cw, cv.width/(120/25.4));
-        const pdfH=pdfW*aspectR;
-        const imgD=cv.toDataURL('image/png',1.0);
+        let imgD=null;
+        const ec=Chart.getChart(cv);
+        if(ec){
+          try{
+            const HI=1600,HIH=Math.round(HI*aspectR);
+            const oc=document.createElement('canvas');
+            oc.width=HI;oc.height=HIH;
+            const ox=oc.getContext('2d');
+            ox.fillStyle='#0f1827';ox.fillRect(0,0,HI,HIH);
+            /* Extraer data cruda directamente (nunca serializar) */
+            const hiDS=ec.data.datasets.map(ds=>({
+              type:ds.type,label:ds.label||'',
+              data:Array.isArray(ds.data)?[...ds.data]:[],
+              borderColor:ds.borderColor,
+              backgroundColor:ds.backgroundColor,
+              borderWidth:3,fill:ds.fill,
+              tension:typeof ds.tension==='number'?ds.tension:0.3,
+              pointRadius:5,pointHoverRadius:7,
+              pointBackgroundColor:ds.borderColor,
+              indexAxis:ds.indexAxis
+            }));
+            /* Reconstruir scales desde la instancia (no serializar opciones) */
+            const hiScales={};
+            const origScales=ec.options&&ec.options.scales?ec.options.scales:{};
+            Object.keys(origScales).forEach(k=>{
+              hiScales[k]={
+                type:origScales[k].type,position:origScales[k].position,
+                ticks:{color:'#94a3b8',font:{size:16}},
+                grid:{color:'rgba(255,255,255,0.15)'},
+                border:{color:'rgba(255,255,255,0.2)'}
+              };
+              if(origScales[k].min!=null)hiScales[k].min=origScales[k].min;
+              if(origScales[k].max!=null)hiScales[k].max=origScales[k].max;
+            });
+            if(!Object.keys(hiScales).length){
+              hiScales.x={ticks:{color:'#94a3b8',font:{size:16}},grid:{color:'rgba(255,255,255,0.15)'}};
+              hiScales.y={ticks:{color:'#94a3b8',font:{size:16}},grid:{color:'rgba(255,255,255,0.15)'}};
+            }
+            const hiOpts={
+              animation:false,responsive:false,devicePixelRatio:1,
+              indexAxis:ec.options&&ec.options.indexAxis?ec.options.indexAxis:undefined,
+              plugins:{
+                legend:{display:true,labels:{color:'#cbd5e1',font:{size:18},boxWidth:24}},
+                datalabels:{display:false}
+              },
+              scales:hiScales
+            };
+            const hiC=new Chart(oc,{type:ec.config.type,data:{labels:[...(ec.data.labels||[])],datasets:hiDS},options:hiOpts});
+            imgD=oc.toDataURL('image/png',1.0);
+            hiC.destroy();oc.remove();
+          }catch(err){imgD=cv.toDataURL('image/png',1.0);}
+        }else{imgD=cv.toDataURL('image/png',1.0);}
         const xImg=mg+(cw-pdfW)/2;
         chkPg(pdfH+8);
-        doc.addImage(imgD,'PNG',xImg,y,pdfW,pdfH,undefined,'FAST');
+        doc.addImage(imgD,'PNG',xImg,y,pdfW,pdfH);
         y+=pdfH+3;
         const cap=`Figura ${figN}. Tendencia histórica de controles críticos — ${sheet.codigo}: ${sheet.nombre}${selectedTab!=="TODAS"?` (Lote: ${selectedTab})`:", todos los lotes"}.`;
         doc.setFont("helvetica","italic");doc.setFontSize(10);
