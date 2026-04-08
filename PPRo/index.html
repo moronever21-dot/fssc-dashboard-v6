@@ -1382,19 +1382,50 @@ const generarInformePDF=async()=>{
             const HI_W=1600,HI_H=Math.round(HI_W*aspectR);
             const offC=document.createElement('canvas');
             offC.width=HI_W;offC.height=HI_H;
+            /* Fondo blanco explícito antes de que Chart.js renderice */
+            const offCtx=offC.getContext('2d');
+            offCtx.fillStyle='#ffffff';
+            offCtx.fillRect(0,0,HI_W,HI_H);
             const clonedData=JSON.parse(JSON.stringify(existingChart.config.data||{}));
             const clonedOpts=JSON.parse(JSON.stringify(existingChart.config.options||{}));
             clonedOpts.animation=false;
             clonedOpts.responsive=false;
             clonedOpts.devicePixelRatio=1;
-            if(clonedOpts.plugins&&clonedOpts.plugins.datalabels){
-              clonedOpts.plugins.datalabels.font=clonedOpts.plugins.datalabels.font||{};
-              clonedOpts.plugins.datalabels.font.size=9;
+            /* Reemplazar paleta oscura → tema claro para paper blanco */
+            const tkDark='#1e293b',grdLight='rgba(0,0,0,0.10)';
+            clonedOpts.scales=clonedOpts.scales||{};
+            ['x','y'].forEach(ax=>{
+              clonedOpts.scales[ax]=clonedOpts.scales[ax]||{};
+              clonedOpts.scales[ax].grid={color:grdLight,borderColor:'rgba(0,0,0,0.2)'};
+              clonedOpts.scales[ax].ticks={color:tkDark,font:{size:12}};
+            });
+            clonedOpts.plugins=clonedOpts.plugins||{};
+            clonedOpts.plugins.legend=clonedOpts.plugins.legend||{};
+            clonedOpts.plugins.legend.labels={color:tkDark,font:{size:12}};
+            if(clonedOpts.plugins.datalabels){
+              clonedOpts.plugins.datalabels.color='#1e293b';
+              clonedOpts.plugins.datalabels.font={size:10,weight:'bold'};
             }
+            /* Líneas más gruesas y puntos visibles */
+            clonedData.datasets.forEach(ds=>{
+              ds.borderWidth=2.5;
+              if(ds.type==='line'||existingChart.config.type==='line'){
+                ds.pointRadius=ds.pointRadius!==undefined?Math.max(Number(ds.pointRadius)||0,3):3;
+                ds.pointHoverRadius=5;
+              }
+            });
             const hiChart=new Chart(offC,{type:existingChart.config.type,data:clonedData,options:clonedOpts});
             imgD=offC.toDataURL('image/png',1.0);
             hiChart.destroy();offC.remove();
-          }catch(e){imgD=cv.toDataURL('image/png',1.0);}
+          }catch(e){
+            /* fallback: copiar canvas de pantalla con fondo blanco */
+            const fb=document.createElement('canvas');
+            fb.width=cv.width;fb.height=cv.height;
+            const fCtx=fb.getContext('2d');
+            fCtx.fillStyle='#ffffff';fCtx.fillRect(0,0,fb.width,fb.height);
+            fCtx.drawImage(cv,0,0);
+            imgD=fb.toDataURL('image/png',1.0);fb.remove();
+          }
         }else{imgD=cv.toDataURL('image/png',1.0);}
         const xImg=mg+(cw-iW)/2;
         chkPg(iH+8);
