@@ -1383,50 +1383,63 @@ const generarInformePDF=async()=>{
             const oc=document.createElement('canvas');
             oc.width=HI;oc.height=HIH;
             const ox=oc.getContext('2d');
-            ox.fillStyle='#0f1827';ox.fillRect(0,0,HI,HIH);
-            /* Extraer data cruda directamente (nunca serializar) */
-            const hiDS=ec.data.datasets.map(ds=>({
-              type:ds.type,label:ds.label||'',
-              data:Array.isArray(ds.data)?[...ds.data]:[],
-              borderColor:ds.borderColor,
-              backgroundColor:ds.backgroundColor,
-              borderWidth:3,fill:ds.fill,
-              tension:typeof ds.tension==='number'?ds.tension:0.3,
-              pointRadius:6,pointHoverRadius:9,
-              pointBackgroundColor:ds.borderColor,
-              indexAxis:ds.indexAxis
-            }));
-            /* Reconstruir scales — fuentes escaladas a 1600px (≈10pt en PDF a 150mm) */
-            const FS=28; /* px: equivale a ~10pt impreso */
+            ox.fillStyle='#0d1625';ox.fillRect(0,0,HI,HIH);
+            /* Paleta original del dashboard — colores sólidos fuertes */
+            const palette=['#06b6d4','#a78bfa','#f59e0b','#22c55e','#fb7185','#38bdf8','#e879f9','#34d399'];
+            const hiDS=ec.data.datasets.map((ds,di)=>{
+              /* Forzar color sólido: si el original es rgba con alpha bajo, usar palette */
+              const rawColor=Array.isArray(ds.borderColor)?ds.borderColor[0]:(ds.borderColor||'');
+              const col=rawColor&&typeof rawColor==='string'&&rawColor.length>3?rawColor:palette[di%palette.length];
+              return {
+                type:ds.type,label:ds.label||'',
+                data:Array.isArray(ds.data)?[...ds.data]:[],
+                borderColor:col,
+                backgroundColor:col.startsWith('rgba')?col:col+'33',
+                borderWidth:4.5,fill:ds.fill,
+                tension:typeof ds.tension==='number'?ds.tension:0.3,
+                pointRadius:7,pointHoverRadius:10,
+                pointBackgroundColor:col,
+                pointBorderColor:'#ffffff',
+                pointBorderWidth:1.5,
+                indexAxis:ds.indexAxis
+              };
+            });
+            const FS=30;
             const hiScales={};
             const origScales=ec.options&&ec.options.scales?ec.options.scales:{};
             Object.keys(origScales).forEach(k=>{
               hiScales[k]={
                 type:origScales[k].type,position:origScales[k].position,
-                ticks:{color:'#94a3b8',font:{size:FS},maxRotation:45,minRotation:0},
-                grid:{color:'rgba(255,255,255,0.18)'},
-                border:{color:'rgba(255,255,255,0.25)'}
+                ticks:{color:'#e2e8f0',font:{size:FS,weight:'500'},maxRotation:45,minRotation:0},
+                grid:{color:'rgba(148,163,184,0.25)'},
+                border:{color:'rgba(148,163,184,0.5)'}
               };
               if(origScales[k].min!=null)hiScales[k].min=origScales[k].min;
               if(origScales[k].max!=null)hiScales[k].max=origScales[k].max;
             });
             if(!Object.keys(hiScales).length){
-              hiScales.x={ticks:{color:'#94a3b8',font:{size:FS}},grid:{color:'rgba(255,255,255,0.18)'}};
-              hiScales.y={ticks:{color:'#94a3b8',font:{size:FS}},grid:{color:'rgba(255,255,255,0.18)'}};
+              hiScales.x={ticks:{color:'#e2e8f0',font:{size:FS}},grid:{color:'rgba(148,163,184,0.25)'}};
+              hiScales.y={ticks:{color:'#e2e8f0',font:{size:FS}},grid:{color:'rgba(148,163,184,0.25)'}};
             }
             const hiOpts={
               animation:false,responsive:false,devicePixelRatio:1,
               indexAxis:ec.options&&ec.options.indexAxis?ec.options.indexAxis:undefined,
-              layout:{padding:{top:20,right:30,bottom:10,left:10}},
+              layout:{padding:{top:24,right:36,bottom:12,left:12}},
               plugins:{
-                legend:{display:true,labels:{color:'#cbd5e1',font:{size:FS},boxWidth:32,padding:20}},
+                legend:{display:true,labels:{color:'#f1f5f9',font:{size:FS,weight:'bold'},boxWidth:36,padding:24,usePointStyle:false}},
                 datalabels:{display:false}
               },
               scales:hiScales
             };
             const hiC=new Chart(oc,{type:ec.config.type,data:{labels:[...(ec.data.labels||[])],datasets:hiDS},options:hiOpts});
-            imgD=oc.toDataURL('image/png',1.0);
-            hiC.destroy();oc.remove();
+            /* Post-render: filtro saturate+contrast para colores más vivos */
+            const fc=document.createElement('canvas');
+            fc.width=HI;fc.height=HIH;
+            const fCtx=fc.getContext('2d');
+            fCtx.filter='saturate(1.6) contrast(1.12) brightness(1.04)';
+            fCtx.drawImage(oc,0,0);
+            imgD=fc.toDataURL('image/png',1.0);
+            hiC.destroy();oc.remove();fc.remove();
           }catch(err){imgD=cv.toDataURL('image/png',1.0);}
         }else{imgD=cv.toDataURL('image/png',1.0);}
         const xImg=mg+(cw-pdfW)/2;
