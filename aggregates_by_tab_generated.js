@@ -115,13 +115,43 @@ window.AGGREGATES_BY_TAB_GENERATED = {
       "muestras": 8,
       "controles": {
         "% Chias": {
-          "valor": null
+          "valor": 6.17,
+          "hist": [
+            6.85,
+            12.7,
+            5.53,
+            5.53,
+            3.48,
+            4.47,
+            4.65,
+            6.15
+          ]
         },
         "% Dannadas": {
-          "valor": null
+          "valor": 8.36,
+          "hist": [
+            5.72,
+            15.48,
+            7.17,
+            9.35,
+            6.95,
+            8.9,
+            5.88,
+            7.43
+          ]
         },
         "% Severamente Dannadas": {
-          "valor": null
+          "valor": 6.65,
+          "hist": [
+            6.85,
+            15.0,
+            6.6,
+            6.03,
+            3.48,
+            4.47,
+            4.65,
+            6.15
+          ]
         }
       }
     },
@@ -210,13 +240,61 @@ window.AGGREGATES_BY_TAB_GENERATED = {
       "muestras": 11,
       "controles": {
         "Acero Inox 4mm": {
-          "valor": "REVISAR"
+          "valor": "ATRAPA ok"
+        },
+        "Cajas Almendra 1ra": {
+          "valor": 106.64,
+          "hist": [
+            75,
+            114,
+            147,
+            95,
+            90,
+            118,
+            136,
+            98,
+            71,
+            141,
+            88
+          ]
+        },
+        "Cajas Almendra 2da": {
+          "valor": 64.18,
+          "hist": [
+            1,
+            6,
+            11,
+            7,
+            7,
+            13,
+            13,
+            11,
+            180,
+            293,
+            164
+          ]
         },
         "Ferroso Fe 3mm": {
-          "valor": "REVISAR"
+          "valor": "ATRAPA ok"
         },
         "No Ferroso 3.5mm": {
-          "valor": "REVISAR"
+          "valor": "ATRAPA ok"
+        },
+        "Pasajes Verificados": {
+          "valor": 3.55,
+          "hist": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            3,
+            3,
+            6,
+            8,
+            7
+          ]
         },
         "Ultima Fecha Registro": {
           "valor": "13-03-2026"
@@ -231,6 +309,12 @@ window.AGGREGATES_BY_TAB_GENERATED = {
         },
         "Clavos/Clips": {
           "valor": "DETECTADO"
+        },
+        "Pase Patrones Pre OK": {
+          "valor": 8.0,
+          "hist": [
+            8
+          ]
         },
         "Pernos 2cm": {
           "valor": "DETECTADO"
@@ -632,13 +716,37 @@ window.AGGREGATES_BY_TAB_GENERATED = {
       "muestras": 6,
       "controles": {
         "% Chias": {
-          "valor": null
+          "valor": 5.37,
+          "hist": [
+            7.5,
+            6.5,
+            4.95,
+            3.67,
+            4.8,
+            4.8
+          ]
         },
         "% Dannadas": {
-          "valor": null
+          "valor": 11.27,
+          "hist": [
+            17.3,
+            11.25,
+            15.65,
+            10.67,
+            6.3,
+            6.45
+          ]
         },
         "% Severamente Dannadas": {
-          "valor": null
+          "valor": 6.08,
+          "hist": [
+            9.7,
+            7.5,
+            4.95,
+            4.0,
+            4.8,
+            5.5
+          ]
         }
       }
     },
@@ -741,13 +849,46 @@ window.AGGREGATES_BY_TAB_GENERATED = {
       "muestras": 6,
       "controles": {
         "Acero Inox 4mm": {
-          "valor": "REVISAR"
+          "valor": "ATRAPA ok"
+        },
+        "Cajas Almendra 1ra": {
+          "valor": 128.5,
+          "hist": [
+            135,
+            134,
+            128,
+            134,
+            80,
+            160
+          ]
+        },
+        "Cajas Almendra 2da": {
+          "valor": 13.17,
+          "hist": [
+            14,
+            10,
+            14,
+            10,
+            22,
+            9
+          ]
         },
         "Ferroso Fe 3mm": {
-          "valor": "REVISAR"
+          "valor": "ATRAPA ok"
         },
         "No Ferroso 3.5mm": {
-          "valor": "REVISAR"
+          "valor": "ATRAPA ok"
+        },
+        "Pasajes Verificados": {
+          "valor": 3.0,
+          "hist": [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ]
         },
         "Ultima Fecha Registro": {
           "valor": "14-02-2026"
@@ -762,6 +903,12 @@ window.AGGREGATES_BY_TAB_GENERATED = {
         },
         "Clavos/Clips": {
           "valor": "DETECTADO"
+        },
+        "Pase Patrones Pre OK": {
+          "valor": 8.0,
+          "hist": [
+            8
+          ]
         },
         "Pernos 2cm": {
           "valor": "DETECTADO"
@@ -1162,6 +1309,12 @@ window.AGGREGATES_BY_TAB_GENERATED = {
         "Clavos/Clips": {
           "valor": "DETECTADO"
         },
+        "Pase Patrones Pre OK": {
+          "valor": 8.0,
+          "hist": [
+            8
+          ]
+        },
         "Pernos 2cm": {
           "valor": "DETECTADO"
         },
@@ -1473,13 +1626,40 @@ window.AGGREGATES_BY_TAB_GENERATED = {
       "muestras": 7,
       "controles": {
         "% Chias": {
-          "valor": null
+          "valor": 4.72,
+          "hist": [
+            4.0,
+            3.3,
+            3.5,
+            5.97,
+            6.3,
+            6.0,
+            4.0
+          ]
         },
         "% Dannadas": {
-          "valor": null
+          "valor": 10.06,
+          "hist": [
+            12.0,
+            9.35,
+            9.95,
+            10.77,
+            9.2,
+            6.87,
+            12.3
+          ]
         },
         "% Severamente Dannadas": {
-          "valor": null
+          "valor": 5.18,
+          "hist": [
+            4.0,
+            3.3,
+            3.5,
+            5.97,
+            9.8,
+            6.67,
+            3.0
+          ]
         }
       }
     },
@@ -1572,13 +1752,49 @@ window.AGGREGATES_BY_TAB_GENERATED = {
       "muestras": 7,
       "controles": {
         "Acero Inox 4mm": {
-          "valor": "REVISAR"
+          "valor": "ATRAPA ok"
+        },
+        "Cajas Almendra 1ra": {
+          "valor": 114.43,
+          "hist": [
+            119,
+            100,
+            89,
+            171,
+            84,
+            109,
+            129
+          ]
+        },
+        "Cajas Almendra 2da": {
+          "valor": 14.29,
+          "hist": [
+            13,
+            12,
+            17,
+            9,
+            11,
+            14,
+            24
+          ]
         },
         "Ferroso Fe 3mm": {
-          "valor": "REVISAR"
+          "valor": "ATRAPA ok"
         },
         "No Ferroso 3.5mm": {
-          "valor": "REVISAR"
+          "valor": "ATRAPA ok"
+        },
+        "Pasajes Verificados": {
+          "valor": 2.86,
+          "hist": [
+            3,
+            3,
+            3,
+            3,
+            2,
+            3,
+            3
+          ]
         },
         "Ultima Fecha Registro": {
           "valor": "28-02-2026"
@@ -1593,6 +1809,12 @@ window.AGGREGATES_BY_TAB_GENERATED = {
         },
         "Clavos/Clips": {
           "valor": "DETECTADO"
+        },
+        "Pase Patrones Pre OK": {
+          "valor": 8.0,
+          "hist": [
+            8
+          ]
         },
         "Pernos 2cm": {
           "valor": "DETECTADO"
@@ -1952,6 +2174,12 @@ window.AGGREGATES_BY_TAB_GENERATED = {
         "Clavos/Clips": {
           "valor": "DETECTADO"
         },
+        "Pase Patrones Pre OK": {
+          "valor": 6.0,
+          "hist": [
+            6
+          ]
+        },
         "Pernos 2cm": {
           "valor": "DETECTADO"
         },
@@ -1979,6 +2207,20 @@ window.AGGREGATES_BY_TAB_GENERATED = {
           "valor": null
         },
         "Total Bacterias": {
+          "valor": null
+        }
+      }
+    },
+    "RC.CC.13": {
+      "muestras": 2,
+      "controles": {
+        "Cumple": {
+          "valor": "SI"
+        },
+        "Peso Neto (kg)": {
+          "valor": null
+        },
+        "Tara Promedio (kg)": {
           "valor": null
         }
       }
@@ -2262,6 +2504,29 @@ window.AGGREGATES_BY_TAB_GENERATED = {
         },
         "Estado Reemplazo": {
           "valor": "CONTROLADO"
+        }
+      }
+    },
+    "RC.CC.08": {
+      "muestras": 1,
+      "controles": {
+        "Alambre 1.5cm": {
+          "valor": "DETECTADO"
+        },
+        "Clavos/Clips": {
+          "valor": "DETECTADO"
+        },
+        "Pase Patrones Pre OK": {
+          "valor": 6.0,
+          "hist": [
+            6
+          ]
+        },
+        "Pernos 2cm": {
+          "valor": "DETECTADO"
+        },
+        "Ultima Fecha Registro": {
+          "valor": "10-10-2026"
         }
       }
     },

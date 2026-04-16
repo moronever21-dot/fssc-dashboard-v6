@@ -1,0 +1,329 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta charset="utf-8" />
+    <style>
+      body { font-family: Arial, sans-serif; padding: 12px; margin:0; }
+      .container { padding:12px; }
+      .section { padding:10px; border-radius:8px; margin-bottom:10px; }
+      .section-lote { background: linear-gradient(180deg,#fff7e6,#ffffff); border:1px solid #ffe1a8; }
+
+      label { display:block; margin-top:8px; font-weight:600; }
+      select, button { width:100%; margin-top:6px; padding:6px; box-sizing:border-box; }
+      #status { margin-top:10px; font-size:12px; color:#333; min-height:22px; }
+      .small-note { font-size:12px; color:#666; margin-top:6px; }
+      .sources-list { margin-top:6px; font-size:13px; color:#222; max-height:120px; overflow:auto; border:1px solid #eee; padding:6px; background:#fafafa; }
+
+      #spinnerOverlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(255,255,255,0.7);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+      .spinnerBox {
+        text-align:center;
+        padding:18px 24px;
+        background: rgba(255,255,255,0.95);
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        min-width:220px;
+      }
+      .loader { width:40px; height:40px; border:4px solid #eee; border-top:4px solid #1a73e8; border-radius:50%; animation: spin 1s linear infinite; margin: 0 auto 8px auto; }
+      @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+      .loading-disabled { opacity:0.6; pointer-events:none; }
+      .controls-row { display:flex; gap:8px; }
+      .controls-row button { flex:1; }
+
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h3 style="margin-top:0">RC.PD Panel</h3>
+
+      <div class="section section-lote">
+        <label>Seleccionar lote</label>
+        <select id="loteSelect">
+          <option value="">Seleccionar lote</option>
+        </select>
+
+        <div class="small-note">Fuentes que contienen el lote seleccionado (RC.PD.01–13 y registros RC.CC)</div>
+        <div id="sourcesForLote" class="sources-list">(selecciona un lote)</div>
+
+        <div class="controls-row">
+          <button id="refreshLotesBtn">Actualizar lista de lotes</button>
+          <button id="pullLoteBtn">Jalar lote (todos)</button>
+        </div>
+        <div class="controls-row" style="margin-top:6px">
+          <button id="diagCCBtn" style="background:#f5f5f5;color:#555;font-size:11px;">Diagnóstico CC G2</button>
+        </div>
+
+        <div class="small-note" style="margin-top:10px;">
+          Automático: al terminar de jalar RC.PD y RC.CC, se consolidará RC.PD.01 sin dañar el modelo ni mover combinadas fuera del bloque.
+        </div>
+      </div>
+
+      <div id="status"></div>
+    </div>
+
+    <div id="spinnerOverlay">
+      <div class="spinnerBox" role="status" aria-live="polite">
+        <div class="loader" aria-hidden="true"></div>
+        <div id="spinnerText">Cargando…</div>
+      </div>
+    </div>
+
+    <script>
+      function escHtml(s) {
+        return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      }
+
+      function renderReport(lote, allResults) {
+        google.script.run
+          .withSuccessHandler(function() { /* modal abierto en la hoja */ })
+          .withFailureHandler(function(err) {
+            showStatus('Error al abrir informe: ' + err, true);
+          })
+          .mostrarInformeJalada(lote, JSON.stringify(allResults));
+      }
+      function showStatus(msg, isError) {
+        const el = document.getElementById('status');
+        el.style.color = isError ? 'red' : '#333';
+        el.textContent = msg || '';
+      }
+
+      function showSpinner(text) {
+        const overlay = document.getElementById('spinnerOverlay');
+        const spinnerText = document.getElementById('spinnerText');
+        spinnerText.textContent = text || 'Cargando…';
+        overlay.style.display = 'flex';
+        document.querySelector('.container').classList.add('loading-disabled');
+      }
+
+      function hideSpinner() {
+        document.getElementById('spinnerOverlay').style.display = 'none';
+        document.querySelector('.container').classList.remove('loading-disabled');
+      }
+
+      function loadLotNames() {
+        showSpinner('Cargando lotes (nombres de pestañas) ...');
+        google.script.run.withSuccessHandler(function(res) {
+          const sel = document.getElementById('loteSelect');
+          sel.innerHTML = '';
+          if (res.success) {
+            const placeholder = document.createElement('option');
+            placeholder.value='';
+            placeholder.textContent='Seleccionar lote';
+            sel.appendChild(placeholder);
+
+            if (res.names.length === 0) {
+              const o = document.createElement('option'); o.value=''; o.textContent='(sin lotes)'; sel.appendChild(o);
+            } else {
+              res.names.forEach(function(n) {
+                const o = document.createElement('option'); o.value = n; o.textContent = n; sel.appendChild(o);
+              });
+            }
+            showStatus('Lotes cargados.');
+            document.getElementById('sourcesForLote').textContent = '(selecciona un lote)';
+          } else {
+            sel.appendChild(document.createElement('option')).textContent = '(error)';
+            showStatus('Error: ' + res.error, true);
+          }
+          hideSpinner();
+        }).withFailureHandler(function(err) {
+          showStatus('Error cargando lotes: ' + err, true);
+          hideSpinner();
+        }).getAllUniqueSheetNames();
+      }
+
+      function loadSourcesForLote() {
+        const lote = document.getElementById('loteSelect').value;
+        const div = document.getElementById('sourcesForLote');
+        if (!lote) { div.textContent = '(selecciona un lote)'; return; }
+        showSpinner('Buscando fuentes que contengan "' + lote + '" ...');
+        google.script.run.withSuccessHandler(function(res) {
+          if (res.success) {
+            if (res.sources.length === 0) {
+              div.textContent = 'Ninguna fuente contiene este lote.';
+            } else {
+              div.innerHTML = '';
+              res.sources.forEach(function(s) {
+                const p = document.createElement('div');
+                p.textContent = s;
+                div.appendChild(p);
+              });
+            }
+            showStatus('Fuentes listadas.');
+          } else {
+            div.textContent = '(error: ' + res.error + ')';
+            showStatus('Error: ' + res.error, true);
+          }
+          hideSpinner();
+        }).withFailureHandler(function(err) {
+          showStatus('Error: ' + err, true);
+          hideSpinner();
+        }).getSourcesContainingSheet(lote);
+      }
+
+      function pullLote() {
+        const lote = document.getElementById('loteSelect').value;
+        if (!lote) { showStatus('Selecciona un lote primero', true); return; }
+
+        const btn = document.getElementById('pullLoteBtn');
+        btn.disabled = true;
+        var allResults = [];
+
+        function collect(results) {
+          (results || []).forEach(function(r) { allResults.push(r); });
+        }
+        function onFail(err) {
+          btn.disabled = false;
+          showStatus('Error: ' + err, true);
+          hideSpinner();
+        }
+
+        // ── Paso B2 (6/6): RC.CC.02 + RC.CC.13 (por celda) ──────────────────
+        function stepB2() {
+          showSpinner('Paso B2 (6/6): jalando RC.CC.02 / 13 (por celda)…');
+          google.script.run
+            .withSuccessHandler(function(res) {
+              collect(res.results || []);
+              btn.disabled = false;
+              renderReport(lote, allResults);
+              showStatus('Jalada completa para "' + lote + '".');
+              hideSpinner();
+            })
+            .withFailureHandler(function(err) {
+              allResults.push({ label: 'Paso B2 (CC.02/13)', ok: false, message: String(err) });
+              btn.disabled = false;
+              renderReport(lote, allResults);
+              showStatus('Jalada con errores.', true);
+              hideSpinner();
+            })
+            .pullLotePasoB2(lote);
+        }
+
+        // ── Paso B1 (5/6): RC.PD.01 (directo o fallback G6:G15) ─────────────
+        function stepB1() {
+          showSpinner('Paso B1 (5/6): jalando RC.PD.01…');
+          google.script.run
+            .withSuccessHandler(function(res) {
+              collect(res.results || []);
+              stepB2();
+            })
+            .withFailureHandler(function(err) {
+              allResults.push({ label: 'Paso B1 (RC.PD.01)', ok: false, message: String(err) });
+              stepB2();
+            })
+            .pullLotePasoB1(lote);
+        }
+
+        // ── Paso A2b (4/6): RC.CC.05 (PLLs — puede ser 8+ hojas) ────────────
+        function stepA2b() {
+          showSpinner('Paso A2b (4/6): consolidando RC.CC.05 (PLLs)…');
+          google.script.run
+            .withSuccessHandler(function(res) {
+              if (!res.success) {
+                allResults.push({ label: 'Paso A2b (CC.05)', ok: false, message: res.error || 'error' });
+              } else {
+                collect(res.results || []);
+              }
+              stepB1();
+            })
+            .withFailureHandler(function(err) {
+              allResults.push({ label: 'Paso A2b (CC.05)', ok: false, message: String(err) });
+              stepB1();
+            })
+            .pullLotePasoA2b(lote);
+        }
+
+        // ── Paso A2a (3/6): RC.CC.04 + RC.CC.11 ─────────────────────────────
+        function stepA2a() {
+          showSpinner('Paso A2a (3/6): consolidando RC.CC.04 / 11…');
+          google.script.run
+            .withSuccessHandler(function(res) {
+              if (!res.success) {
+                allResults.push({ label: 'Paso A2a (CC.04/11)', ok: false, message: res.error || 'error' });
+              } else {
+                collect(res.results || []);
+              }
+              stepA2b();
+            })
+            .withFailureHandler(function(err) {
+              allResults.push({ label: 'Paso A2a (CC.04/11)', ok: false, message: String(err) });
+              stepA2b();
+            })
+            .pullLotePasoA2a(lote);
+        }
+
+        // ── Paso A1b (2/6): RC.CC Grupo 1 (9 registros, copyTo directo) ──────
+        function stepA1b() {
+          showSpinner('Paso A1b (2/6): jalando RC.CC Grupo 1 (CC.01/06/07/08/09/10/14/17)…');
+          google.script.run
+            .withSuccessHandler(function(res) {
+              if (!res.success) {
+                allResults.push({ label: 'Paso A1b (CC G1)', ok: false, message: res.error || 'error' });
+              } else {
+                collect(res.results || []);
+              }
+              stepA2a();
+            })
+            .withFailureHandler(function(err) {
+              allResults.push({ label: 'Paso A1b (CC G1)', ok: false, message: String(err) });
+              stepA2a();
+            })
+            .pullLotePasoA1b(lote);
+        }
+
+        // ── Paso A1a (1/6): RC.PD.02-13 (12 registros, copyTo directo) ───────
+        showSpinner('Paso A1a (1/6): jalando RC.PD.02–13…');
+        google.script.run
+          .withSuccessHandler(function(res) {
+            if (!res.success) {
+              allResults.push({ label: 'Paso A1a (RC.PD)', ok: false, message: res.error || 'error' });
+              btn.disabled = false;
+              renderReport(lote, allResults);
+              showStatus('Error en Paso A1a.', true);
+              hideSpinner();
+              return;
+            }
+            collect(res.results || []);
+            stepA1b();
+          })
+          .withFailureHandler(onFail)
+          .pullLotePasoA1a(lote);
+      }
+
+      document.getElementById('loteSelect').addEventListener('change', loadSourcesForLote);
+      document.getElementById('refreshLotesBtn').addEventListener('click', loadLotNames);
+      document.getElementById('pullLoteBtn').addEventListener('click', pullLote);
+      document.getElementById('diagCCBtn').addEventListener('click', function() {
+        const lote = document.getElementById('loteSelect').value;
+        if (!lote) { showStatus('Selecciona un lote primero', true); return; }
+        showSpinner('Ejecutando diagnóstico CC G2…');
+        google.script.run
+          .withSuccessHandler(function(report) {
+            hideSpinner();
+            // Mostrar en status: primero 3 líneas, resto en console
+            const lines = report.split('\n');
+            showStatus('[DIAG] Ver Apps Script → Executions → View log para el reporte completo. Resumen: ' +
+              lines.filter(function(l){ return l.indexOf('COINCIDE') !== -1 || l.indexOf('Coincidencias') !== -1; }).join(' | ') || 'Sin coincidencias');
+            console.log(report);
+          })
+          .withFailureHandler(function(err) {
+            hideSpinner();
+            showStatus('Error diagnóstico: ' + err, true);
+          })
+          .diagnosticarCCGrupo2(lote);
+      });
+
+      loadLotNames();
+    </script>
+  </body>
+</html>

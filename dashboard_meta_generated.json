@@ -37,28 +37,28 @@
       "timestamp": "2026-03-23"
     },
     {
+      "codigo": "RC.CC.07",
+      "ultimaFecha": "20-03-2026",
+      "ultimaHoja": "IA-005 PLL33-34",
+      "timestamp": "2026-03-20"
+    },
+    {
       "codigo": "RC.CC.04",
       "ultimaFecha": "18-03-2026",
       "ultimaHoja": "33",
       "timestamp": "2026-03-18"
     },
     {
+      "codigo": "RC.CC.13",
+      "ultimaFecha": "17-03-2026",
+      "ultimaHoja": "AA 01-26 PLL31-32",
+      "timestamp": "2026-03-17"
+    },
+    {
       "codigo": "RC.CC.05",
       "ultimaFecha": "13-03-2026",
       "ultimaHoja": "PLL 29",
       "timestamp": "2026-03-13"
-    },
-    {
-      "codigo": "RC.CC.07",
-      "ultimaFecha": "13-03-2026",
-      "ultimaHoja": "IA 004-PLL03",
-      "timestamp": "2026-03-13"
-    },
-    {
-      "codigo": "RC.CC.13",
-      "ultimaFecha": "12-03-2026",
-      "ultimaHoja": "DA 01-CV PLL04",
-      "timestamp": "2026-03-12"
     },
     {
       "codigo": "RC.CC.11",
@@ -358,6 +358,7 @@
         "RC.CC.06",
         "RC.CC.08",
         "RC.CC.09",
+        "RC.CC.13",
         "RC.CC.14",
         "RC.CC.17"
       ],
@@ -367,8 +368,7 @@
         "RC.CC.05",
         "RC.CC.07",
         "RC.CC.10",
-        "RC.CC.11",
-        "RC.CC.13"
+        "RC.CC.11"
       ],
       "isComplete": false
     },
@@ -378,6 +378,7 @@
         "RC.CC.01",
         "RC.CC.1.1",
         "RC.CC.06",
+        "RC.CC.08",
         "RC.CC.14",
         "RC.CC.17"
       ],
@@ -386,7 +387,6 @@
         "RC.CC.04",
         "RC.CC.05",
         "RC.CC.07",
-        "RC.CC.08",
         "RC.CC.09",
         "RC.CC.10",
         "RC.CC.11",
@@ -478,6 +478,72 @@
         "RC.CC.10",
         "RC.CC.11",
         "RC.CC.13",
+        "RC.CC.17"
+      ],
+      "isComplete": false
+    },
+    {
+      "tab": "IA-005 PLL29-30",
+      "present": [
+        "RC.CC.07"
+      ],
+      "missing": [
+        "RC.CC.01",
+        "RC.CC.1.1",
+        "RC.CC.02",
+        "RC.CC.04",
+        "RC.CC.05",
+        "RC.CC.06",
+        "RC.CC.08",
+        "RC.CC.09",
+        "RC.CC.10",
+        "RC.CC.11",
+        "RC.CC.13",
+        "RC.CC.14",
+        "RC.CC.17"
+      ],
+      "isComplete": false
+    },
+    {
+      "tab": "IA-005 PLL31-32",
+      "present": [
+        "RC.CC.07"
+      ],
+      "missing": [
+        "RC.CC.01",
+        "RC.CC.1.1",
+        "RC.CC.02",
+        "RC.CC.04",
+        "RC.CC.05",
+        "RC.CC.06",
+        "RC.CC.08",
+        "RC.CC.09",
+        "RC.CC.10",
+        "RC.CC.11",
+        "RC.CC.13",
+        "RC.CC.14",
+        "RC.CC.17"
+      ],
+      "isComplete": false
+    },
+    {
+      "tab": "IA-005 PLL33-34",
+      "present": [
+        "RC.CC.07"
+      ],
+      "missing": [
+        "RC.CC.01",
+        "RC.CC.1.1",
+        "RC.CC.02",
+        "RC.CC.04",
+        "RC.CC.05",
+        "RC.CC.06",
+        "RC.CC.08",
+        "RC.CC.09",
+        "RC.CC.10",
+        "RC.CC.11",
+        "RC.CC.13",
+        "RC.CC.14",
         "RC.CC.17"
       ],
       "isComplete": false

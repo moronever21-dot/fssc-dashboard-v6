@@ -1,0 +1,585 @@
+{
+  "RC.PD.02": {
+    "tabs": [
+      "RG 01-CV",
+      "RG 02-CV",
+      "BSI 01",
+      "DA 01-CV",
+      "AA 01-26",
+      "AA 02-26"
+    ],
+    "tab0_name": "RG 01-CV",
+    "headers": [
+      "BENEFICIADORA",
+      "",
+      "",
+      "REGISTRO",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "CODIGO:",
+      "RC.PD.01",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "subhdrs": [
+      [
+        "RECEPCION CASTAÑA EN CASCARA",
+        "REVISION:"
+      ],
+      [
+        "Fecha.",
+        "20/11/2023"
+      ],
+      [
+        "PROVEEDOR",
+        "LOTE Proveedor",
+        "LOTE TRAZABILIDAD",
+        "Municipio de Procedencia",
+        "CP-",
+        "LOTE IA",
+        "CFO",
+        "TC.",
+        "Kgs. utilizados",
+        "Hoja origen"
+      ]
+    ]
+  },
+  "RC.PD.03": {
+    "tabs": [
+      "RG 01-CV",
+      "RG 02-CV",
+      "BSI 01",
+      "DA 01-CV",
+      "AA 01-26",
+      "AA 02-26",
+      "Copia de AA 02-26"
+    ],
+    "tab0_name": "RG 01-CV",
+    "headers": [
+      "",
+      "BENEFICIADORA Responsable de Control:__ _Sadrad Loaiza Racua__________________________________Firma:______________________",
+      "",
+      "",
+      "REGISTRO PRE - LIMPIEZA Y CLASIFICADO",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "Lote Proveedor: Lote Trazabilidad:",
+      "RC.PD.03 No. Revisión: 01 Vigente a partir de 15-05-24",
+      "",
+      "RG 01-CV CONV. 01",
+      "",
+      ""
+    ],
+    "subhdrs": [
+      [
+        "Responsable de Seguimiento: ___Elmo Espinoza Trujillo ______________________________ Firma:______________________",
+        "56,952"
+      ],
+      [
+        "Nombre Transportista: ______________________________________________________________________"
+      ],
+      [
+        "PRE-LIMPIEZA Y CLASIFICADO"
+      ]
+    ]
+  },
+  "RC.PD.05": {
+    "tabs": [
+      "RG 01-CV",
+      "RG 02-CV",
+      "BSI 01",
+      "DA 01-CV",
+      "AA 01-26",
+      "AA 02-26"
+    ],
+    "tab0_name": "RG 01-CV",
+    "headers": [
+      "",
+      "BENEFICIADORA Responsable de Control: Responsable de Seguimiento: No. de Lote Proveedor",
+      "No. de Lote Ingama",
+      "No. Proceso de Cilindrada",
+      "Cil. Utilizados",
+      "REGISTRO CONTROL DE INGRESO DE ALMENDRA A CILINDROS Fecha Ingreso de Cilindro",
+      "Fecha y Hora salida de Cilindro",
+      "P ° CALDERO",
+      "INGRESO Kg",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "RC.PD.05 No. Revisión: 01 Vigente a partir del: 15-05-2024 FIRMA: FIRMA:",
+      ""
+    ],
+    "subhdrs": [
+      [],
+      [],
+      [
+        "RG 01-CV",
+        "CONV. 01",
+        "1",
+        "6/01/2026",
+        "7/01/2026",
+        "8-9",
+        "6,900",
+        "22%",
+        "15%"
+      ]
+    ]
+  },
+  "RC.PD.06": {
+    "tabs": [
+      "RG 01-CV",
+      "RG 02-CV",
+      "BSI 01",
+      "DA 01-CV",
+      "AA 01-26",
+      "AA 02-26"
+    ],
+    "tab0_name": "RG 01-CV",
+    "headers": [
+      "",
+      "BENEFICIADORA Responsable de Control: ________________________________________________________________________ Responsable de Seguimiento: ____________________________________________________________________",
+      "",
+      "",
+      "REGISTRO SALIDA DE CILINDROS - INGRESO A DEPOSITOS DE MPS",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "Firma: _______________________________ Firma: _______________________________",
+      "",
+      "RC.PD.06 No. Revisión: 01 Vigente a partir del: 15-05-2024",
+      ""
+    ],
+    "subhdrs": [
+      [
+        "No. Lote trazabilidad",
+        "RG 01-CV",
+        "FECHA SALIDA:",
+        "7/1/2026",
+        "ORG",
+        "FALSE",
+        "FT",
+        "FALSE",
+        "CON."
+      ],
+      [
+        "FECHA INGRESO:",
+        "D - 04",
+        "D - 05",
+        "D - 06",
+        "D - 07",
+        "D - 08",
+        "D - 09"
+      ],
+      [
+        "7/1/26",
+        "Kg",
+        "Kg",
+        "% H",
+        "Kg",
+        "Kg",
+        "% H",
+        "Kg",
+        "% H",
+        "Kg",
+        "% H"
+      ]
+    ]
+  },
+  "RC.PD.07": {
+    "tabs": [
+      "RG 01-CV",
+      "RG 02-CV",
+      "BSI 01",
+      "DA 01-CV",
+      "AA 01-26",
+      "AA 02-26"
+    ],
+    "tab0_name": "RG 01-CV",
+    "headers": [
+      "",
+      "Responsable de Control: ___________________________________________________ Responsable de Seguimiento: ________________________________________________",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "REGISTRO INGRESO Y SALIDA DE MPSC A SANCOCHADO",
+      "",
+      "CARACTERISTICAS",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "subhdrs": [
+      [
+        "07-01-26",
+        "220",
+        "3,025",
+        "6,103",
+        "1,650",
+        "10,998"
+      ],
+      [
+        "09-01-26",
+        "222",
+        "4,150",
+        "5,566",
+        "1,950",
+        "11,888"
+      ],
+      [
+        "12-01-26",
+        "240",
+        "6,050",
+        "5,781",
+        "277",
+        "12,348"
+      ]
+    ]
+  },
+  "RC.PD.08": {
+    "tabs": [
+      "RG 01-CV",
+      "RG 02-CV",
+      "BSI 01",
+      "DA 01-CV",
+      "AA 01-26",
+      "AA 02-26"
+    ],
+    "tab0_name": "RG 01-CV",
+    "headers": [
+      "",
+      "BENEFICIADORA Responsable de Control: Yirsa Aguilar Rojas Responsable de Seguimiento Elmo Felipe Espinoza Trujillo No. Lote Trazabilidad",
+      "",
+      "CONV. 01",
+      "",
+      "REGISTRO RENDIMIENTO DE ALMEDRA PELADA - CLASIFICADA (Tipo y Calidad) - RECORTADA",
+      "",
+      "No. Lote Proveedor",
+      "",
+      "Firma Firma RG 01-CV",
+      "RC.PD.08 No. Revisión: 02 Vigente a partir del 01-04-24",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "subhdrs": [
+      [
+        "Fecha Sancochado",
+        "13/1/2026",
+        "TRUE",
+        "1"
+      ],
+      [
+        "Fecha Quebrado",
+        "14/1/2026"
+      ],
+      [
+        "TIPO",
+        "5.7%",
+        "18.6",
+        "% Corte",
+        "4.0%",
+        "22.0"
+      ]
+    ]
+  },
+  "RC.PD.09": {
+    "tabs": [
+      "RG 01-CV",
+      "RG 02-CV",
+      "BSI 01",
+      "DA 01-CV",
+      "AA 01-26",
+      "AA 02-26"
+    ],
+    "tab0_name": "RG 01-CV",
+    "headers": [
+      "BENEFICIADORA Responsable de control dìa Responsable de control noche Responsable de Seguimiento: Lote de Proveedor",
+      "",
+      "REGISTRO CONTROL DE ALMENDRA PELADA DESHIDRATADA Hugo Dumay Cuata Tania Rojas Quette RG 01-CV",
+      "",
+      "Org",
+      "FT",
+      "Firma Firma Firma Conv.",
+      "Lote de Proveedor",
+      "",
+      "RG 01-CV",
+      "Límite crítico: Límite Operacional:",
+      "RC.PD.09 No. Revisión: 02 Vigente a partir del 05/01/26 Org",
+      "75 °C 75 - 80 °C FT",
+      "Conv."
+    ],
+    "subhdrs": [
+      [
+        "CONV. 01",
+        "FALSE",
+        "TRUE",
+        "CONV. 01",
+        "FALSE",
+        "FALSE",
+        "✔"
+      ],
+      [
+        "14/01/2026",
+        "1",
+        "16-01-26",
+        "Nº Plla."
+      ],
+      [
+        "16/01/2026"
+      ]
+    ]
+  },
+  "RC.PD.10": {
+    "tabs": [
+      "RG 01-CV",
+      "RG 02-CV",
+      "BSI 01",
+      "DA 01-CV",
+      "AA 01-26",
+      "AA 02-26"
+    ],
+    "tab0_name": "RG 01-CV",
+    "headers": [
+      "",
+      "BENEFICIADORA Responsable de Control : Responsable de Seguimiento No. Lote Trazabilidad",
+      "",
+      "",
+      "",
+      "CONV. 01",
+      "",
+      "",
+      "REGISTRO CONTROL DE ALMENDRA EMBALADA",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "subhdrs": [
+      [
+        "Nº Lote",
+        "Nº Lote",
+        "Nº Lote",
+        "Nº Lote",
+        "Nº Lote"
+      ],
+      [
+        "Nº Plla."
+      ],
+      [
+        "16-1",
+        "1",
+        "1,560.00",
+        "0.0",
+        "1,560.0",
+        "IA-001",
+        "2.0",
+        "2.0",
+        "IA-001",
+        "73.0",
+        "2.0",
+        "IA-011",
+        "0.0",
+        "0.0",
+        "IA-012",
+        "0.0",
+        "1.0",
+        "IA-013",
+        "0.0"
+      ]
+    ]
+  },
+  "RC.PD.11": {
+    "tabs": [
+      "RG 01-CV",
+      "RG 02-CV",
+      "BSI 01",
+      "DA 01-CV",
+      "AA 01-26",
+      "AA 02-26"
+    ],
+    "tab0_name": "RG 01-CV",
+    "headers": [
+      "",
+      "BENEFICIADORA Responsable de Control BISMARK FORERO SAUCEDO Responsable de Seguimiento: ELMO FELIPE ESPINOZA TRUJILLO",
+      "",
+      "",
+      "REGISTRO CONTROL DE SELLADO",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "Firma: ________________ Firma: _________________",
+      "RC.PD.11 No. Revisión: 02 Vigente a partir del 05-01-26",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "subhdrs": [
+      [
+        "CONV. 01",
+        "FALSE",
+        "✔"
+      ],
+      [
+        "RG 01-CV",
+        "75238,1"
+      ],
+      [
+        "OF.205891"
+      ]
+    ]
+  },
+  "RC.PD.12": {
+    "tabs": [
+      "RG 01-CV",
+      "RG 02-CV",
+      "BSI 01",
+      "DA 01-CV",
+      "AA 01-26",
+      "AA 02-26"
+    ],
+    "tab0_name": "RG 01-CV",
+    "headers": [
+      "",
+      "BENEFICIADORA Responsable de Control :BISMARK FORERO SAUCEDO Responsable de Seguimiento : ELMO FELIPE ESPINOZA TRUJILLO No. Lote Trazabilidad",
+      "",
+      "",
+      "REGISTRO ALMACEN DE PRODUCTO TERMINADO",
+      "",
+      "CONV. 01",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "Firma: _____________________________________________________ Firma: _____________________________________________________",
+      "No. Lote Proveedor",
+      ""
+    ],
+    "subhdrs": [
+      [
+        "31/1/2026"
+      ],
+      [
+        "salida",
+        "salida",
+        "salida",
+        "salida",
+        "salida"
+      ],
+      []
+    ]
+  },
+  "RC.PD.13": {
+    "tabs": [
+      "RG 01-CV",
+      "AA 02-26"
+    ],
+    "tab0_name": "RG 01-CV",
+    "headers": [
+      "",
+      "BENEFICIADORA PRODUCTO ORGANICO CERTIFICADO POR CERES GMBH BO-BIO-140 N°",
+      "",
+      "REGISTRO CONOCIMIENTO DE CARGA",
+      "",
+      "",
+      "",
+      "",
+      "RC.PD.13 REVISION: 01 vigente a partir de:15/05/2024",
+      "001/2026",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "subhdrs": [
+      [
+        "GUIA DE MOVIMIENTO VEGETAL Nº 148019",
+        "PRECINTO Nº",
+        "0001428"
+      ],
+      [
+        "REMITENTE:",
+        "HORACIO GAMARRA TELLEZ \"INGAMA\"",
+        "CEL:",
+        "76073333"
+      ],
+      [
+        "CONSIGNATARIO:",
+        "Mario Flores Torrez",
+        "CEL:",
+        "73005610"
+      ]
+    ]
+  }
+}
