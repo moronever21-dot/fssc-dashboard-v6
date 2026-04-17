@@ -50,3 +50,12 @@
 - No romper la lógica de consolidación de TRAZABILIDAD — está funcionando correctamente.
 - Si se agrega un nuevo paso o función en RC_PD_Panel.gs, actualizar también RC_PD_Sidebar.html.
 - El usuario puede trabajar desde cualquier PC usando OneDrive + GitHub web.
+
+## Commit diario obligatorio
+- Al finalizar cada sesión de trabajo, recordar al usuario hacer git push de todo lo trabajado en INGAMA.
+- Comando estándar al cerrar el día:
+  cd "c:\Users\Ingama\OneDrive - Escuela Militar de Ingenieria\INGAMA"
+  git add .
+  git commit -m "trabajo del dia: <descripcion breve>"
+  git push
+- Si durante la sesión se modificaron archivos, ofrecer ejecutar el commit al terminar sin que el usuario tenga que pedirlo.
