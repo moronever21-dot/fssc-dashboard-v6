@@ -1,14 +1,52 @@
-# Instrucciones del proyecto FSSC 22000 v6
+# Instrucciones del proyecto INGAMA — FSSC 22000 v6
 
-- Proyecto principal dividido en dos carpetas: PPRo para Calidad y Produccion para registros RC.PD.
-- El dashboard principal esta en PPRo/index.html y funciona con HTML + React CDN + Chart.js, sin Node.
-- Los calculos de Calidad se modifican en PPRo/scrape_quality.py.
-- Los calculos de Produccion se modifican en Produccion/scrape_produccion.py.
-- Cuando se cambie un registro RC.CC.xx, se debe ajustar su parser correspondiente y luego regenerar los archivos generados.
-- Cuando se cambie un registro RC.PD.xx, se debe ajustar su scraper correspondiente y luego regenerar los archivos generados.
-- Prioridad del usuario: mostrar datos reales. Si no hay dato real por lote o registro, evitar fallback estatico o valores inventados.
-- Preferencia operativa del usuario: puede trabajar sin Git local en otra PC, usando OneDrive + GitHub web cuando sea necesario.
-- No mover bloques visuales grandes del dashboard si el usuario no lo pide explicitamente.
-- Si un cambio afecta un registro especifico, mencionar claramente que parser o bloque fue modificado.
-- Archivos operativos principales de Calidad: PPRo/index.html, PPRo/scrape_quality.py, PPRo/aggregates_by_tab_generated.json, PPRo/aggregates_by_tab_generated.js.
-- Archivos operativos principales de Produccion: Produccion/scrape_produccion.py, Produccion/produccion_aggregates_generated.json, Produccion/produccion_aggregates_generated.js, Produccion/lote_info_pd02.json, Produccion/lote_info_pd02.js.
+## Repositorio
+- Repo privado en GitHub: https://github.com/moronever21-dot/INGAMA (rama main)
+- Remote local configurado: https://github.com/moronever21-dot/INGAMA.git
+- Flujo diario: git add . → git commit -m "mensaje" → git push
+- Página pública del dashboard en Vercel (configurada via vercel.json, outputDirectory: PPRo)
+
+## Estructura de carpetas
+- PPRo/          → Dashboard de Calidad (index.html, scrape_quality.py, aggregates generados)
+- Produccion/    → Dashboard de Producción (scrape_produccion.py, aggregates generados)
+- TRAZABILIDAD/  → Sistema Apps Script de trazabilidad RC.PD + RC.CC para Google Sheets
+
+## TRAZABILIDAD — Archivos clave
+- TRAZABILIDAD/RC_PD_Panel.gs       → lógica principal Apps Script (cadena 6 pasos, ~1245 líneas)
+- TRAZABILIDAD/RC_PD_Sidebar.html   → sidebar HTML del panel lateral en Google Sheets
+- TRAZABILIDAD/scrape_rc_cc.py      → scraper diagnóstico de RC.CC
+- TRAZABILIDAD/diagnose_cc_tabs.py  → diagnóstico de pestañas CC
+
+## TRAZABILIDAD — Cadena de 6 pasos (anti-timeout)
+- Paso A1a (1/6): pullLotePasoA1a → jala RC.PD.02–13 (pullSheetToMaster por hoja)
+- Paso A1b (2/6): pullLotePasoA1b → jala RC.CC Grupo 1 (pullCCSheetToMaster por hoja)
+- Paso A2a (3/6): pullLotePasoA2a → consolida RC.CC.04 / RC.CC.11 (_consolidarPorNombreTab_)
+- Paso A2b (4/6): pullLotePasoA2b → consolida RC.CC.05 PLLs (_consolidarPorNombreTab_)
+- Paso B1  (5/6): pullLotePasoB1  → jala RC.PD.01 (directo + fallback consolidarRC_PD_01_desdeLink)
+- Paso B2  (6/6): pullLotePasoB2  → consolida RC.CC.02 / RC.CC.13 (_consolidarPorCelda_)
+- Todos los pasos tienen live-view: master.setActiveSheet(sheet) + SpreadsheetApp.flush() por bloque
+
+## TRAZABILIDAD — Constantes importantes
+- CONTROL_TIMESTAMP_CELL = "C3"
+- EXTERNAL_RC_PD_01_ID = ID externo del spreadsheet RC.PD.01
+- SOURCES = array de RC.PD.01–13 con sus IDs de spreadsheet
+- CC_SOURCES = array de RC.CC.01–17 con sus IDs de spreadsheet
+
+## Dashboard Calidad (PPRo)
+- Archivo principal: PPRo/index.html (HTML + React CDN + Chart.js, sin Node)
+- Datos: PPRo/aggregates_by_tab_generated.json / .js
+- Scraper: PPRo/scrape_quality.py
+- Publicado en Vercel — actualiza automáticamente en cada git push
+
+## Dashboard Producción
+- Scraper: Produccion/scrape_produccion.py
+- Datos: Produccion/produccion_aggregates_generated.json / .js
+- Info de lote: Produccion/lote_info_pd02.json / .js
+
+## Reglas de trabajo
+- Prioridad: mostrar datos reales. Si no hay dato real por lote/registro → mostrar "sin dato", nunca fallback estático.
+- No mover bloques visuales grandes del dashboard si el usuario no lo pide explícitamente.
+- Si un cambio afecta un registro específico, mencionar claramente qué parser o bloque fue modificado.
+- No romper la lógica de consolidación de TRAZABILIDAD — está funcionando correctamente.
+- Si se agrega un nuevo paso o función en RC_PD_Panel.gs, actualizar también RC_PD_Sidebar.html.
+- El usuario puede trabajar desde cualquier PC usando OneDrive + GitHub web.
