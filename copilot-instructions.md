@@ -43,6 +43,31 @@
 - Datos: Produccion/produccion_aggregates_generated.json / .js
 - Info de lote: Produccion/lote_info_pd02.json / .js
 
+## Sobre el usuario
+- Nombre: Ever
+- Trabaja solo — no hay colaboradores en el proyecto
+- Accede desde distintas PCs (trabajo y casa) usando OneDrive + GitHub como fuente de verdad
+- Visión a futuro: crear su propia agencia de IA, replicar el sistema FSSC 22000 a otras empresas
+
+## Visión del proyecto INGAMA
+El proyecto central es un **sistema automatizado de gestión FSSC 22000 v6** para la empresa INGAMA.
+
+### Objetivos:
+1. **Automatización máxima** del sistema de calidad FSSC 22000 v6
+2. **App de auditoría** — interfaz para auditores internos/externos
+3. **App para el cliente** — acceso a sus registros y estado de calidad
+4. **Chatbot con extracción de imágenes (OCR/AI)**:
+   - Los encargados mandan fotos de sus registros físicos por la app
+   - Se extrae el contenido con la API de IA (OCR + interpretación)
+   - El sistema carga automáticamente los datos al registro de calidad correspondiente, conservando formato y texto escrito
+5. **Replicabilidad**: el sistema será una plantilla/producto para ofrecer a otras empresas del sector alimentario
+
+### Roadmap general:
+- Fase 1: Sistema automatizado FSSC 22000 (actual — dashboards, trazabilidad, scraping)
+- Fase 2: App de auditoría + app cliente
+- Fase 3: Chatbot con OCR/extracción de registros fotográficos
+- Fase 4: Agencia de IA — replicar y comercializar el sistema
+
 ## Reglas de trabajo
 - Prioridad: mostrar datos reales. Si no hay dato real por lote/registro → mostrar "sin dato", nunca fallback estático.
 - No mover bloques visuales grandes del dashboard si el usuario no lo pide explícitamente.
@@ -50,6 +75,7 @@
 - No romper la lógica de consolidación de TRAZABILIDAD — está funcionando correctamente.
 - Si se agrega un nuevo paso o función en RC_PD_Panel.gs, actualizar también RC_PD_Sidebar.html.
 - El usuario puede trabajar desde cualquier PC usando OneDrive + GitHub web.
+- Siempre tener en cuenta la visión de replicabilidad: el código debe ser limpio, parametrizable y documentado para facilitar adaptarlo a otras empresas.
 
 ## Commit diario obligatorio
 - Al finalizar cada sesión de trabajo, recordar al usuario hacer git push de todo lo trabajado en INGAMA.
