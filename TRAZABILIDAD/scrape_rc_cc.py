@@ -8,25 +8,20 @@ Guarda: rc_cc_data_raw.json  (datos crudos por registro)
 
 import json
 import re
+import sys
 import urllib.request
 from datetime import datetime
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from sheets_config import RC_CC_SHEETS
 
 # ─── REGISTROS RC.CC ─────────────────────────────────────────────────────────
+# Excluye RC.CC.14 (alias de RC.CC.16 — misma hoja física, código del dashboard calidad)
 SHEETS = [
-    {"codigo": "RC.CC.01",   "id": "1d0prT3LWszhEhg4zvmgBxQf4bxrLz_e7kF8AAhNijcE"},
-    {"codigo": "RC.CC.1.1",  "id": "1YhGfSrQ3YtOL535wnerlmCYNxPni8ThzX41WDfy-Fs4"},
-    {"codigo": "RC.CC.02",   "id": "180CSHCjVKgng9xKAYFTthUfNr_qhNKeGuEXjIPF7tLU"},
-    {"codigo": "RC.CC.04",   "id": "1HHW21Eql5j_AlgWrEg92hquBqkEo6t7wCiqpZ2fO_8g"},
-    {"codigo": "RC.CC.05",   "id": "19tAPT8hR8gUziLQNxVL5V0eo866C4IUr9ljzXWI5mnA"},
-    {"codigo": "RC.CC.06",   "id": "1Azuyxj2TNKLmNzqx6QvYCLHTlF9v7xr3CJkK0_mt0uI"},
-    {"codigo": "RC.CC.07",   "id": "1o9WflLxWc2CzcMb_kbXVAq7aGCvfWDx-aVqKAkDsRR0"},
-    {"codigo": "RC.CC.08",   "id": "1QEiNvG3e4qz9REdlro3O5_7oI26uwy92VwpHFabgCPM"},
-    {"codigo": "RC.CC.09",   "id": "1UNmL2BFzyBM-MXShC5lpxaMOstnkLh3NO8lXJeQyK5o"},
-    {"codigo": "RC.CC.10",   "id": "1OKBjSUd7rIdDkHs2fh6Jmp2vudXVcLjtBcq43r7J4CU"},
-    {"codigo": "RC.CC.11",   "id": "1apbRKPoVq8OXEYfGviZXBRkMvGc-W9Rdy--9RwDXVwI"},
-    {"codigo": "RC.CC.13",   "id": "1xCVOvIesYySTqYB9qbroVoJtCHhfgPd6Wo0xg5ceZq0"},
-    {"codigo": "RC.CC.16",   "id": "16mBCHcPztf_YGDI_zqmU5idmzllhw40-rIpyleZgLI0"},
-    {"codigo": "RC.CC.17",   "id": "1ZRXfyPBLpqDc0ycwpEG_nkhWd36kCT78calkszVeSvs"},
+    {"codigo": k, "id": v}
+    for k, v in RC_CC_SHEETS.items()
+    if k != "RC.CC.14"
 ]
 
 GVIZ_URL = "https://docs.google.com/spreadsheets/d/{id}/gviz/tq?tqx=out:json"

@@ -2,25 +2,18 @@ import csv
 import io
 import json
 import re
+import sys
 import time
 import urllib.request
 from datetime import datetime
 from html.parser import HTMLParser
 from pathlib import Path
 
-PRODUCTION_SHEETS = {
-    "RC.PD.02": "1_aWiCwHrAx1bHpJ3twchTRwX0sCRtmwglVkPE7WrN04",
-    "RC.PD.03": "1Ueb02r1KKiCSlsgr0DFm4LJNLSvHwMtpjsnMmLf82d8",
-    "RC.PD.05": "1l_WaU1PekIp_Cyk79jGhEGhtZkWJ0X6pOnupCnAhSQQ",
-    "RC.PD.06": "17KcWzCQeIyGdsn9YNTjPNtqd7dq1kcB7aQVIGqXKyL8",
-    "RC.PD.07": "1z7zUKc2-kS2BZA6e7Wakzuk0tgoBeV5_F8quvTu2qrA",
-    "RC.PD.08": "1D9R19nsSb0bhqBgEWBCEbeDDdyOmpams8sLMhCAqdf4",
-    "RC.PD.09": "1Ruel5WGlQtLjHIdXsX3LhV6bI3VaxiI4rk_C5qCNvlU",
-    "RC.PD.10": "1IadQ8KERDI8rvKLBKervoSyaotP2Opdtu_n3FmgTJT4",
-    "RC.PD.11": "1Ld8XA13BnSBYoJ6uMsQiptu7v_t4uKFdXwfBwtnFYaI",
-    "RC.PD.12": "1W5eGAe2LOzIrQax_wLI386oZpDXQiAdp9rGgWxdqLQ4",
-    "RC.PD.13": "1p9v0jkbcKgul_Ba40-2166b0vOucHh53U3qbp6aib0M",
-}
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from sheets_config import RC_PD_SHEETS
+
+# RC.PD.01 es la hoja maestra/consolidado — no se scrapea directamente aquí
+PRODUCTION_SHEETS = {k: v for k, v in RC_PD_SHEETS.items() if k not in ("RC.PD.01", "RC.PD.04")}
 
 
 class TableParser(HTMLParser):

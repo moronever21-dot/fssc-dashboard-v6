@@ -1,21 +1,12 @@
+import sys
 import urllib.request, re, json
+from pathlib import Path
 
-CC_SOURCES = [
-  ('RC.CC.01',  '1d0prT3LWszhEhg4zvmgBxQf4bxrLz_e7kF8AAhNijcE'),
-  ('RC.CC.1.1', '1YhGfSrQ3YtOL535wnerlmCYNxPni8ThzX41WDfy-Fs4'),
-  ('RC.CC.02',  '180CSHCjVKgng9xKAYFTthUfNr_qhNKeGuEXjIPF7tLU'),
-  ('RC.CC.04',  '1HHW21Eql5j_AlgWrEg92hquBqkEo6t7wCiqpZ2fO_8g'),
-  ('RC.CC.05',  '19tAPT8hR8gUziLQNxVL5V0eo866C4IUr9ljzXWI5mnA'),
-  ('RC.CC.06',  '1Azuyxj2TNKLmNzqx6QvYCLHTlF9v7xr3CJkK0_mt0uI'),
-  ('RC.CC.07',  '1o9WflLxWc2CzcMb_kbXVAq7aGCvfWDx-aVqKAkDsRR0'),
-  ('RC.CC.08',  '1QEiNvG3e4qz9REdlro3O5_7oI26uwy92VwpHFabgCPM'),
-  ('RC.CC.09',  '1UNmL2BFzyBM-MXShC5lpxaMOstnkLh3NO8lXJeQyK5o'),
-  ('RC.CC.10',  '1OKBjSUd7rIdDkHs2fh6Jmp2vudXVcLjtBcq43r7J4CU'),
-  ('RC.CC.11',  '1apbRKPoVq8OXEYfGviZXBRkMvGc-W9Rdy--9RwDXVwI'),
-  ('RC.CC.13',  '1xCVOvIesYySTqYB9qbroVoJtCHhfgPd6Wo0xg5ceZq0'),
-  ('RC.CC.16',  '16mBCHcPztf_YGDI_zqmU5idmzllhw40-rIpyleZgLI0'),
-  ('RC.CC.17',  '1ZRXfyPBLpqDc0ycwpEG_nkhWd36kCT78calkszVeSvs'),
-]
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from sheets_config import RC_CC_SHEETS
+
+# Excluye RC.CC.14 (alias de RC.CC.16 — misma hoja física)
+CC_SOURCES = [(k, v) for k, v in RC_CC_SHEETS.items() if k != "RC.CC.14"]
 
 def get_sheet_tabs(sheet_id):
     url = 'https://docs.google.com/spreadsheets/d/' + sheet_id + '/edit'
