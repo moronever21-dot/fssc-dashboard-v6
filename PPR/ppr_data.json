@@ -1,0 +1,2029 @@
+{
+  "BPM_2026": [
+    {
+      "archivo": "RC.HP.05 Registros de Control de Lavado de Ropa  Rev.02_IG_AU.xlsx",
+      "hojas": [
+        {
+          "hoja": "BB",
+          "filas": [
+            [
+              "ISO 22002-1",
+              "ISO 22002-1",
+              "ISO 22002-1",
+              "ISO 22002-1"
+            ]
+          ],
+          "total_filas": 15
+        },
+        {
+          "hoja": "RC.HP.05 Lavado Uniformes",
+          "filas": [
+            [
+              "BENEFICIADORA",
+              "REGISTRO ",
+              "RC.HP.05"
+            ],
+            [
+              "LAVADO DE UNIFORME",
+              "No. Revisión: 02"
+            ],
+            [
+              "Vigente A Partir de 10-10-2025"
+            ],
+            [
+              "Responsable de Control :       ANA PAOLA YANAMO",
+              "Firma:……………………………………………………………."
+            ],
+            [
+              "Responsable de Seguimiento:   TANIA ROJAS QUETTE",
+              "Firma:……………………………………………………………."
+            ],
+            [
+              "Feche de entrega a lavado ",
+              "Hora",
+              "Responsable de la Entrega",
+              "Área de Trabajo ",
+              "Código de Uniforme ",
+              "LAVADO DE UNIFORMES",
+              "Responsable del Lavado ",
+              "Fecha Devulución ",
+              "Hora ",
+              "Cantidad de Devolución ",
+              "Código del Uniforme Devuelto ",
+              "Responsable de Devolución de los uniforme Lavado",
+              "Firma ",
+              "OBSERVACIONES"
+            ],
+            [
+              "CASACA",
+              "PANTALÓN ",
+              "COFIA",
+              "BARBIJO"
+            ],
+            [
+              "2026-01-16 00:00:00",
+              "17:00:00",
+              "CRISTIAN SUÁREZ RIVERO",
+              "DESHIDRATADO Y ENFRIADO DE ALM. PELADA",
+              "H-01",
+              "2.0",
+              "2.0",
+              "2.0",
+              "2.0",
+              "ALEXIA NATIVI",
+              "2026-01-17 00:00:00",
+              "08:00:00",
+              "8.0",
+              "H-01",
+              "Amelia Tanaka "
+            ],
+            [
+              "2026-01-21 00:00:00",
+              "17:00:00",
+              "AMELIA TANAKA",
+              "SELECC. DE ALM. PELADA DESHIDRATADA",
+              "SA.PD.01",
+              "12.0",
+              "12.0",
+              "12.0",
+              "12.0",
+              "ALEXIA NATIVI",
+              "2026-01-22 00:00:00",
+              "08:00:00",
+              "48.0",
+              "SAPD.01",
+              "AMELIA TANAKA "
+            ],
+            [
+              "2026-01-21 00:00:00",
+              "16:45:00",
+              "MAYERLY RAFAEL",
+              "ALM. DE PRIMERA Y RECORTE",
+              "EBR.01",
+              "5.0",
+              "5.0",
+              "5.0",
+              "5.0",
+              "ALEXIA NATIVI",
+              "2026-01-22 00:00:00",
+              "08:00:00",
+              "20.0",
+              "EBR.01",
+              "MAYERLY RAFAEL"
+            ],
+            [
+              "2026-01-21 00:00:00",
+              "18:00:00",
+              "BISMARCK FORERO",
+              "PESADO Y SELLADO DE PRODUCTO TER.",
+              "PST.01",
+              "2.0",
+              "2.0",
+              "2.0",
+              "2.0",
+              "ALEXIA NATIVI",
+              "2026-01-22 00:00:00",
+              "08:00:00",
+              "8.0",
+              "PST-01",
+              "AMELIA TANAKA "
+            ],
+            [
+              "2026-01-21 00:00:00",
+              "17:00:00",
+              "TANIA ROJAS",
+              "LABCAR ",
+              "LB.01",
+              "1.0",
+              "1.0",
+              "_",
+              "_",
+              "ALEXIA NATIVI",
+              "2026-01-22 00:00:00",
+              "08:00:00",
+              "LB-01",
+              "TANIA ROJAS"
+            ]
+          ],
+          "total_filas": 1108
+        }
+      ]
+    }
+  ],
+  "Eliminacion_Residuos": [
+    {
+      "archivo": "ELIMIN~1.xlsm",
+      "hojas": [
+        {
+          "hoja": "Grafico",
+          "filas": [
+            [
+              "Fecha"
+            ],
+            [
+              "2025-06-12 00:00:00"
+            ],
+            [
+              "2025-06-13 00:00:00"
+            ],
+            [
+              "2025-06-14 00:00:00"
+            ],
+            [
+              "2025-06-11 00:00:00"
+            ],
+            [
+              "2025-08-12 00:00:00"
+            ],
+            [
+              "2025-08-09 00:00:00"
+            ],
+            [
+              "2025-08-08 00:00:00"
+            ],
+            [
+              "2025-08-05 00:00:00"
+            ],
+            [
+              "2025-08-04 00:00:00"
+            ],
+            [
+              "2025-08-02 00:00:00"
+            ],
+            [
+              "2025-08-01 00:00:00"
+            ],
+            [
+              "2025-08-14 00:00:00"
+            ],
+            [
+              "2025-08-11 00:00:00"
+            ]
+          ],
+          "total_filas": 15
+        },
+        {
+          "hoja": "Datos ",
+          "filas": [
+            [
+              "Nº IA",
+              "Fecha",
+              "Àreas",
+              "Valor en kg (Chias",
+              "Valor en kg (Podridas)",
+              "Cantidad utilizada"
+            ],
+            [
+              "IA-26",
+              "2025-08-14 00:00:00",
+              "Seleccionado de Almendra Deshidratada",
+              "23.8"
+            ],
+            [
+              "IA-26",
+              "2025-08-12 00:00:00",
+              "Seleccionado de Almendra Deshidratada",
+              "28.8"
+            ],
+            [
+              "IA-26",
+              "2025-08-11 00:00:00",
+              "Seleccionado de Almendra Deshidratada",
+              "42.1"
+            ],
+            [
+              "IA-26",
+              "2025-08-09 00:00:00",
+              "Seleccionado de Almendra Deshidratada",
+              "28.6"
+            ],
+            [
+              "IA-26",
+              "2025-08-08 00:00:00",
+              "Seleccionado de Almendra Deshidratada",
+              "36.6"
+            ],
+            [
+              "IA-26",
+              "2025-08-05 00:00:00",
+              "Seleccionado de Almendra Deshidratada",
+              "27.6"
+            ],
+            [
+              "IA-26",
+              "2025-08-04 00:00:00",
+              "Seleccionado de Almendra Deshidratada",
+              "43.8"
+            ],
+            [
+              "IA-26",
+              "2025-08-12 00:00:00",
+              "Seleccionado de Almendra Pelada Cruda",
+              "208.0",
+              "94.0"
+            ],
+            [
+              "IA-26",
+              "2025-08-09 00:00:00",
+              "Seleccionado de Almendra Pelada Cruda",
+              "198.0",
+              "80.0"
+            ],
+            [
+              "IA-26",
+              "2025-08-08 00:00:00",
+              "Seleccionado de Almendra Pelada Cruda",
+              "186.0",
+              "75.0"
+            ],
+            [
+              "IA-26",
+              "2025-08-05 00:00:00",
+              "Seleccionado de Almendra Pelada Cruda",
+              "191.0",
+              "96.0"
+            ],
+            [
+              "IA-26",
+              "2025-08-04 00:00:00",
+              "Seleccionado de Almendra Pelada Cruda",
+              "225.0",
+              "86.0"
+            ],
+            [
+              "IA-26",
+              "2025-08-02 00:00:00",
+              "Seleccionado de Almendra Pelada Cruda",
+              "225.0",
+              "140.0"
+            ],
+            [
+              "IA-26",
+              "2025-08-01 00:00:00",
+              "Seleccionado de Almendra Pelada Cruda",
+              "251.0",
+              "86.0"
+            ]
+          ],
+          "total_filas": 1000
+        },
+        {
+          "hoja": "Tablas Dinamicas",
+          "filas": [
+            [
+              "Etiquetas de fila",
+              "Etiquetas de fila 2",
+              "Valor en kg(Chias)",
+              "Valor en kg(Podridas)",
+              "783709.9"
+            ],
+            [
+              "2025-06-12 00:00:00",
+              "Seleccionado de Almendra Deshidratada",
+              "231.3",
+              "Columna1",
+              "Columna2",
+              "Columna3",
+              "Columna4",
+              "Chias",
+              "Podridas"
+            ],
+            [
+              "2025-06-13 00:00:00",
+              "Seleccionado de Almendra Pelada Cruda",
+              "1484.0",
+              "657.0",
+              "Seleccionado de Almendra Deshidratada",
+              "#REF!"
+            ],
+            [
+              "2025-06-14 00:00:00",
+              "Seleccionado de MPS",
+              "685.0",
+              "Seleccionado de Almendra Pelada Cruda",
+              "#REF!",
+              "#REF!"
+            ],
+            [
+              "2025-06-11 00:00:00",
+              "Total general",
+              "1715.3",
+              "1342.0",
+              "Seleccionado de MPS",
+              "#REF!"
+            ],
+            [
+              "2025-08-12 00:00:00"
+            ],
+            [
+              "2025-08-09 00:00:00"
+            ],
+            [
+              "2025-08-08 00:00:00"
+            ],
+            [
+              "2025-08-05 00:00:00"
+            ],
+            [
+              "2025-08-04 00:00:00"
+            ],
+            [
+              "2025-08-02 00:00:00"
+            ],
+            [
+              "2025-08-01 00:00:00"
+            ],
+            [
+              "2025-08-14 00:00:00"
+            ],
+            [
+              "2025-08-11 00:00:00"
+            ],
+            [
+              "Total general"
+            ]
+          ],
+          "total_filas": 15
+        }
+      ]
+    },
+    {
+      "archivo": "ELIMIN~3.XLS",
+      "error": "openpyxl does not support the old .xls file format, please use xlrd to read this file, or convert it to the more recent .xlsx file format."
+    }
+  ],
+  "Materiales_Quebradizos": {
+    "PLASTICO VIDRIO CERAMICA": [
+      {
+        "archivo": "Copia de RC.Vidrio_Plástico Duro 10_Ensamb. Montaje .xlsx",
+        "hojas": [
+          {
+            "hoja": "BB",
+            "filas": [
+              [
+                "ISO 22000:2018"
+              ]
+            ],
+            "total_filas": 12
+          },
+          {
+            "hoja": "RC.GV.01_Relevamiento",
+            "filas": [
+              [
+                "BENEFICIADORA ",
+                "REGISTRO",
+                "RC.GV.01"
+              ],
+              [
+                " Relevamiento de Elementos De Vidrio - Cerámica - Plástico Duro",
+                "No. Revisión: 01"
+              ],
+              [
+                "Vigente A Partir de 01-04-2024"
+              ],
+              [
+                "Responsable de Control: ________________________________________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "Responsable de Seguimiento: ____________________________________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "ÁREA: Ensamblaje y Montaje de Cedazos con Almendra en Castillo ",
+                "Fecha: ____________________________________"
+              ],
+              [
+                "Elemento",
+                "UBICACIÓN",
+                "Cantidad",
+                "ESTADO",
+                "CORRECCIONES / REPARACIONES\nReparar\nDesechar - Cambiar",
+                "Obsevaciones"
+              ],
+              [
+                "Vidrio",
+                "Plástico",
+                "Cerámica",
+                "SOBRE EL PRODUCTO / EN CONTACTO CON EL PRODUCTO",
+                "ESTRUCTURA DEL EQUIPO O INSTALACIÓN",
+                "ACEPTABLE",
+                "INACEPTABLE",
+                "DEFECTO"
+              ],
+              [
+                "-",
+                "Lámpara led cuadrada",
+                "-",
+                "-",
+                "SI",
+                "6.0",
+                "6.0",
+                "0.0",
+                "0.0",
+                "Ninguna",
+                "-"
+              ]
+            ],
+            "total_filas": 1000
+          },
+          {
+            "hoja": "RC.GV.02_Riesgo",
+            "filas": [
+              [
+                "BENEFICIADORA ",
+                "REGISTRO",
+                "RC.GM.02",
+                "SEMANAL"
+              ],
+              [
+                "Evaluación del Riesgo de Contaminación del Producto Por\nVidrio - Cerámica - Plástico Duro",
+                "No. Revisión: 01",
+                "QUINCENAL"
+              ],
+              [
+                "Vigente A Partir de\n 01-04-2024",
+                "MENSUAL"
+              ],
+              [
+                "Responsable de Control: _______________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "Responsable de Seguimiento: _____________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "ÁREA:  Ensamblaje y Montaje de Cedazos con Almendra en Castillo ",
+                "Fecha: ___________________________________"
+              ],
+              [
+                "No.",
+                "Elemento",
+                "IMPACTO SEGÚN LA EXPOSICION DEL PRODUCTO ",
+                "PROBABILIDAD DE ROTURA - DESPORTILLADO - ASTILLADO",
+                "RIESGO TOTAL",
+                "FRECUENCIA DE INSPECCION SEGÚN RIESGO",
+                "FRECUENCIA DE LA INSPECCIÓN"
+              ],
+              [
+                "Vidrio",
+                "Plástico",
+                "Cerámica",
+                "ALTO PRODUCTO ABIERTO = 3\nMEDIO PRODUCTO CERRADO=2\nBAJO SIN PRODUCTO =1",
+                "CASI SEGURO = 3 PROBABLE = 2 IMPROBABLE = 1 ",
+                " IMPACTO ALTO \nSEMANAL\nImpacto = 6-9",
+                "IMPACTO MEDIO\nQUINCENAL\nImpacto = 3-4",
+                "IMPACTO BAJO \nMENSUAL\nImpacto = 1-2"
+              ],
+              [
+                "1.0",
+                "-",
+                "Lámpara led cuadrada",
+                "-",
+                "1.0",
+                "2.0",
+                "2",
+                "-",
+                "-",
+                "✓",
+                "MENSUAL"
+              ]
+            ],
+            "total_filas": 1000
+          },
+          {
+            "hoja": "RC.GV.03_Control",
+            "filas": [
+              [
+                "BENEFICIADORA ",
+                "REGISTRO",
+                "RC.GV.03"
+              ],
+              [
+                "CONTROL DE VIDRIO - PLÁSTICO DURO - CERÁMICA",
+                "No. Revisión: 01"
+              ],
+              [
+                "Vigente A Partir de 01-04-2024"
+              ],
+              [
+                "Responsable de Control: _____________________________________________________________________________________________",
+                "Firma: __________________________"
+              ],
+              [
+                "Responsable de Seguimiento: ________________________________________________________________________________________",
+                "Firma: __________________________"
+              ],
+              [
+                "ÁREA:  Ensamblaje y Montaje de Cedazos con Almendra en Castillo ",
+                "MES: __________________________"
+              ],
+              [
+                "DÍA",
+                "FECHA",
+                "CORRECCIÓN / ACCIÓN CORRECTIVA",
+                "Responsable de Control",
+                "Responsable de Seguimiento",
+                "Observaciones"
+              ],
+              [
+                "Lámpara led cuadrada",
+                "Ventanas de vidrio",
+                "Ventanas de Plástico",
+                "Techo ",
+                "Pared",
+                "Aire Acondicionado",
+                "Tarima",
+                "Puerta",
+                "Piso"
+              ],
+              [
+                "1.0",
+                "2.0",
+                "3.0",
+                "4.0",
+                "5.0",
+                "6.0",
+                "7.0",
+                "8.0",
+                "9.0"
+              ],
+              [
+                "M",
+                "M",
+                "M",
+                "M",
+                "M",
+                "M",
+                "M",
+                "M",
+                "M"
+              ]
+            ],
+            "total_filas": 1025
+          },
+          {
+            "hoja": "Matriz_Riesgo",
+            "filas": [
+              [
+                "RIESGO = PROBABILIDAD x IMPACTO",
+                "IMPACTO",
+                "RIESGO = PROBABILIDAD X IMPACTO"
+              ],
+              [
+                "BAJO = 1 \nSIN PRODUCTO",
+                "MEDIO = 2 \nPRODUCTO CERRADO",
+                "ALTO = 3\nPRODUCTO ABIERTO"
+              ],
+              [
+                "PROBABILIDAD",
+                "CASI SEGURO = 3",
+                "3X1=3\nINSPECCIÓN QUINCENAL",
+                "3X2=6\nINSPECCIÓN SEMANAL",
+                "3X3=9\nINSPECCIÓN SEMANAL",
+                "6 a 9",
+                "IMPACTO  ALTO FRECUENCIA SEMANAL DE INSPECCIÓN"
+              ],
+              [
+                "PROBABLE = 2",
+                "2X1=2\nINSPECCIÓN MENSUAL",
+                "2X2=4\nINSPECCIÓN QUINCENAL",
+                "2X3=6\nINSPECCIÓN SEMANAL",
+                "3 a 4",
+                "IMPACTO  MEDIO FRECUENCIA QUINCENAL DE INSPECCIÓN\n"
+              ],
+              [
+                "IMPROBABLE = 1 ",
+                "1X1=1\nINSPECCIÓN MENSUAL",
+                "1X2=2\nINSPECCIÓN MENSUAL",
+                "1X3=3\nINSPECCIÓN QUINCENAL",
+                "1 a 2",
+                "IMPACTO  BAJO FRECUENCIA MENSUAL DE INSPECCIÓN\n"
+              ]
+            ],
+            "total_filas": 12
+          },
+          {
+            "hoja": "RC.GV.04",
+            "filas": [
+              [
+                "BENEFICIADORA",
+                "REGISTRO",
+                "RC.GV.04"
+              ],
+              [
+                "Control de incidentes con materiales de vidrio, ceramica y plastico duro",
+                "No. Revisión: 01"
+              ],
+              [
+                "Vigente A Partir de 01-04-2024"
+              ],
+              [
+                "Responsable de Control: _________________________________________________________________________",
+                "Firma: _____________________",
+                "N° Incidente:\n\n_______"
+              ],
+              [
+                "Responsable de Seguimiento: ____________________________________________________________________",
+                "Firma: _____________________"
+              ],
+              [
+                "Área: ___________________________________________________",
+                "__________",
+                "Fecha: _____________________"
+              ],
+              [
+                "Descripción del Elemento"
+              ],
+              [
+                "Material:  ________________________________"
+              ],
+              [
+                "Nombre del Elemento: ______________________",
+                "VIDRIO",
+                "CERAMICA",
+                "PLASTICO"
+              ],
+              [
+                "Descripción del Incidente"
+              ]
+            ],
+            "total_filas": 1000
+          }
+        ]
+      },
+      {
+        "archivo": "Copia de RC.Vidrio_Plástico Duro 11_DESHIDRATADO  DE ALMENDRA PELDADA (HORNOS).xlsx",
+        "hojas": [
+          {
+            "hoja": "BB",
+            "filas": [
+              [
+                "ISO 22000:2018"
+              ]
+            ],
+            "total_filas": 12
+          },
+          {
+            "hoja": "RC.GV.01_Relevamiento",
+            "filas": [
+              [
+                "BENEFICIADORA ",
+                "REGISTRO",
+                "RC.GV.01"
+              ],
+              [
+                " Relevamiento de Elementos De Vidrio - Cerámica - Plástico Duro",
+                "No. Revisión: 01"
+              ],
+              [
+                "Vigente A Partir de 01-04-2024"
+              ],
+              [
+                "Responsable de Control: ________________________________________________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "Responsable de Seguimiento: ____________________________________________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "ÁREA: Deshidratadado de Almendra Pelada (Hornos)",
+                "Fecha: _________________________________"
+              ],
+              [
+                "Elemento",
+                "UBICACIÓN",
+                "Cantidad",
+                "ESTADO",
+                "CORRECCIONES / REPARACIONES\nReparar\nDesechar - Cambiar",
+                "Obsevaciones"
+              ],
+              [
+                "Vidrio",
+                "Plástico",
+                "Cerámica",
+                "SOBRE EL PRODUCTO / EN CONTACTO CON EL PRODUCTO",
+                "ESTRUCTURA DEL EQUIPO O INSTALACIÓN",
+                "ACEPTABLE",
+                "INACEPTABLE",
+                "DEFECTO"
+              ],
+              [
+                "-",
+                "Lámpara Led Cuadrado",
+                "-",
+                "-",
+                "SI ",
+                "2.0",
+                "2.0",
+                "0.0",
+                "0.0",
+                "Ninguna",
+                "-"
+              ]
+            ],
+            "total_filas": 1000
+          },
+          {
+            "hoja": "RC.GV.02_Riesgo",
+            "filas": [
+              [
+                "BENEFICIADORA ",
+                "REGISTRO",
+                "RC.GV.02",
+                "SEMANAL"
+              ],
+              [
+                "Evaluación del Riesgo de Contaminación del Producto Por\nVidrio - Cerámica - Plástico Duro",
+                "No. Revisión: 01",
+                "QUINCENAL"
+              ],
+              [
+                "Vigente A Partir de\n 01-04-2024",
+                "MENSUAL"
+              ],
+              [
+                "Responsable de Control: _________________________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "Responsable de Seguimiento: ____________________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "ÁREA: Deshidratado de Almendra Pelada (Hornos)",
+                "Fecha: ___________________________________"
+              ],
+              [
+                "No.",
+                "Elemento",
+                "IMPACTO SEGÚN LA EXPOSICION DEL PRODUCTO ",
+                "PROBABILIDAD DE ROTURA - DESPORTILLADO - ASTILLADO",
+                "RIESGO TOTAL",
+                "FRECUENCIA DE INSPECCION SEGÚN RIESGO",
+                "FRECUENCIA DE LA INSPECCIÓN"
+              ],
+              [
+                "Vidrio",
+                "Plástico",
+                "Cerámica",
+                "ALTO PRODUCTO ABIERTO = 3\nMEDIO PRODUCTO CERRADO=2\nBAJO SIN PRODUCTO =1",
+                "CASI SEGURO = 3 PROBABLE = 2 IMPROBABLE = 1 ",
+                " IMPACTO ALTO \nSEMANAL\nImpacto = 6-9",
+                "IMPACTO MEDIO\nQUINCENAL\nImpacto = 3-4",
+                "IMPACTO BAJO \nMENSUAL\nImpacto = 1-2"
+              ],
+              [
+                "1.0",
+                "-",
+                "Lámpara Led Cuadrado",
+                "-",
+                "1.0",
+                "1.0",
+                "1",
+                "-",
+                "-",
+                "✓",
+                "MENSUAL"
+              ]
+            ],
+            "total_filas": 1000
+          },
+          {
+            "hoja": "RC.GV.03_Control",
+            "filas": [
+              [
+                "BENEFICIADORA ",
+                "REGISTRO",
+                "RC.GV.03"
+              ],
+              [
+                "CONTROL DE VIDRIO - PLÁSTICO DURO - CERÁMICA",
+                "No. Revisión: 01"
+              ],
+              [
+                "Vigente A Partir de 01-04-2024"
+              ],
+              [
+                "Responsable de Control: _____________________________________________________________________________________________________",
+                "Firma: __________________________"
+              ],
+              [
+                "Responsable de Seguimiento: _______________________________________________________________________________________________",
+                "Firma: __________________________"
+              ],
+              [
+                "ÁREA: Deshidratado de Almendra Pelada (Hornos)",
+                "MES: _______________________"
+              ],
+              [
+                "Día",
+                "Fecha",
+                "ELEMENTOS DE VIDRIO - PLÁSTICO DURO - CERÁMICA",
+                "CORRECCIÓN / ACCIÓN CORRECTIVA",
+                "Responsable de Control",
+                "Responsable de Seguimiento",
+                "Observaciones"
+              ],
+              [
+                "Lámpara Led Cuadrado",
+                "Lámpara Led Cuadrado",
+                "Techo ",
+                "Pared ",
+                "Protector de lámparas",
+                "Escoba ",
+                "Alza Basura ",
+                "Piso"
+              ],
+              [
+                "1.0",
+                "2.0",
+                "3.0",
+                "4.0",
+                "5.0",
+                "6.0",
+                "7.0",
+                "8.0"
+              ],
+              [
+                "M",
+                "M",
+                "M",
+                "M",
+                "M",
+                "M",
+                "M",
+                "M"
+              ]
+            ],
+            "total_filas": 1000
+          },
+          {
+            "hoja": "Matriz_Riesgo",
+            "filas": [
+              [
+                "RIESGO = PROBABILIDAD x IMPACTO",
+                "IMPACTO",
+                "RIESGO = PROBABILIDAD X IMPACTO"
+              ],
+              [
+                "BAJO = 1 \nSIN PRODUCTO",
+                "MEDIO = 2 \nPRODUCTO CERRADO",
+                "ALTO = 3\nPRODUCTO ABIERTO"
+              ],
+              [
+                "PROBABILIDAD",
+                "CASI SEGURO = 3",
+                "3X1=3\nINSPECCIÓN QUINCENAL",
+                "3X2=6\nINSPECCIÓN SEMANAL",
+                "3X3=9\nINSPECCIÓN SEMANAL",
+                "6 a 9",
+                "IMPACTO  ALTO FRECUENCIA SEMANAL DE INSPECCIÓN"
+              ],
+              [
+                "PROBABLE = 2",
+                "2X1=2\nINSPECCIÓN MENSUAL",
+                "2X2=4\nINSPECCIÓN QUINCENAL",
+                "2X3=6\nINSPECCIÓN SEMANAL",
+                "3 a 4",
+                "IMPACTO  MEDIO FRECUENCIA QUINCENAL DE INSPECCIÓN\n"
+              ],
+              [
+                "IMPROBABLE = 1 ",
+                "1X1=1\nINSPECCIÓN MENSUAL",
+                "1X2=2\nINSPECCIÓN MENSUAL",
+                "1X3=3\nINSPECCIÓN QUINCENAL",
+                "1 a 2",
+                "IMPACTO  BAJO FRECUENCIA MENSUAL DE INSPECCIÓN\n"
+              ]
+            ],
+            "total_filas": 12
+          },
+          {
+            "hoja": "RC.GV.04",
+            "filas": [
+              [
+                "BENEFICIADORA",
+                "REGISTRO",
+                "RC.GV.04"
+              ],
+              [
+                "Control de de vidrio - plástico duro-cerámica",
+                "No. Revisión: 01"
+              ],
+              [
+                "Vigente A Partir de 01-04-2024"
+              ],
+              [
+                "Responsable de Control: _________________________________________________________________________",
+                "Firma: ___________________________",
+                "N° Incidente:\n\n_______"
+              ],
+              [
+                "Responsable de Seguimiento: ____________________________________________________________________",
+                "Firma: ___________________________"
+              ],
+              [
+                "Área: _______________________________________________________________________",
+                "Fecha: ___________________________"
+              ],
+              [
+                "Descripción del Elemento"
+              ],
+              [
+                "Material:  ________________________________"
+              ],
+              [
+                "Nombre del Elemento: ______________________",
+                "VIDRIO ",
+                "PLÁSTICO",
+                "CERÁMICA"
+              ],
+              [
+                "Descripción del Incidente"
+              ]
+            ],
+            "total_filas": 1000
+          }
+        ]
+      }
+    ],
+    "MADERA": [
+      {
+        "archivo": "Copia de Registros_Madera 10_Clasificado de Almendra pelada cruda.xlsx",
+        "hojas": [
+          {
+            "hoja": "BB",
+            "filas": [
+              [
+                "ISO 22000:2018"
+              ]
+            ],
+            "total_filas": 35
+          },
+          {
+            "hoja": "RC.GM.01_Relevamiento",
+            "filas": [
+              [
+                "BENEFICIADORA ",
+                "REGISTRO",
+                "RC.GM.01"
+              ],
+              [
+                " Relevamiento de Elementos de Madera",
+                "No. Revisión: 01"
+              ],
+              [
+                "Vigente A Partir de 01-04-2024"
+              ],
+              [
+                "Responsable de Control: ________________________________________________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "Responsable de Seguimiento: ___________________________________________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "ÁREA: Clasificado de almendra Pelada Cruda",
+                "Fecha: ___________________________________"
+              ],
+              [
+                "Elemento",
+                "UBICACIÓN",
+                "Cantidad",
+                "Estado",
+                "CORRECCIONES / REPARACIONES\nReparar\nDesechar - Cambiar",
+                "Obsevaciones"
+              ],
+              [
+                "SOBRE EL PRODUCTO / EN CONTACTO CON EL PRODUCTO",
+                "ESTRUCTURA DEL EQUIPO O INSTALACIÓN",
+                "ACEPTABLE",
+                "INACEPTABLE",
+                "DEFECTO"
+              ],
+              [
+                "Pallet  Pequeñas ",
+                "NO ",
+                "-",
+                "5.0",
+                "5.0",
+                "0.0",
+                "0.0",
+                "Ninguna",
+                "-"
+              ]
+            ],
+            "total_filas": 1000
+          },
+          {
+            "hoja": "RC.GM.02_Riesgo",
+            "filas": [
+              [
+                "BENEFICIADORA ",
+                "REGISTRO",
+                "RC.GM.02",
+                "SEMANAL"
+              ],
+              [
+                "Evaluación del Riesgo - Elementos de Madera",
+                "No. Revisión: 01",
+                "QUINCENAL"
+              ],
+              [
+                "Vigente A Partir de\n 01-04-2024",
+                "MENSUAL"
+              ],
+              [
+                "Responsable de Control: _________________________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "Responsable de Seguimiento: ____________________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "ÁREA: Clasificado de Almendra Pelada Cruda",
+                "Fecha: ___________________________________"
+              ],
+              [
+                "No.",
+                "ELEMENTO",
+                "IMPACTO SEGÚN LA EXPOSICION DEL PRODUCTO ",
+                "PROBABILIDAD DE ROTURA - DESPORTILLADO - ASTILLADO",
+                "RIESGO TOTAL",
+                "FRECUENCIA DE INSPECCION SEGÚN RIESGO",
+                "FRECUENCIA DE LA INSPECCIÓN"
+              ],
+              [
+                "ALTO PRODUCTO ABIERTO = 3\nMEDIO PRODUCTO CERRADO=2\nBAJO SIN PRODUCTO =1",
+                "CASI SEGURO = 3 PROBABLE = 2 IMPROBABLE = 1 ",
+                " IMPACTO ALTO \nSEMANAL\nImpacto = 6-9",
+                "IMPACTO MEDIO\nQUINCENAL\nImpacto = 3-4",
+                "IMPACTO BAJO \nMENSUAL\nImpacto = 1-2"
+              ],
+              [
+                "1.0",
+                "Pallet  Pequeñas ",
+                "1.0",
+                "2.0",
+                "2",
+                "-",
+                "-",
+                "✓",
+                "MENSUAL"
+              ]
+            ],
+            "total_filas": 1000
+          },
+          {
+            "hoja": "RC.03 GM",
+            "filas": [
+              [
+                "BENEFICIADORA ",
+                "REGISTRO",
+                "RC.GM.03"
+              ],
+              [
+                "CONTROL DE MADERA",
+                "No. Revisión: 01"
+              ],
+              [
+                "Vigente A Partir de 01-04-2024"
+              ],
+              [
+                "Responsable de Control: ___________________________________________________________________________________________",
+                "Firma: _______________________________"
+              ],
+              [
+                "Responsable de Seguimiento: _______________________________________________________________________________________",
+                "Firma: _______________________________"
+              ],
+              [
+                "ÁREA: Clasificado de almendra Pelada Cruda",
+                "MES: _______________________________"
+              ],
+              [
+                "Día",
+                "Fecha",
+                "ELEMENTOS DE MADERA O QUE TENGAN MADERA",
+                "CORRECCIÓN / ACCIÓN CORRECTIVA",
+                "Responsable de Control",
+                "Responsable de Seguimiento",
+                "Observaciones"
+              ],
+              [
+                "Pallet Pequeña",
+                "Pallet Mediana",
+                "Marco de ventana",
+                "Banco",
+                "Asiento",
+                "Palo de escoba",
+                "Jala agua"
+              ],
+              [
+                "1.0",
+                "2.0",
+                "3.0",
+                "4.0",
+                "5.0",
+                "6.0",
+                "7.0"
+              ]
+            ],
+            "total_filas": 1023
+          },
+          {
+            "hoja": "Matriz_Riesgo",
+            "filas": [
+              [
+                "RIESGO = PROBABILIDAD x IMPACTO",
+                "IMPACTO",
+                "RIESGO = PROBABILIDAD X IMPACTO"
+              ],
+              [
+                "BAJO = 1 \nSIN PRODUCTO",
+                "MEDIO = 2 \nPRODUCTO CERRADO",
+                "ALTO = 3\nPRODUCTO ABIERTO"
+              ],
+              [
+                "PROBABILIDAD",
+                "CASI SEGURO = 3",
+                "3X1=3\nINSPECCIÓN QUINCENAL",
+                "3X2=6\nINSPECCIÓN SEMANAL",
+                "3X3=9\nINSPECCIÓN SEMANAL",
+                "6 a 9",
+                "IMPACTO  ALTO FRECUENCIA SEMANAL DE INSPECCIÓN"
+              ],
+              [
+                "PROBABLE = 2",
+                "2X1=2\nINSPECCIÓN MENSUAL",
+                "2X2=4\nINSPECCIÓN QUINCENAL",
+                "2X3=6\nINSPECCIÓN SEMANAL",
+                "3 a 4",
+                "IMPACTO  MEDIO FRECUENCIA QUINCENAL DE INSPECCIÓN\n"
+              ],
+              [
+                "IMPROBABLE = 1 ",
+                "1X1=1\nINSPECCIÓN MENSUAL",
+                "1X2=2\nINSPECCIÓN MENSUAL",
+                "1X3=3\nINSPECCIÓN QUINCENAL",
+                "1 a 2",
+                "IMPACTO  BAJO FRECUENCIA MENSUAL DE INSPECCIÓN\n"
+              ]
+            ],
+            "total_filas": 12
+          },
+          {
+            "hoja": "RC.GM",
+            "filas": [
+              [
+                "BENEFICIADORA",
+                "REGISTRO",
+                "RC.GV.04"
+              ],
+              [
+                "Control de incidentes con madera",
+                "No. Revisión: 01"
+              ],
+              [
+                "Vigente A Partir de 01-04-2024"
+              ],
+              [
+                "Responsable de Control: _________________________________________________________________________",
+                "Firma: ______________________",
+                "N° Incidente:"
+              ],
+              [
+                "Responsable de Seguimiento: ____________________________________________________________________",
+                "Firma: ______________________"
+              ],
+              [
+                "Área: ___________________________________________________________________________________",
+                "Fecha: ______________________"
+              ],
+              [
+                "Descripción del Elemento"
+              ],
+              [
+                "Material:  ________________________________"
+              ],
+              [
+                "Nombre del Elemento: ______________________",
+                "Madera "
+              ],
+              [
+                "Descripción del Incidente"
+              ]
+            ],
+            "total_filas": 1000
+          }
+        ]
+      },
+      {
+        "archivo": "Copia de Registros_Madera 12_DESHIDRATADO DE ALMENDRA PELADA (HORNOS.xlsx",
+        "hojas": [
+          {
+            "hoja": "BB",
+            "filas": [
+              [
+                "ISO 22000:2018"
+              ]
+            ],
+            "total_filas": 35
+          },
+          {
+            "hoja": "RC.GM.01_Relevamiento",
+            "filas": [
+              [
+                "BENEFICIADORA ",
+                "REGISTRO",
+                "RC.GM.01"
+              ],
+              [
+                " Relevamiento de Elementos de Madera",
+                "No. Revisión: 01"
+              ],
+              [
+                "Vigente A Partir de 01-04-2024"
+              ],
+              [
+                "Responsable de Control: ________________________________________________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "Responsable de Seguimiento: ___________________________________________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "ÁREA: Deshidratado de Almendra Pelada (Hornos)",
+                "Fecha: ___________________________________"
+              ],
+              [
+                "Elemento",
+                "UBICACIÓN",
+                "Cantidad",
+                "Estado",
+                "CORRECCIONES / REPARACIONES\nReparar\nDesechar - Cambiar",
+                "Obsevaciones"
+              ],
+              [
+                "SOBRE EL PRODUCTO / EN CONTACTO CON EL PRODUCTO",
+                "ESTRUCTURA DEL EQUIPO O INSTALACIÓN",
+                "ACEPTABLE",
+                "INACEPTABLE",
+                "DEFECTO"
+              ],
+              [
+                "Borde de cedazos ",
+                "NO ",
+                "-",
+                "350.0",
+                "350.0",
+                "0.0",
+                "0.0",
+                "Cambiar ",
+                "-"
+              ]
+            ],
+            "total_filas": 1000
+          },
+          {
+            "hoja": "RC.GM.02_Riesgo",
+            "filas": [
+              [
+                "BENEFICIADORA ",
+                "REGISTRO",
+                "RC.GM.02",
+                "SEMANAL"
+              ],
+              [
+                "Evaluación del Riesgo - Elementos de Madera",
+                "No. Revisión: 01",
+                "QUINCENAL"
+              ],
+              [
+                "Vigente A Partir de\n 01-04-2024",
+                "MENSUAL"
+              ],
+              [
+                "Responsable de Control: _________________________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "Responsable de Seguimiento: ____________________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "ÁREA: Deshidratado de Almendra Pelada ",
+                "Fecha: ___________________________________"
+              ],
+              [
+                "No.",
+                "ELEMENTO",
+                "IMPACTO SEGÚN LA EXPOSICION DEL PRODUCTO ",
+                "PROBABILIDAD DE ROTURA - DESPORTILLADO - ASTILLADO",
+                "RIESGO TOTAL",
+                "FRECUENCIA DE INSPECCION SEGÚN RIESGO",
+                "FRECUENCIA DE LA INSPECCIÓN"
+              ],
+              [
+                "ALTO PRODUCTO ABIERTO = 3\nMEDIO PRODUCTO CERRADO=2\nBAJO SIN PRODUCTO =1",
+                "CASI SEGURO = 3 PROBABLE = 2 IMPROBABLE = 1 ",
+                " IMPACTO ALTO \nSEMANAL\nImpacto = 6-9",
+                "IMPACTO MEDIO\nQUINCENAL\nImpacto = 3-4",
+                "IMPACTO BAJO \nMENSUAL\nImpacto = 1-2"
+              ],
+              [
+                "1.0",
+                "Cedazos ",
+                "3.0",
+                "2.0",
+                "6",
+                "✓",
+                "-",
+                "-",
+                "SEMANAL"
+              ]
+            ],
+            "total_filas": 1000
+          },
+          {
+            "hoja": "RC.03 GM",
+            "filas": [
+              [
+                "BENEFICIADORA ",
+                "REGISTRO",
+                "RC.GM.03"
+              ],
+              [
+                "CONTROL DE MADERA",
+                "No. Revisión: 01"
+              ],
+              [
+                "Vigente A Partir de 01-04-2024"
+              ],
+              [
+                "Responsable de Control: _____________JANETH CAYA______________________________________________________________________________",
+                "Firma: ________________________"
+              ],
+              [
+                "Responsable de Seguimiento: ______________________________________________________________________________________",
+                "Firma: ________________________"
+              ],
+              [
+                "ÁREA: Deshidratado de Almendra Pelada (Hornos)",
+                "MES: __ENERO__________________"
+              ],
+              [
+                "Dia ",
+                "Fecha ",
+                "ELEMENTOS DE MADERA O QUE TENGAN MADERA",
+                "CORRECCIÓN / ACCIÓN CORRECTIVA",
+                "Responsable de Control",
+                "Responsable de Seguimiento",
+                "Observaciones"
+              ],
+              [
+                "Cedazos ",
+                "Escalera Pequeña ",
+                "Tarima ",
+                "Tarima "
+              ],
+              [
+                "1.0",
+                "2.0",
+                "3.0",
+                "4.0"
+              ],
+              [
+                "S",
+                "M",
+                "M",
+                "M"
+              ]
+            ],
+            "total_filas": 1040
+          },
+          {
+            "hoja": "Matriz_Riesgo",
+            "filas": [
+              [
+                "RIESGO = PROBABILIDAD x IMPACTO",
+                "IMPACTO",
+                "RIESGO = PROBABILIDAD X IMPACTO"
+              ],
+              [
+                "BAJO = 1 \nSIN PRODUCTO",
+                "MEDIO = 2 \nPRODUCTO CERRADO",
+                "ALTO = 3\nPRODUCTO ABIERTO"
+              ],
+              [
+                "PROBABILIDAD",
+                "CASI SEGURO = 3",
+                "3X1=3\nINSPECCIÓN QUINCENAL",
+                "3X2=6\nINSPECCIÓN SEMANAL",
+                "3X3=9\nINSPECCIÓN SEMANAL",
+                "6 a 9",
+                "IMPACTO  ALTO FRECUENCIA SEMANAL DE INSPECCIÓN"
+              ],
+              [
+                "PROBABLE = 2",
+                "2X1=2\nINSPECCIÓN MENSUAL",
+                "2X2=4\nINSPECCIÓN QUINCENAL",
+                "2X3=6\nINSPECCIÓN SEMANAL",
+                "3 a 4",
+                "IMPACTO  MEDIO FRECUENCIA QUINCENAL DE INSPECCIÓN\n"
+              ],
+              [
+                "IMPROBABLE = 1 ",
+                "1X1=1\nINSPECCIÓN MENSUAL",
+                "1X2=2\nINSPECCIÓN MENSUAL",
+                "1X3=3\nINSPECCIÓN QUINCENAL",
+                "1 a 2",
+                "IMPACTO  BAJO FRECUENCIA MENSUAL DE INSPECCIÓN\n"
+              ]
+            ],
+            "total_filas": 12
+          },
+          {
+            "hoja": "RC.GM",
+            "filas": [
+              [
+                "BENEFICIADORA",
+                "REGISTRO",
+                "RC.GV.04"
+              ],
+              [
+                "Control de incidentes con madera",
+                "No. Revisión: 01"
+              ],
+              [
+                "Vigente A Partir de 01-04-2024"
+              ],
+              [
+                "Responsable de Control: _________________________________________________________________________",
+                "Firma: ______________________",
+                "N° Incidente:"
+              ],
+              [
+                "Responsable de Seguimiento: ____________________________________________________________________",
+                "Firma: ______________________"
+              ],
+              [
+                "Área: ___________________________________________________________________________________",
+                "Fecha: ______________________"
+              ],
+              [
+                "Descripción del Elemento"
+              ],
+              [
+                "Material:  ________________________________"
+              ],
+              [
+                "Nombre del Elemento: ______________________",
+                "Madera "
+              ],
+              [
+                "Descripción del Incidente"
+              ]
+            ],
+            "total_filas": 1000
+          }
+        ]
+      }
+    ],
+    "METALES": [
+      {
+        "archivo": "Copia de Registros_Métales 10_CLASIFICADO DE ALM.PELAD.CRUS.xlsx",
+        "hojas": [
+          {
+            "hoja": "BB",
+            "filas": [
+              [
+                "ISO 22000:2018"
+              ]
+            ],
+            "total_filas": 35
+          },
+          {
+            "hoja": "RC.MT.01_Relevamiento",
+            "filas": [
+              [
+                "BENEFICIADORA",
+                "REGISTRO",
+                "RC.MT.01"
+              ],
+              [
+                " Relevamiento de Elementos De Metal",
+                "No. Revisión: 01"
+              ],
+              [
+                "Vigente A Partir de 01-04-2024"
+              ],
+              [
+                "Responsable de Control: ________________________________________________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "Responsable de Seguimiento: ____________________________________________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "ÁREA: Clasificado de Almendra Pelada Cruda",
+                "Fecha: ____________________________________"
+              ],
+              [
+                "MÉTALES",
+                "UBICACIÓN",
+                "ESTADO",
+                "CORRECCIONES / REPARACIONES\nReparar\nDesechar - Cambiar",
+                "Obsevaciones"
+              ],
+              [
+                "Elemento",
+                "Posibles Contaminantes",
+                "Ferrosos",
+                "No Ferrosos",
+                "Acero",
+                "SOBRE EL PRODUCTO / EN CONTACTO CON EL PRODUCTO",
+                "ESTRUCTURA DEL EQUIPO O INSTALACIÓN",
+                "ACEPTABLE",
+                "INACEPTABLE"
+              ],
+              [
+                "Estructura de la Zaranda Clasificadora de Almendra Pelada Cruda",
+                "NO",
+                "-",
+                "SI",
+                "-",
+                "SI",
+                "-",
+                "SI",
+                "-",
+                "Ninguna",
+                "-"
+              ]
+            ],
+            "total_filas": 1000
+          },
+          {
+            "hoja": "RC.MT.02_Riesgo",
+            "filas": [
+              [
+                "BENEFICIADORA ",
+                "REGISTRO",
+                "RC.MT.02",
+                "SEMANAL"
+              ],
+              [
+                "Evaluación del Riesgo de Contaminación del Producto Por Métales",
+                "No. Revisión: 01",
+                "QUINCENAL"
+              ],
+              [
+                "Vigente A Partir de\n 01-04-2024",
+                "MENSUAL"
+              ],
+              [
+                "Responsable de Control: ______________________________________________________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "Responsable de Seguimiento: _________________________________________________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "ÁREA: Classificado de Almendra Pelada en Cruda",
+                "Fecha: ___________________________________"
+              ],
+              [
+                "No.",
+                "Elemento",
+                "IMPACTO SEGÚN LA EXPOSICION DEL PRODUCTO ",
+                "PROBABILIDAD DE ROTURA - DESPORTILLADO - ASTILLADO",
+                "RIESGO TOTAL",
+                "FRECUENCIA DE INSPECCION SEGÚN RIESGO",
+                "FRECUENCIA DE LA INSPECCIÓN"
+              ],
+              [
+                "Nombre",
+                "Posibles Contaminantes",
+                "Ferrosos",
+                "No Ferrosos",
+                "Acero",
+                "ALTO PRODUCTO ABIERTO = 3\nMEDIO PRODUCTO CERRADO=2\nBAJO SIN PRODUCTO =1",
+                "CASI SEGURO = 3 PROBABLE = 2 IMPROBABLE = 1 ",
+                " IMPACTO ALTO \nSEMANAL\nImpacto = 6-9",
+                "IMPACTO MEDIO\nQUINCENAL\nImpacto = 3-4",
+                "IMPACTO BAJO \nMENSUAL\nImpacto = 1-2"
+              ],
+              [
+                "1.0",
+                "Estructura de la Zaranda Clasificadora de Almendra Pelada Cruda",
+                "NO",
+                "-",
+                "SI",
+                "-",
+                "1.0",
+                "1.0",
+                "1",
+                "-",
+                "-",
+                "Ö",
+                "MENSUAL"
+              ]
+            ],
+            "total_filas": 1000
+          },
+          {
+            "hoja": "RC.MT.03",
+            "filas": [
+              [
+                "BENEFICIADORA ",
+                "REGISTRO",
+                "RC.MT.03"
+              ],
+              [
+                "CONTROL DE METALES ",
+                "No. Revisión: 01"
+              ],
+              [
+                "Vigente A Partir de 01-04-2024"
+              ],
+              [
+                "Responsable de Control: ___________________________________________________________________________________________________________________",
+                "Firma: __________________________"
+              ],
+              [
+                "Responsable de Seguimiento: _______________________________________________________________________________________________________________",
+                "Firma: __________________________"
+              ],
+              [
+                "ÁREA: Clasificado de Almendra Pelada Cruda ",
+                "MES: ________________________"
+              ],
+              [
+                "Día",
+                "Fecha",
+                "ELEMENTOS DE METAL ",
+                "CORRECCIÓN / ACCIÓN CORRECTIVA",
+                "Responsable de Control",
+                "Responsable de Seguimiento",
+                "Observaciones"
+              ],
+              [
+                "Cedazos de la Zaranda",
+                "Mesón de revisado",
+                "Cajas de deposito de Almendra caída",
+                "Estructura de la Zaranda Clasificadora de Almend. Pelada",
+                "Tablero Eléctrico",
+                "Estructura de la Balanza"
+              ],
+              [
+                "1.0",
+                "2.0",
+                "3.0",
+                "4.0",
+                "5.0",
+                "6.0"
+              ]
+            ],
+            "total_filas": 1021
+          },
+          {
+            "hoja": "Matriz_Riesgo",
+            "filas": [
+              [
+                "RIESGO = PROBABILIDAD x IMPACTO",
+                "IMPACTO",
+                "RIESGO = PROBABILIDAD X IMPACTO"
+              ],
+              [
+                "BAJO = 1 \nSIN PRODUCTO",
+                "MEDIO = 2 \nPRODUCTO CERRADO",
+                "ALTO = 3\nPRODUCTO ABIERTO"
+              ],
+              [
+                "PROBABILIDAD",
+                "CASI SEGURO = 3",
+                "3X1=3\nINSPECCIÓN QUINCENAL",
+                "3X2=6\nINSPECCIÓN SEMANAL",
+                "3X3=9\nINSPECCIÓN SEMANAL",
+                "6 a 9",
+                "IMPACTO  ALTO FRECUENCIA SEMANAL DE INSPECCIÓN"
+              ],
+              [
+                "PROBABLE = 2",
+                "2X1=2\nINSPECCIÓN MENSUAL",
+                "2X2=4\nINSPECCIÓN QUINCENAL",
+                "2X3=6\nINSPECCIÓN SEMANAL",
+                "3 a 4",
+                "IMPACTO  MEDIO FRECUENCIA QUINCENAL DE INSPECCIÓN\n"
+              ],
+              [
+                "IMPROBABLE = 1 ",
+                "1X1=1\nINSPECCIÓN MENSUAL",
+                "1X2=2\nINSPECCIÓN MENSUAL",
+                "1X3=3\nINSPECCIÓN QUINCENAL",
+                "1 a 2",
+                "IMPACTO  BAJO FRECUENCIA MENSUAL DE INSPECCIÓN\n"
+              ]
+            ],
+            "total_filas": 12
+          }
+        ]
+      },
+      {
+        "archivo": "Copia de Registros_Métales 11_Recorte.xlsx",
+        "hojas": [
+          {
+            "hoja": "BB",
+            "filas": [
+              [
+                "ISO 22000:2018"
+              ]
+            ],
+            "total_filas": 35
+          },
+          {
+            "hoja": "RC.MT.01_Relevamiento",
+            "filas": [
+              [
+                "BENEFICIADORA",
+                "REGISTRO",
+                "RC.MT.01"
+              ],
+              [
+                " Relevamiento de Elementos De Metal",
+                "No. Revisión: 01"
+              ],
+              [
+                "Vigente A Partir de 01-04-2024"
+              ],
+              [
+                "Responsable de Control: ________________________________________________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "Responsable de Seguimiento: ____________________________________________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "ÁREA: Recorte",
+                "Fecha: ____________________________________"
+              ],
+              [
+                "MÉTALES",
+                "UBICACIÓN",
+                "ESTADO",
+                "CORRECCIONES / REPARACIONES\nReparar\nDesechar - Cambiar",
+                "Obsevaciones"
+              ],
+              [
+                "Elemento",
+                "Posibles Contaminantes",
+                "Ferrosos",
+                "No Ferrosos",
+                "Acero",
+                "SOBRE EL PRODUCTO / EN CONTACTO CON EL PRODUCTO",
+                "ESTRUCTURA DEL EQUIPO O INSTALACIÓN",
+                "ACEPTABLE",
+                "INACEPTABLE"
+              ],
+              [
+                "Meones de Inox",
+                "NO",
+                "-",
+                "-",
+                "SI",
+                "SI",
+                "-",
+                "SI",
+                "-",
+                "Ninguna",
+                "-"
+              ]
+            ],
+            "total_filas": 19
+          },
+          {
+            "hoja": "RC.MT.02_Riesgo",
+            "filas": [
+              [
+                "BENEFICIADORA ",
+                "REGISTRO",
+                "RC.MT.02",
+                "SEMANAL"
+              ],
+              [
+                "Evaluación del Riesgo de Contaminación del Producto Por Métales",
+                "No. Revisión: 01",
+                "QUINCENAL"
+              ],
+              [
+                "Vigente A Partir de\n 01-04-2024",
+                "MENSUAL"
+              ],
+              [
+                "Responsable de Control: ______________________________________________________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "Responsable de Seguimiento: _________________________________________________________________________________________________",
+                "Firma: ___________________________________"
+              ],
+              [
+                "ÁREA: Recorte",
+                "Fecha: ___________________________________"
+              ],
+              [
+                "No.",
+                "Elemento",
+                "IMPACTO SEGÚN LA EXPOSICION DEL PRODUCTO ",
+                "PROBABILIDAD DE ROTURA - DESPORTILLADO - ASTILLADO",
+                "RIESGO TOTAL",
+                "FRECUENCIA DE INSPECCION SEGÚN RIESGO",
+                "FRECUENCIA DE LA INSPECCIÓN"
+              ],
+              [
+                "Nombre",
+                "Posibles Contaminantes",
+                "Ferrosos",
+                "No Ferrosos",
+                "Acero",
+                "ALTO PRODUCTO ABIERTO = 3\nMEDIO PRODUCTO CERRADO=2\nBAJO SIN PRODUCTO =1",
+                "CASI SEGURO = 3 PROBABLE = 2 IMPROBABLE = 1 ",
+                " IMPACTO ALTO \nDIARIO\nImpacto = 6-9",
+                "IMPACTO MEDIO\nQUINCENAL\nImpacto = 3-4",
+                "IMPACTO BAJO \nMENSUAL\nImpacto = 1-2"
+              ],
+              [
+                "1",
+                "Mesones de Inox",
+                "NO",
+                "-",
+                "-",
+                "SI",
+                "3",
+                "2",
+                "6",
+                "Ö",
+                "-",
+                "-",
+                "SEMANAL"
+              ]
+            ],
+            "total_filas": 15
+          },
+          {
+            "hoja": "RC.MT.03",
+            "filas": [
+              [
+                "BENEFICIADORA ",
+                "REGISTRO",
+                "RC.MT.03"
+              ],
+              [
+                "CONTROL DE METALES ",
+                "No. Revisión: 01"
+              ],
+              [
+                "Vigente A Partir de 01-04-2024"
+              ],
+              [
+                "Responsable de Control: ___________________________________________________________________________________________________________________",
+                "Firma: _______________________________________"
+              ],
+              [
+                "Responsable de Seguimiento: _______________________________________________________________________________________________________________",
+                "Firma: _______________________________________"
+              ],
+              [
+                "ÁREA: Recorte",
+                "MES: _______________________________________"
+              ],
+              [
+                "Día",
+                "Fecha",
+                "ELEMENTOS DE METAL ",
+                "CORRECCIÓN / ACCIÓN CORRECTIVA",
+                "Responsable de Control",
+                "Responsable de Seguimiento",
+                "Observaciones"
+              ],
+              [
+                "Cuchillos",
+                "Mesones de Inox",
+                "Marco Puerta",
+                "Agarradores de Puerta "
+              ],
+              [
+                "1",
+                "2",
+                "3",
+                "4"
+              ]
+            ],
+            "total_filas": 45
+          },
+          {
+            "hoja": "Matriz_Riesgo",
+            "filas": [
+              [
+                "RIESGO = PROBABILIDAD x IMPACTO",
+                "IMPACTO",
+                "RIESGO = PROBABILIDAD X IMPACTO"
+              ],
+              [
+                "BAJO = 1 \nSIN PRODUCTO",
+                "MEDIO = 2 \nPRODUCTO CERRADO",
+                "ALTO = 3\nPRODUCTO ABIERTO"
+              ],
+              [
+                "PROBABILIDAD",
+                "CASI SEGURO = 3",
+                "3X1=3\nINSPECCIÓN QUINCENAL",
+                "3X2=6\nINSPECCIÓN DIARIA",
+                "3X3=9\nINSPECCIÓN DIARIA",
+                "6 a 9",
+                "IMPACTO  ALTO FRECUENCIA DIARIA DE INSPECCIÓN"
+              ],
+              [
+                "PROBABLE = 2",
+                "2X1=2\nINSPECCIÓN MENSUAL",
+                "2X2=4\nINSPECCIÓN QUINCENAL",
+                "2X3=6\nINSPECCIÓN DIARIA",
+                "3 a 4",
+                "IMPACTO  MEDIO FRECUENCIA QUINCENAL DE INSPECCIÓN\n"
+              ],
+              [
+                "IMPROBABLE = 1 ",
+                "1X1=1\nINSPECCIÓN MENSUAL",
+                "1X2=2\nINSPECCIÓN MENSUAL",
+                "1X3=3\nINSPECCIÓN QUINCENAL",
+                "1 a 2",
+                "IMPACTO  BAJO FRECUENCIA MENSUAL DE INSPECCIÓN\n"
+              ]
+            ],
+            "total_filas": 12
+          }
+        ]
+      }
+    ]
+  },
+  "Material_Embalaje": [
+    "Copia de RC.IS.01 MATERIALES E INSUMOS.gsheet",
+    "Copia de RC.IS.02 MATERIAL DE EMBALAJE.gsheet",
+    "desktop.ini"
+  ],
+  "Control_Plagas": [
+    "Registros de Control Plagas 2025 Rev2.gsheet",
+    "registros y control PLAGAS.gsheet",
+    "DASHBOARD CONTROL DE PLAGAS.gsheet",
+    "desktop.ini"
+  ]
+}

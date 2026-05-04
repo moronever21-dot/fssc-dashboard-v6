@@ -524,10 +524,8 @@ def build_all():
 def write_files(payload):
     json_text = json.dumps(payload, ensure_ascii=False, indent=2)
     Path("produccion_aggregates_generated.json").write_text(json_text, encoding="utf-8")
-    Path("produccion_aggregates_generated.js").write_text(
-        "window.PRODUCCION_AGGREGATES_GENERATED = " + json_text + ";",
-        encoding="utf-8",
-    )
+    js_content = "window.PRODUCCION_AGGREGATES_GENERATED = " + json_text + ";\nwindow.PRODUCCION_AGGREGATES = window.PRODUCCION_AGGREGATES_GENERATED;"
+    Path("produccion_aggregates_generated.js").write_text(js_content, encoding="utf-8")
 
 
 def fetch_csv_text(url):

@@ -1,4 +1,5 @@
 window.DASHBOARD_META_GENERATED = {
+window.DASHBOARD_META = window.DASHBOARD_META_GENERATED;
   "latestRecords": [
     {
       "codigo": "RC.CC.01",

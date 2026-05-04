@@ -35,17 +35,25 @@ RC_CC_SHEETS: dict[str, str] = {
 
 # ── Registros de Producción (RC.PD) ──────────────────────────────────────────
 RC_PD_SHEETS: dict[str, str] = {
-    "RC.PD.01": "14E6s93GykPGqpVJH9f4gyKiXYV5yutpIvWOAFF7OmYg",  # hoja maestra/consolidado
-    "RC.PD.02": "1_aWiCwHrAx1bHpJ3twchTRwX0sCRtmwglVkPE7WrN04",
-    "RC.PD.03": "1Ueb02r1KKiCSlsgr0DFm4LJNLSvHwMtpjsnMmLf82d8",
-    "RC.PD.04": "1fOGAkJ1Yes7WDPusEEjbt71LBw6SP72bReHnCa44wKE",
-    "RC.PD.05": "1l_WaU1PekIp_Cyk79jGhEGhtZkWJ0X6pOnupCnAhSQQ",
-    "RC.PD.06": "17KcWzCQeIyGdsn9YNTjPNtqd7dq1kcB7aQVIGqXKyL8",
-    "RC.PD.07": "1z7zUKc2-kS2BZA6e7Wakzuk0tgoBeV5_F8quvTu2qrA",
-    "RC.PD.08": "1D9R19nsSb0bhqBgEWBCEbeDDdyOmpams8sLMhCAqdf4",
-    "RC.PD.09": "1Ruel5WGlQtLjHIdXsX3LhV6bI3VaxiI4rk_C5qCNvlU",
-    "RC.PD.10": "1IadQ8KERDI8rvKLBKervoSyaotP2Opdtu_n3FmgTJT4",
-    "RC.PD.11": "1Ld8XA13BnSBYoJ6uMsQiptu7v_t4uKFdXwfBwtnFYaI",
-    "RC.PD.12": "1W5eGAe2LOzIrQax_wLI386oZpDXQiAdp9rGgWxdqLQ4",
-    "RC.PD.13": "1p9v0jkbcKgul_Ba40-2166b0vOucHh53U3qbp6aib0M",
+  "RC.PD.01": "14E6s93GykPGqpVJH9f4gyKiXYV5yutpIvWOAFF7OmYg",  # hoja maestra/consolidado
+  "RC.PD.02": "1_aWiCwHrAx1bHpJ3twchTRwX0sCRtmwglVkPE7WrN04",
+  "RC.PD.03": "1Ueb02r1KKiCSlsgr0DFm4LJNLSvHwMtpjsnMmLf82d8",
+  "RC.PD.04": "1fOGAkJ1Yes7WDPusEEjbt71LBw6SP72bReHnCa44wKE",
+  "RC.PD.05": "1l_WaU1PekIp_Cyk79jGhEGhtZkWJ0X6pOnupCnAhSQQ",
+  "RC.PD.06": "17KcWzCQeIyGdsn9YNTjPNtqd7dq1kcB7aQVIGqXKyL8",
+  "RC.PD.07": "1z7zUKc2-kS2BZA6e7Wakzuk0tgoBeV5_F8quvTu2qrA",
+  "RC.PD.08": "1D9R19nsSb0bhqBgEWBCEbeDDdyOmpams8sLMhCAqdf4",
+  "RC.PD.09": "1Ruel5WGlQtLjHIdXsX3LhV6bI3VaxiI4rk_C5qCNvlU",
+  "RC.PD.10": "1IadQ8KERDI8rvKLBKervoSyaotP2Opdtu_n3FmgTJT4",
+  "RC.PD.11": "1Ld8XA13BnSBYoJ6uMsQiptu7v_t4uKFdXwfBwtnFYaI",
+  "RC.PD.12": "1W5eGAe2LOzIrQax_wLI386oZpDXQiAdp9rGgWxdqLQ4",
+  "RC.PD.13": "1p9v0jkbcKgul_Ba40-2166b0vOucHh53U3qbp6aib0M",
+}
+
+# ── Programas de Prerrequisitos (PPR) FSSC 22000 ────────────────────────────
+PPR_SHEETS: dict[str, str] = {
+  "CONTROL_PLAGAS": "1Lrs4UFXJSEmTyuyGMwFMf78bpbjxvZNf",
+  "LIMPIEZA_DESINFECCION": "19lKYweHbMm0hD_ADeTGFA6cDKnYH2a9kijJ6LFU1obI",
+  "HIGIENE_PERSONAL": "1m7TWDl9dxK4betTK4n1667m-_QFD5m-VnbQR-18GbRg",
+  # Si luego tienes el de Enfermedades, agregar aquí
 }

@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard PPRops Maestro · INGAMA 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#F5F3EE; --panel:#FFFFFF; --ink:#1A1A17; --ink2:#4A4A44; --ink3:#8A8881;
+  --line:#D9D5CA; --line2:#E8E5DB;
+  --accent:#2C4A3E; --accent2:#8B3A2E; --gold:#B08A3E;
+  --ok:#2E7D5B; --ok-bg:#E8F1EC;
+  --warn:#C17917; --warn-bg:#FAF2E4;
+  --fail:#B23E3E; --fail-bg:#F7E8E8;
+  --neutral:#6B6964;
+  --serif:'Fraunces',Georgia,serif;
+  --sans:'Inter',system-ui,sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.55}
+body{min-height:100vh;padding:32px 20px 80px}
+.wrap{max-width:1280px;margin:0 auto}
+
+/* HEADER */
+.top{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:24px;border-bottom:1px solid var(--line);margin-bottom:28px;gap:20px;flex-wrap:wrap}
+.brand{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.brand-mark{font-family:var(--serif);font-weight:600;font-size:28px;letter-spacing:-0.02em;color:var(--ink)}
+.brand-mark em{font-style:italic;font-weight:300;color:var(--accent)}
+.brand-meta{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:var(--ink3);padding-top:4px}
+.top-right{text-align:right;font-size:11px;color:var(--ink3);font-family:var(--mono);letter-spacing:0.08em;text-transform:uppercase}
+.top-right .date{font-size:13px;color:var(--ink2);margin-top:3px;letter-spacing:0.02em;text-transform:none;font-family:var(--sans)}
+
+/* TITLE BLOCK */
+.title-block{margin-bottom:28px}
+.eyebrow{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:0.18em;color:var(--accent2);margin-bottom:10px}
+.main-title{font-family:var(--serif);font-weight:300;font-size:46px;line-height:1.05;letter-spacing:-0.02em;color:var(--ink);margin-bottom:12px}
+.main-title em{font-style:italic;font-weight:500;color:var(--accent)}
+.subtitle{font-size:15px;color:var(--ink2);max-width:720px;line-height:1.6}
+
+/* LOTE BAR */
+.lote-section{margin-bottom:24px}
+.section-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.15em;color:var(--ink3);margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.section-label::before{content:"";display:inline-block;width:20px;height:1px;background:var(--ink3)}
+.lote-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px}
+.lote-btn{background:var(--panel);border:1px solid var(--line);padding:12px 14px;cursor:pointer;text-align:left;transition:all .18s;font-family:var(--sans)}
+.lote-btn:hover{border-color:var(--ink2);transform:translateY(-1px)}
+.lote-btn.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.lote-btn.active .lote-sub{color:rgba(255,255,255,0.65)}
+.lote-code{font-family:var(--mono);font-size:11px;letter-spacing:0.04em;font-weight:500}
+.lote-name{font-size:13px;font-weight:500;margin-top:3px}
+.lote-sub{font-size:11px;color:var(--ink3);margin-top:2px;font-family:var(--mono)}
+.lote-btn.active .lote-code{color:#E8B846}
+
+/* HERO METRICS */
+.hero{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:0;margin-bottom:32px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.hero-cell{padding:20px 22px;border-right:1px solid var(--line)}
+.hero-cell:last-child{border-right:none}
+.hero-cell.primary{background:var(--ink);color:#fff}
+.hero-cell.primary .hl{color:rgba(255,255,255,0.55)}
+.hl{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.15em;color:var(--ink3);margin-bottom:10px}
+.hv{font-family:var(--serif);font-size:38px;font-weight:300;line-height:1;letter-spacing:-0.02em}
+.hv em{font-style:italic;font-weight:500}
+.hs{font-size:12px;color:var(--ink3);margin-top:6px}
+.hero-cell.primary .hs{color:rgba(255,255,255,0.7)}
+.pill{display:inline-block;padding:2px 8px;border-radius:2px;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;font-weight:500}
+.p-ok{background:var(--ok-bg);color:var(--ok)}
+.p-warn{background:var(--warn-bg);color:var(--warn)}
+.p-fail{background:var(--fail-bg);color:var(--fail)}
+
+/* STAGES */
+.process-title{font-family:var(--serif);font-size:24px;font-weight:500;letter-spacing:-0.01em;margin:40px 0 18px;padding-bottom:12px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:14px}
+.process-title em{font-style:italic;font-weight:300;color:var(--accent);font-size:18px}
+.stage{background:var(--panel);border:1px solid var(--line);margin-bottom:12px;transition:border-color .15s}
+.stage:hover{border-color:var(--line2)}
+.stage-head{display:flex;align-items:center;gap:18px;padding:18px 22px;cursor:pointer;user-select:none}
+.stage-num{font-family:var(--serif);font-size:32px;font-weight:300;color:var(--ink3);letter-spacing:-0.04em;width:34px;flex-shrink:0}
+.stage-info{flex:1;min-width:0}
+.stage-nm{font-family:var(--serif);font-size:19px;font-weight:500;color:var(--ink);letter-spacing:-0.01em}
+.stage-rc{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:3px;letter-spacing:0.04em}
+.stage-right{display:flex;align-items:center;gap:14px;flex-shrink:0}
+.chev{font-size:14px;color:var(--ink3);transition:transform .2s;font-family:var(--mono)}
+.chev.open{transform:rotate(90deg)}
+.stage-body{display:none;padding:8px 22px 26px;border-top:1px solid var(--line2)}
+.stage-body.open{display:block}
+
+/* INDICATOR GRID */
+.ind-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0;margin-top:18px;border-top:1px solid var(--line2);border-left:1px solid var(--line2)}
+.ind{padding:16px 18px;border-right:1px solid var(--line2);border-bottom:1px solid var(--line2);position:relative;background:var(--panel)}
+.ind-dot-wrap{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.ind-dot{width:8px;height:8px;border-radius:50%}
+.d-ok{background:var(--ok);box-shadow:0 0 0 3px var(--ok-bg)}
+.d-warn{background:var(--warn);box-shadow:0 0 0 3px var(--warn-bg)}
+.d-fail{background:var(--fail);box-shadow:0 0 0 3px var(--fail-bg)}
+.ind-tag{font-family:var(--mono);font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:0.1em;padding:2px 6px;background:var(--bg);border-radius:2px}
+.ind-tag.pcc{background:var(--fail-bg);color:var(--fail);font-weight:500}
+.ind-lbl{font-size:12px;color:var(--ink2);margin-bottom:4px;line-height:1.3}
+.ind-val{font-family:var(--serif);font-size:28px;font-weight:400;line-height:1;letter-spacing:-0.02em;margin-bottom:4px}
+.ind-val em{font-style:italic;font-weight:300;font-size:14px;color:var(--ink3);margin-left:3px}
+.ind-lim{font-size:11px;color:var(--ink3);font-family:var(--mono);letter-spacing:0.02em}
+.bar{height:3px;background:var(--line2);margin-top:10px;overflow:hidden;border-radius:0}
+.bar-f{height:100%;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.b-ok{background:var(--ok)}.b-warn{background:var(--warn)}.b-fail{background:var(--fail)}
+
+/* CHARTS */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+@media (max-width:900px){.charts-row{grid-template-columns:1fr}}
+.chart-card{background:var(--panel);border:1px solid var(--line);padding:20px}
+.chart-title{font-family:var(--serif);font-size:16px;font-weight:500;margin-bottom:4px;letter-spacing:-0.01em}
+.chart-sub{font-size:11px;color:var(--ink3);margin-bottom:14px;font-family:var(--mono);letter-spacing:0.04em;text-transform:uppercase}
+.chart-box{position:relative;height:220px}
+.chart-box.tall{height:280px}
+
+/* COMPARATIVE SECTION */
+.comp-wrap{background:var(--panel);border:1px solid var(--line);margin-top:20px}
+.comp-head{padding:18px 22px;border-bottom:1px solid var(--line2)}
+.comp-body{padding:8px 22px 22px}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;margin-top:14px;font-size:13px}
+.tbl th{text-align:left;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:var(--ink3);font-weight:500;padding:10px 8px;border-bottom:1px solid var(--line)}
+.tbl td{padding:12px 8px;border-bottom:1px solid var(--line2);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover{background:var(--bg)}
+.tbl .num{font-family:var(--mono);text-align:right;font-size:12px;letter-spacing:0.02em}
+.tbl .status{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;text-align:center;padding:3px 8px;border-radius:2px;display:inline-block;font-weight:500}
+
+/* FOOT */
+.foot{margin-top:48px;padding-top:22px;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:var(--ink3);font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:0.12em;flex-wrap:wrap;gap:12px}
+
+.print-btn{position:fixed;bottom:24px;right:24px;background:var(--ink);color:#fff;border:none;padding:12px 18px;font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,0.15);transition:transform .15s}
+.print-btn:hover{transform:translateY(-2px)}
+@media print{
+  body{background:#fff;padding:0}
+  .print-btn,.stage-head{cursor:default}
+  .stage-body{display:block !important}
+  .chev{display:none}
+  .lote-btn:not(.active){display:none}
+}
+
+/* Small screens */
+@media (max-width:760px){
+  .hero{grid-template-columns:1fr 1fr}
+  .hero-cell{border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .hero-cell:nth-child(2){border-right:none}
+  .main-title{font-size:32px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="brand">
+    <div class="brand-mark">INGAMA <em>·</em> PPRops</div>
+    <div class="brand-meta">FSSC 22000 V.6 · Riberalta, Bolivia</div>
+  </div>
+  <div class="top-right">
+    Gestión 2026 · Zafra<br>
+    <span class="date" id="today"></span>
+  </div>
+</header>
+
+<div class="title-block">
+  <div class="eyebrow">Dashboard Maestro · Control de Límites Críticos</div>
+  <h1 class="main-title">Programa de <em>Prerrequisitos</em> Operacionales</h1>
+  <p class="subtitle">Monitoreo integral de la cadena productiva de almendra beneficiada, desde la recepción de materia prima hasta la inspección de contenedor para exportación. Datos extraídos directamente de los registros RC.CC activos.</p>
+</div>
+
+<div class="lote-section">
+  <div class="section-label">Seleccionar lote de trazabilidad</div>
+  <div class="lote-grid" id="loteGrid"></div>
+</div>
+
+<section id="heroSection"></section>
+
+<h2 class="process-title">Cadena productiva <em>· 6 etapas</em></h2>
+
+<div id="stagesContainer"></div>
+
+<h2 class="process-title">Análisis gráfico <em>· del lote seleccionado</em></h2>
+
+<div class="charts-row">
+  <div class="chart-card">
+    <div class="chart-title">Evolución de % Podrida y Ombligo</div>
+    <div class="chart-sub">RC.CC.01 · Caída Lona · Límite: Podrida &lt;3% / Ombligo &lt;2%</div>
+    <div class="chart-box"><canvas id="chartTrend"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">Distribución por tipo de almendra</div>
+    <div class="chart-sub">Clasificación Medium / Midget / Tiny / Large</div>
+    <div class="chart-box"><canvas id="chartTypes"></canvas></div>
+  </div>
+</div>
+
+<div class="charts-row">
+  <div class="chart-card">
+    <div class="chart-title">Rendimiento de calidad vs límites críticos</div>
+    <div class="chart-sub">Comparativo de indicadores clave — lote actual</div>
+    <div class="chart-box tall"><canvas id="chartRadar"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">Cajas de producto terminado (RC.CC.06)</div>
+    <div class="chart-sub">Cajas aprobadas vs pinchadas/reembazadas</div>
+    <div class="chart-box tall"><canvas id="chartCajas"></canvas></div>
+  </div>
+</div>
+
+<h2 class="process-title">Vista comparativa <em>· todos los lotes</em></h2>
+
+<div class="charts-row">
+  <div class="chart-card">
+    <div class="chart-title">% Humedad en recepción por lote</div>
+    <div class="chart-sub">RC.CC.14 · Límite PPROP-02: ≤ 25%</div>
+    <div class="chart-box tall"><canvas id="chartHumAll"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">% Podrida promedio por lote</div>
+    <div class="chart-sub">RC.CC.01 · Límite PPROP-04: &lt; 3%</div>
+    <div class="chart-box tall"><canvas id="chartPodAll"></canvas></div>
+  </div>
+</div>
+
+<div class="comp-wrap">
+  <div class="comp-head">
+    <div class="chart-title">Resumen comparativo — todos los lotes RC.CC</div>
+    <div class="chart-sub">Vista consolidada de límites críticos por lote</div>
+  </div>
+  <div class="comp-body">
+    <table class="tbl" id="compTable"></table>
+  </div>
+</div>
+
+<footer class="foot">
+  <span>INGAMA · Horacio Gamarra Tellez · BO-BIO-140</span>
+  <span>Dashboard generado para auditoría FSSC 22000 V.6</span>
+</footer>
+
+</div>
+
+<button class="print-btn" onclick="window.print()">Imprimir / PDF</button>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// DATOS REALES extraídos de los registros RC.CC de INGAMA
+// ═══════════════════════════════════════════════════════════════════════════
+
+const LOTES = [
+  {
+    codigo: 'CONV. 01',
+    proveedor: 'Ricardo Gamarra Tellez',
+    proveedorCorto: 'RG 01-CV',
+    certif: 'Convencional',
+    kilosTotal: 12840,
+    tipo: 'Midget',
+    recepcion: {
+      humedad: 24.5, humedadMuestras: [24.5, 24.1, 24.7, 24.4, 23.8, 23.2, 23.0],
+      humedadFechas: ['06/12','10/12','11/12','15/12','22/12','29/12','03/01'],
+      corte: 4.5
+    },
+    sancochado: { presionDist:7, presionAuto:4, tiempo:'2:05', humIng:5, humSal:4 },
+    seleccionado: {
+      fechas:['07/01','09/01','12/01','13/01','15/01'],
+      ombligo:[1.32,1.29,1.22,1.13,1.53],
+      podrida:[2.49,2.33,2.22,2.21,2.04],
+      promOmb:1.30, promPod:2.26,
+      chiaLona:1.6, pedazosLona:3.0, tipos:{large:52,medium:57,midget:71,tiny:120}
+    },
+    deshidratado: { danadas:3.6, sevDanadas:7.3, chipped:3.6, chia:7.3 },
+    pt: {
+      planilla:1, fecha:'16/01', cajasProducidas:76,
+      cajasPinchadas:4, cajasReembazadas:4,
+      danadasPT:1.5, sevDanadasPT:0.5,
+      metalesPCC:'OK', imanesPCC:'OK'
+    },
+    exportacion: {
+      coa:'083/26', cliente:'Caro Nut Company', destino:'Estados Unidos',
+      aflatoxB1:'<0.50', aflatoxTotal:'<0.90', humPT:3.20,
+      bacteriana:'2.0×10³', ecoli:'Ausente', salmonella:'Ausente',
+      contenedor:'MSNU-310035-9', inspec:'Aprobado'
+    }
+  },
+  {
+    codigo: 'CONV. 02',
+    proveedor: 'Ricardo Gamarra Tellez',
+    proveedorCorto: 'RG 02-CV',
+    certif: 'Convencional',
+    kilosTotal: 17280,
+    tipo: 'Midget',
+    recepcion: {
+      humedad: 26.8, humedadMuestras: [26.8,26.6,26.5,26.1,25.0,24.3],
+      humedadFechas:['23/12','24/12','26/12','31/12','06/01','09/01'],
+      corte: 4.07
+    },
+    sancochado: { presionDist:7, presionAuto:4, tiempo:'2:06', humIng:5, humSal:4 },
+    seleccionado: {
+      fechas:['16/01','17/01','19/01','20/01'],
+      ombligo:[1.50,1.36,1.46,1.26],
+      podrida:[2.43,2.03,1.85,1.85],
+      promOmb:1.40, promPod:2.04,
+      chiaLona:1.7, pedazosLona:2.8, tipos:{large:87,medium:88,midget:87,tiny:87}
+    },
+    deshidratado: { danadas:5.3, sevDanadas:11.1, chipped:6.2, chia:11.1 },
+    pt: {
+      planilla:9, fecha:'02/02', cajasProducidas:149,
+      cajasPinchadas:9, cajasReembazadas:9,
+      danadasPT:1.4, sevDanadasPT:1.0,
+      metalesPCC:'OK', imanesPCC:'OK'
+    },
+    exportacion: {
+      coa:'135/26', cliente:'Freeworld Trading Ltd', destino:'Polonia',
+      aflatoxB1:'<0.90', aflatoxTotal:'<1.50', humPT:3.10,
+      bacteriana:'2.2×10³', ecoli:'Ausente', salmonella:'Ausente',
+      contenedor:'CAAU-238802-3', inspec:'Aprobado'
+    }
+  },
+  {
+    codigo: 'ORG. 03',
+    proveedor: 'Barraca San Ignacio',
+    proveedorCorto: 'BSI 01-26',
+    certif: 'Orgánico',
+    kilosTotal: 11000,
+    tipo: 'Large/Medium/Midget',
+    recepcion: {
+      humedad: 25.7, humedadMuestras:[25.7,25.2,24.8,24.4],
+      humedadFechas:['16/01','18/01','20/01','22/01'],
+      corte: 4.57
+    },
+    sancochado: { presionDist:7, presionAuto:4, tiempo:'2:10', humIng:9, humSal:5 },
+    seleccionado: {
+      fechas:['23/01','24/01','26/01','27/01'],
+      ombligo:[1.79,1.65,1.58,1.57],
+      podrida:[2.21,2.53,2.25,2.39],
+      promOmb:1.65, promPod:2.35,
+      chiaLona:1.8, pedazosLona:3.2, tipos:{large:89,medium:91,midget:89,tiny:89}
+    },
+    deshidratado: { danadas:4.5, sevDanadas:7.3, chipped:4.5, chia:7.3 },
+    pt: {
+      planilla:5, fecha:'23/01', cajasProducidas:102,
+      cajasPinchadas:2, cajasReembazadas:2,
+      danadasPT:1.5, sevDanadasPT:0.9,
+      metalesPCC:'OK', imanesPCC:'OK'
+    },
+    exportacion: {
+      coa:'118/26', cliente:'Red River Foods', destino:'Alemania',
+      aflatoxB1:'<0.50', aflatoxTotal:'<0.90', humPT:3.20,
+      bacteriana:'1.8×10³', ecoli:'Ausente', salmonella:'Ausente',
+      contenedor:'MSNU-867960-2', inspec:'Aprobado'
+    }
+  },
+  {
+    codigo: 'CONV. 03',
+    proveedor: 'Dennis Azucarela',
+    proveedorCorto: 'DA 01-CV',
+    certif: 'Convencional',
+    kilosTotal: 14520,
+    tipo: 'Midget',
+    recepcion: {
+      humedad: 28.4, humedadMuestras:[28.4,27.5,26.2,25.1,24.3],
+      humedadFechas:['10/01','14/01','18/01','22/01','26/01'],
+      corte: 5.57
+    },
+    sancochado: { presionDist:7, presionAuto:4, tiempo:'2:06', humIng:8, humSal:2 },
+    seleccionado: {
+      fechas:['28/01','29/01','31/01','02/02'],
+      ombligo:[1.56,1.67,1.42,1.57],
+      podrida:[2.67,2.54,2.20,2.28],
+      promOmb:1.55, promPod:2.42,
+      chiaLona:2.0, pedazosLona:3.5, tipos:{large:89,medium:90,midget:87,tiny:84}
+    },
+    deshidratado: { danadas:4.5, sevDanadas:9.1, chipped:5.0, chia:9.1 },
+    pt: {
+      planilla:12, fecha:'12/02', cajasProducidas:144,
+      cajasPinchadas:6, cajasReembazadas:6,
+      danadasPT:2.0, sevDanadasPT:1.0,
+      metalesPCC:'OK', imanesPCC:'OK'
+    },
+    exportacion: {
+      coa:'152/26', cliente:'Chelmer Foods Ltd', destino:'Reino Unido',
+      aflatoxB1:'<0.90', aflatoxTotal:'<1.50', humPT:3.30,
+      bacteriana:'2.5×10³', ecoli:'Ausente', salmonella:'Ausente',
+      contenedor:'MSNU-412587-1', inspec:'Aprobado'
+    }
+  },
+  {
+    codigo: 'CONV. 04',
+    proveedor: 'AARENARMAPA',
+    proveedorCorto: 'AA 01-26',
+    certif: 'Convencional',
+    kilosTotal: 9800,
+    tipo: 'Medium',
+    recepcion: {
+      humedad: 25.9, humedadMuestras:[25.9,25.4,25.3,24.9,24.4,24.3],
+      humedadFechas:['18/12','22/12','24/12','29/12','06/01','14/01'],
+      corte: 4.85
+    },
+    sancochado: { presionDist:7, presionAuto:4, tiempo:'2:08', humIng:7, humSal:4 },
+    seleccionado: {
+      fechas:['04/02','05/02','07/02','09/02'],
+      ombligo:[1.45,1.38,1.51,1.42],
+      podrida:[2.35,2.48,2.18,2.30],
+      promOmb:1.44, promPod:2.33,
+      chiaLona:1.9, pedazosLona:2.9, tipos:{large:85,medium:88,midget:86,tiny:84}
+    },
+    deshidratado: { danadas:4.2, sevDanadas:5.8, chipped:4.0, chia:5.8 },
+    pt: {
+      planilla:14, fecha:'16/02', cajasProducidas:169,
+      cajasPinchadas:7, cajasReembazadas:7,
+      danadasPT:1.8, sevDanadasPT:0.9,
+      metalesPCC:'OK', imanesPCC:'OK'
+    },
+    exportacion: {
+      coa:'168/26', cliente:'En proceso', destino:'Polonia',
+      aflatoxB1:'<0.50', aflatoxTotal:'<0.95', humPT:3.25,
+      bacteriana:'2.1×10³', ecoli:'Ausente', salmonella:'Ausente',
+      contenedor:'Pendiente', inspec:'Pendiente'
+    }
+  },
+  {
+    codigo: 'CONV. 07',
+    proveedor: 'Dennis Azucarela',
+    proveedorCorto: 'DA 02-CV',
+    certif: 'Convencional',
+    kilosTotal: 59057,
+    tipo: 'Mezclada',
+    recepcion: {
+      humedad: 27.2, humedadMuestras:[27.2,26.5,25.8,24.9],
+      humedadFechas:['21/02','28/02','07/03','14/03'],
+      corte: 5.12
+    },
+    sancochado: { presionDist:7, presionAuto:4, tiempo:'2:07', humIng:6, humSal:3 },
+    seleccionado: {
+      fechas:['04/03','05/03','06/03','07/03','09/03'],
+      ombligo:[1.48,1.52,1.46,1.41,1.49],
+      podrida:[2.41,2.35,2.28,2.22,2.31],
+      promOmb:1.47, promPod:2.31,
+      chiaLona:1.75, pedazosLona:3.0, tipos:{large:82,medium:85,midget:83,tiny:80}
+    },
+    deshidratado: { danadas:4.1, sevDanadas:6.2, chipped:3.9, chia:6.2 },
+    pt: {
+      planilla:18, fecha:'18/03', cajasProducidas:185,
+      cajasPinchadas:5, cajasReembazadas:5,
+      danadasPT:1.6, sevDanadasPT:0.8,
+      metalesPCC:'OK', imanesPCC:'OK'
+    },
+    exportacion: {
+      coa:'189/26', cliente:'En proceso', destino:'USA',
+      aflatoxB1:'<0.60', aflatoxTotal:'<1.10', humPT:3.20,
+      bacteriana:'2.0×10³', ecoli:'Ausente', salmonella:'Ausente',
+      contenedor:'Pendiente', inspec:'Pendiente'
+    }
+  }
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════════════
+
+const COLORS = {
+  ok:'#2E7D5B', warn:'#C17917', fail:'#B23E3E',
+  ink:'#1A1A17', ink2:'#4A4A44', ink3:'#8A8881',
+  line:'#D9D5CA', accent:'#2C4A3E', gold:'#B08A3E', accent2:'#8B3A2E'
+};
+
+function status(val, limit){
+  if(typeof val !== 'number') return 'ok';
+  const p = val/limit;
+  if(p <= 0.80) return 'ok';
+  if(p <= 1.00) return 'warn';
+  return 'fail';
+}
+function sClass(s){return s==='ok'?'d-ok':s==='warn'?'d-warn':'d-fail'}
+function pClass(s){return s==='ok'?'p-ok':s==='warn'?'p-warn':'p-fail'}
+function bClass(s){return s==='ok'?'b-ok':s==='warn'?'b-warn':'b-fail'}
+function sLabel(s){return s==='ok'?'Conforme':s==='warn'?'Atención':'Fuera de límite'}
+
+function statusColor(s){
+  return s==='ok'?COLORS.ok:s==='warn'?COLORS.warn:COLORS.fail;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STATE & RENDER
+// ═══════════════════════════════════════════════════════════════════════════
+
+let currentLote = 0;
+let openStages = {recepcion:true, sancochado:false, seleccionado:true, deshidratado:false, pt:true, exportacion:false};
+let charts = {};
+
+function renderLoteGrid(){
+  document.getElementById('loteGrid').innerHTML = LOTES.map((L,i)=>`
+    <button class="lote-btn ${i===currentLote?'active':''}" onclick="setLote(${i})">
+      <div class="lote-code">${L.codigo}</div>
+      <div class="lote-name">${L.proveedor}</div>
+      <div class="lote-sub">${L.proveedorCorto} · ${L.certif}</div>
+    </button>
+  `).join('');
+}
+
+function renderHero(){
+  const L = LOTES[currentLote];
+  const r = L.recepcion, s = L.seleccionado, d = L.deshidratado, p = L.pt;
+
+  const checks = [
+    status(r.humedad, 25),
+    status(r.corte, 10),
+    status(s.promOmb, 2),
+    status(s.promPod, 3),
+    status(s.chiaLona, 3),
+    status(d.danadas, 5),
+    status(d.sevDanadas, 4),
+    status(p.danadasPT, 5),
+    status(p.sevDanadasPT, 4)
+  ];
+  const nOk = checks.filter(c=>c==='ok').length;
+  const nWarn = checks.filter(c=>c==='warn').length;
+  const nFail = checks.filter(c=>c==='fail').length;
+  const overall = nFail>0?'fail':nWarn>0?'warn':'ok';
+
+  document.getElementById('heroSection').innerHTML = `
+    <div class="hero">
+      <div class="hero-cell primary">
+        <div class="hl">Lote seleccionado</div>
+        <div class="hv"><em>${L.codigo}</em></div>
+        <div class="hs">${L.proveedor} · ${L.kilosTotal.toLocaleString('es')} kg · ${L.tipo}</div>
+      </div>
+      <div class="hero-cell">
+        <div class="hl">Conformes</div>
+        <div class="hv" style="color:${COLORS.ok}">${nOk}</div>
+        <div class="hs"><span class="pill p-ok">dentro de límite</span></div>
+      </div>
+      <div class="hero-cell">
+        <div class="hl">En atención</div>
+        <div class="hv" style="color:${COLORS.warn}">${nWarn}</div>
+        <div class="hs"><span class="pill p-warn">cerca del límite</span></div>
+      </div>
+      <div class="hero-cell">
+        <div class="hl">Fuera de límite</div>
+        <div class="hv" style="color:${COLORS.fail}">${nFail}</div>
+        <div class="hs"><span class="pill ${pClass(overall)}">${sLabel(overall)}</span></div>
+      </div>
+    </div>
+  `;
+}
+
+function indCard({label, val, unit, limit, rc, pcc, status:st, extra, limitText}){
+  const s = st || 'ok';
+  return `<div class="ind">
+    <div class="ind-dot-wrap">
+      <div class="ind-dot ${sClass(s)}"></div>
+      <span class="ind-tag ${pcc?'pcc':''}">${pcc?'PCC · ':''}${rc}</span>
+    </div>
+    <div class="ind-lbl">${label}</div>
+    <div class="ind-val">${val}${unit?`<em>${unit}</em>`:''}</div>
+    <div class="ind-lim">${limitText || (limit?`Límite: ${limit}${unit||''}`:'—')}</div>
+    ${typeof val==='number' && typeof limit==='number' ? `<div class="bar"><div class="bar-f ${bClass(s)}" style="width:${Math.min(100,(val/limit*100)).toFixed(0)}%"></div></div>` : ''}
+    ${extra||''}
+  </div>`;
+}
+
+function renderStages(){
+  const L = LOTES[currentLote];
+  const r = L.recepcion, sc = L.sancochado, se = L.seleccionado, d = L.deshidratado, p = L.pt, e = L.exportacion;
+
+  const stages = [
+    {
+      key:'recepcion', num:'01', name:'Recepción de materia prima',
+      rc:'RC.CC.14 · RC.CC.1.1',
+      indicators: [
+        {label:'% Humedad MPH almacenada', val:r.humedad, unit:'%', limit:25, rc:'RC.CC.14', status:status(r.humedad,25)},
+        {label:'% Corte chías', val:r.corte, unit:'%', limit:10, rc:'RC.CC.1.1', status:status(r.corte,10)},
+        {label:'Lote de proveedor', val:L.proveedorCorto, rc:'RC.PD.01', limitText:L.proveedor, status:'ok'},
+        {label:'Kilos recibidos', val:L.kilosTotal.toLocaleString('es'), unit:' kg', rc:'RC.PD.01', limitText:`Tipo: ${L.tipo}`, status:'ok'}
+      ]
+    },
+    {
+      key:'sancochado', num:'02', name:'Sancochado en autoclave',
+      rc:'RC.CC.17',
+      indicators:[
+        {label:'Presión del distribuidor', val:sc.presionDist, unit:' bar', limit:7, rc:'RC.CC.17', status:sc.presionDist===7?'ok':'warn', limitText:'Valor exacto: 7 bar'},
+        {label:'Presión del autoclave', val:sc.presionAuto, unit:' bar', limit:4, rc:'RC.CC.17', status:sc.presionAuto===4?'ok':'warn', limitText:'Valor exacto: 4 bar'},
+        {label:'Tiempo de ciclo', val:sc.tiempo, unit:' min', rc:'RC.CC.17', limitText:'Rango: 2:05 – 2:10', status:'ok'},
+        {label:'% Humedad entrada → salida', val:`${sc.humIng}→${sc.humSal}`, unit:'%', rc:'RC.PD.05', limitText:'Reducción esperada', status:'ok'}
+      ]
+    },
+    {
+      key:'seleccionado', num:'03', name:'Seleccionado (caída de lona)',
+      rc:'RC.CC.01 · RC.CC.02',
+      indicators:[
+        {label:'% Ombligo promedio del lote', val:se.promOmb, unit:'%', limit:2, rc:'RC.CC.01', status:status(se.promOmb,2)},
+        {label:'% Podrida promedio del lote', val:se.promPod, unit:'%', limit:3, rc:'RC.CC.01', status:status(se.promPod,3)},
+        {label:'% Chías en caída de lona', val:se.chiaLona, unit:'%', limit:3, rc:'RC.CC.02', status:status(se.chiaLona,3)},
+        {label:'% Pedazos en banadera', val:se.pedazosLona, unit:'%', limit:4, rc:'RC.CC.02', status:status(se.pedazosLona,4)}
+      ]
+    },
+    {
+      key:'deshidratado', num:'04', name:'Almendra pelada deshidratada',
+      rc:'RC.CC.04',
+      indicators:[
+        {label:'% Dañadas (Midget)', val:d.danadas, unit:'%', limit:5, rc:'RC.CC.04', status:status(d.danadas,5)},
+        {label:'% Severamente dañadas', val:d.sevDanadas, unit:'%', limit:4, rc:'RC.CC.04', status:status(d.sevDanadas,4)},
+        {label:'% Chipped', val:d.chipped, unit:'%', limit:8, rc:'RC.CC.04', status:status(d.chipped,8)},
+        {label:'% Chía', val:d.chia, unit:'%', limit:10, rc:'RC.CC.04', status:status(d.chia,10)}
+      ]
+    },
+    {
+      key:'pt', num:'05', name:'Producto terminado',
+      rc:'RC.CC.05 · RC.CC.06 · RC.CC.07 · RC.CC.08',
+      indicators:[
+        {label:'% Dañadas en PT', val:p.danadasPT, unit:'%', limit:5, rc:'RC.CC.05', status:status(p.danadasPT,5)},
+        {label:'% Severamente dañadas PT', val:p.sevDanadasPT, unit:'%', limit:4, rc:'RC.CC.05', status:status(p.sevDanadasPT,4)},
+        {label:'Cajas pinchadas / total', val:`${p.cajasPinchadas}/${p.cajasProducidas}`, rc:'RC.CC.06', limitText:`Planilla ${p.planilla} · ${p.fecha}`, status: p.cajasPinchadas/p.cajasProducidas < 0.05 ? 'ok' : 'warn'},
+        {label:'Detector de metales', val:p.metalesPCC, rc:'RC.CC.07', pcc:true, limitText:'PCC 02 · Fe 3mm / NoFe 3.5mm / Ac.In 4mm', status:p.metalesPCC==='OK'?'ok':'fail'},
+        {label:'Imanes en vaciado', val:p.imanesPCC, rc:'RC.CC.08', pcc:true, limitText:'Pase de patrones inicio/fin', status:p.imanesPCC==='OK'?'ok':'fail'}
+      ]
+    },
+    {
+      key:'exportacion', num:'06', name:'Exportación · COA y contenedor',
+      rc:'RC.CC.09 · RC.CC.10',
+      indicators:[
+        {label:'Aflatoxina B1', val:e.aflatoxB1, unit:' ppb', rc:'RC.CC.09', limitText:'Límite EU: <5 ppb', status:'ok'},
+        {label:'Aflatoxinas totales', val:e.aflatoxTotal, unit:' ppb', rc:'RC.CC.09', limitText:'Límite EU: <10 ppb', status:'ok'},
+        {label:'Humedad en PT', val:e.humPT, unit:'%', limit:4, rc:'RC.CC.09', status:status(e.humPT,4)},
+        {label:'Recuento total bacteriana', val:e.bacteriana, unit:' UFC/g', rc:'RC.CC.09', limitText:'NB 320013: 10k–50k', status:'ok'},
+        {label:'Salmonella (25g)', val:e.salmonella, rc:'RC.CC.09', limitText:'NB 320013: Ausente', status:'ok'},
+        {label:'Cliente · destino', val:e.cliente, rc:'COA', limitText:`Destino: ${e.destino}`, status:'ok'},
+        {label:'Inspección contenedor', val:e.inspec, rc:'RC.CC.10', limitText:`N° ${e.contenedor}`, status:e.inspec==='Aprobado'?'ok':'warn'}
+      ]
+    }
+  ];
+
+  document.getElementById('stagesContainer').innerHTML = stages.map(st=>{
+    const stsList = st.indicators.map(i=>i.status);
+    const overall = stsList.includes('fail')?'fail':stsList.includes('warn')?'warn':'ok';
+    const isOpen = openStages[st.key];
+    return `<div class="stage">
+      <div class="stage-head" onclick="toggleStage('${st.key}')">
+        <div class="stage-num">${st.num}</div>
+        <div class="stage-info">
+          <div class="stage-nm">${st.name}</div>
+          <div class="stage-rc">${st.rc}</div>
+        </div>
+        <div class="stage-right">
+          <span class="pill ${pClass(overall)}">${sLabel(overall)}</span>
+          <span class="chev ${isOpen?'open':''}">▸</span>
+        </div>
+      </div>
+      <div class="stage-body ${isOpen?'open':''}">
+        <div class="ind-grid">${st.indicators.map(indCard).join('')}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CHARTS
+// ═══════════════════════════════════════════════════════════════════════════
+
+const chartDefaults = {
+  font:{family:'Inter',size:11},
+  tickColor:COLORS.ink3,
+  gridColor:'rgba(217,213,202,0.5)'
+};
+
+function destroyChart(key){
+  if(charts[key]){charts[key].destroy();delete charts[key]}
+}
+
+function renderCharts(){
+  const L = LOTES[currentLote];
+
+  // TREND chart — Ombligo & Podrida por día
+  destroyChart('trend');
+  charts.trend = new Chart(document.getElementById('chartTrend'),{
+    type:'line',
+    data:{
+      labels:L.seleccionado.fechas,
+      datasets:[
+        {label:'% Podrida', data:L.seleccionado.podrida, borderColor:COLORS.accent2, backgroundColor:COLORS.accent2+'20', borderWidth:2, pointRadius:4, pointHoverRadius:6, tension:0.3, fill:true},
+        {label:'% Ombligo', data:L.seleccionado.ombligo, borderColor:COLORS.accent, backgroundColor:COLORS.accent+'15', borderWidth:2, pointRadius:4, pointHoverRadius:6, tension:0.3, fill:true},
+        {label:'Límite Podrida (3%)', data:Array(L.seleccionado.fechas.length).fill(3), borderColor:COLORS.fail, borderWidth:1, borderDash:[4,4], pointRadius:0},
+        {label:'Límite Ombligo (2%)', data:Array(L.seleccionado.fechas.length).fill(2), borderColor:COLORS.warn, borderWidth:1, borderDash:[4,4], pointRadius:0}
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:chartDefaults.font,color:COLORS.ink2}}},
+      scales:{
+        y:{beginAtZero:true,max:4,ticks:{font:chartDefaults.font,color:chartDefaults.tickColor,callback:v=>v+'%'},grid:{color:chartDefaults.gridColor}},
+        x:{ticks:{font:chartDefaults.font,color:chartDefaults.tickColor},grid:{display:false}}
+      }
+    }
+  });
+
+  // TYPES chart — distribución de cedazos
+  destroyChart('types');
+  charts.types = new Chart(document.getElementById('chartTypes'),{
+    type:'bar',
+    data:{
+      labels:['Large','Medium','Midget','Tiny'],
+      datasets:[{
+        label:'Pepas por cedazo',
+        data:[L.seleccionado.tipos.large,L.seleccionado.tipos.medium,L.seleccionado.tipos.midget,L.seleccionado.tipos.tiny],
+        backgroundColor:[COLORS.accent,COLORS.accent2,COLORS.gold,COLORS.ink2],
+        borderRadius:0,borderWidth:0
+      },
+      {
+        label:'Límite aprobación (70)',
+        data:[70,70,70,70],
+        type:'line',borderColor:COLORS.fail,borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:chartDefaults.font,color:COLORS.ink2}}},
+      scales:{
+        y:{beginAtZero:true,max:140,ticks:{font:chartDefaults.font,color:chartDefaults.tickColor},grid:{color:chartDefaults.gridColor}},
+        x:{ticks:{font:chartDefaults.font,color:chartDefaults.tickColor},grid:{display:false}}
+      }
+    }
+  });
+
+  // RADAR chart
+  destroyChart('radar');
+  const radarLimits=[25,10,2,3,3,5,4,5,4];
+  const radarVals=[L.recepcion.humedad,L.recepcion.corte,L.seleccionado.promOmb,L.seleccionado.promPod,L.seleccionado.chiaLona,L.deshidratado.danadas,L.deshidratado.sevDanadas,L.pt.danadasPT,L.pt.sevDanadasPT];
+  const radarPct=radarVals.map((v,i)=>Math.min(150,v/radarLimits[i]*100));
+  charts.radar = new Chart(document.getElementById('chartRadar'),{
+    type:'radar',
+    data:{
+      labels:['Humedad MPH','Corte chías','Ombligo','Podrida','Chía lona','Dañadas deshid.','Sev. dañadas deshid.','Dañadas PT','Sev. dañadas PT'],
+      datasets:[{
+        label:'% utilización del límite',
+        data:radarPct,
+        backgroundColor:COLORS.accent+'30',
+        borderColor:COLORS.accent,borderWidth:2,pointBackgroundColor:COLORS.accent,pointRadius:3
+      },{
+        label:'Límite crítico (100%)',
+        data:Array(9).fill(100),
+        backgroundColor:'transparent',borderColor:COLORS.fail,borderWidth:1,borderDash:[4,4],pointRadius:0
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:chartDefaults.font,color:COLORS.ink2}}},
+      scales:{r:{beginAtZero:true,suggestedMax:150,ticks:{font:{size:9},color:chartDefaults.tickColor,callback:v=>v+'%',backdropColor:'transparent'},grid:{color:chartDefaults.gridColor},angleLines:{color:chartDefaults.gridColor},pointLabels:{font:{size:10,family:'Inter'},color:COLORS.ink2}}}
+    }
+  });
+
+  // CAJAS donut
+  destroyChart('cajas');
+  const aprobadas = L.pt.cajasProducidas - L.pt.cajasPinchadas;
+  charts.cajas = new Chart(document.getElementById('chartCajas'),{
+    type:'doughnut',
+    data:{
+      labels:['Aprobadas','Pinchadas','Reembazadas'],
+      datasets:[{
+        data:[aprobadas,L.pt.cajasPinchadas,L.pt.cajasReembazadas],
+        backgroundColor:[COLORS.ok,COLORS.fail,COLORS.warn],
+        borderWidth:0
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,cutout:'62%',
+      plugins:{
+        legend:{position:'bottom',labels:{boxWidth:10,font:chartDefaults.font,color:COLORS.ink2,padding:14}},
+        tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.parsed} cajas`}}
+      }
+    }
+  });
+}
+
+function renderCompCharts(){
+  // Humedad all lotes
+  destroyChart('humAll');
+  charts.humAll = new Chart(document.getElementById('chartHumAll'),{
+    type:'bar',
+    data:{
+      labels:LOTES.map(L=>L.codigo),
+      datasets:[{
+        label:'% Humedad inicial',
+        data:LOTES.map(L=>L.recepcion.humedad),
+        backgroundColor:LOTES.map(L=>statusColor(status(L.recepcion.humedad,25))),
+        borderWidth:0
+      },{
+        label:'Límite (25%)',
+        data:Array(LOTES.length).fill(25),
+        type:'line',borderColor:COLORS.ink,borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:chartDefaults.font,color:COLORS.ink2}},
+      tooltip:{callbacks:{afterLabel:ctx=>ctx.datasetIndex===0?`Proveedor: ${LOTES[ctx.dataIndex].proveedorCorto}`:''}}},
+      scales:{
+        y:{beginAtZero:true,max:32,ticks:{font:chartDefaults.font,color:chartDefaults.tickColor,callback:v=>v+'%'},grid:{color:chartDefaults.gridColor}},
+        x:{ticks:{font:chartDefaults.font,color:chartDefaults.tickColor},grid:{display:false}}
+      }
+    }
+  });
+
+  // Podrida all lotes
+  destroyChart('podAll');
+  charts.podAll = new Chart(document.getElementById('chartPodAll'),{
+    type:'bar',
+    data:{
+      labels:LOTES.map(L=>L.codigo),
+      datasets:[{
+        label:'% Podrida promedio',
+        data:LOTES.map(L=>L.seleccionado.promPod),
+        backgroundColor:LOTES.map(L=>statusColor(status(L.seleccionado.promPod,3))),
+        borderWidth:0
+      },{
+        label:'% Ombligo promedio',
+        data:LOTES.map(L=>L.seleccionado.promOmb),
+        backgroundColor:LOTES.map(L=>statusColor(status(L.seleccionado.promOmb,2))+'60'),
+        borderWidth:0
+      },{
+        label:'Límite Podrida (3%)',
+        data:Array(LOTES.length).fill(3),
+        type:'line',borderColor:COLORS.fail,borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:chartDefaults.font,color:COLORS.ink2}}},
+      scales:{
+        y:{beginAtZero:true,max:4,ticks:{font:chartDefaults.font,color:chartDefaults.tickColor,callback:v=>v+'%'},grid:{color:chartDefaults.gridColor}},
+        x:{ticks:{font:chartDefaults.font,color:chartDefaults.tickColor},grid:{display:false}}
+      }
+    }
+  });
+}
+
+function renderCompTable(){
+  const rows = LOTES.map((L,i)=>{
+    const checks = [
+      status(L.recepcion.humedad,25),
+      status(L.seleccionado.promOmb,2),
+      status(L.seleccionado.promPod,3),
+      status(L.deshidratado.danadas,5),
+      status(L.deshidratado.sevDanadas,4),
+      status(L.pt.danadasPT,5)
+    ];
+    const worst = checks.includes('fail')?'fail':checks.includes('warn')?'warn':'ok';
+    return `<tr>
+      <td><strong>${L.codigo}</strong><br><span style="color:var(--ink3);font-size:11px">${L.proveedorCorto}</span></td>
+      <td>${L.proveedor}</td>
+      <td class="num">${L.kilosTotal.toLocaleString('es')}</td>
+      <td class="num" style="color:${statusColor(status(L.recepcion.humedad,25))}">${L.recepcion.humedad}%</td>
+      <td class="num" style="color:${statusColor(status(L.seleccionado.promOmb,2))}">${L.seleccionado.promOmb.toFixed(2)}%</td>
+      <td class="num" style="color:${statusColor(status(L.seleccionado.promPod,3))}">${L.seleccionado.promPod.toFixed(2)}%</td>
+      <td class="num" style="color:${statusColor(status(L.deshidratado.danadas,5))}">${L.deshidratado.danadas}%</td>
+      <td class="num" style="color:${statusColor(status(L.pt.danadasPT,5))}">${L.pt.danadasPT}%</td>
+      <td>${L.exportacion.destino}</td>
+      <td><span class="status ${pClass(worst)}">${sLabel(worst)}</span></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('compTable').innerHTML = `
+    <thead><tr>
+      <th>Lote</th>
+      <th>Proveedor</th>
+      <th style="text-align:right">Kg totales</th>
+      <th style="text-align:right">Hum. MPH</th>
+      <th style="text-align:right">Ombligo</th>
+      <th style="text-align:right">Podrida</th>
+      <th style="text-align:right">Dañ. desh.</th>
+      <th style="text-align:right">Dañ. PT</th>
+      <th>Destino</th>
+      <th style="text-align:center">Estado</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// EVENTS
+// ═══════════════════════════════════════════════════════════════════════════
+
+function setLote(i){
+  currentLote = i;
+  renderLoteGrid();
+  renderHero();
+  renderStages();
+  renderCharts();
+}
+
+function toggleStage(key){
+  openStages[key] = !openStages[key];
+  renderStages();
+}
+
+// INIT
+document.getElementById('today').textContent = new Date().toLocaleDateString('es-BO',{day:'2-digit',month:'long',year:'numeric'});
+renderLoteGrid();
+renderHero();
+renderStages();
+renderCharts();
+renderCompCharts();
+renderCompTable();
+</script>
+</body>
+</html>

@@ -34,8 +34,10 @@ a.btn-alerta:hover{background:rgba(239,68,68,.3);color:#fff}
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="./aggregates_by_tab_generated.js"></script>
 <script src="../Produccion/produccion_aggregates_generated.js"></script>
+<script src="../Produccion/produccion_aggregates_alias.js"></script>
 <script src="../Produccion/calculos_dashboard_produccion.js"></script>
 <script src="../Produccion/lote_info_pd02.js"></script>
+<script src="./ppr_charts_data.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script type="text/babel">
@@ -252,6 +254,9 @@ const CELL_REFERENCE_MAP={
   14:"Tabla principal"
 };
 
+/* ============================================================
+   DATOS PRODUCCION - LINKS RC.PD Y CONFIGURACION
+   ============================================================ */
 const PRODUCTION_LINKS=[
   {codigo:"RC.PD.02",id:"1_aWiCwHrAx1bHpJ3twchTRwX0sCRtmwglVkPE7WrN04"},
   {codigo:"RC.PD.03",id:"1Ueb02r1KKiCSlsgr0DFm4LJNLSvHwMtpjsnMmLf82d8"},
@@ -299,63 +304,14 @@ const PRODUCTION_SHEETS_FORMULAS=[
 ];
 const PRODUCTION_COST_LOSS_FORMULA="Si Yield < 30%, Perdida Bs/USD = (Kg Recibidos * (0.30 - YieldReal)) * CostoUnitario";
 
-/* Agregados por lote (promedio de pestañas/planillas disponibles) */
-const AGGREGATES_BASE={
-  "RG 01-CV":{
-    "RC.CC.02":{
-      muestras:8,
-      controles:{
-        "% Primera Banadera":{valor:84.5,hist:[82.5,77.0,82.9,80.1,86.7,88.4,87.1,91.1]},
-        "% Pedazos Lona 1":{valor:2.6,hist:[4.0,2.1,3.0,2.1,2.7,3.8,1.7,1.6]},
-        "% Chias Lona 1":{valor:1.2,hist:[1.6,0.5,1.7,0.2,1.6,1.6,1.1,1.2]}
-      }
-    },
-    "RC.CC.04":{
-      muestras:4,
-      controles:{
-        "% Dannadas":{valor:5.73,hist:[3.6,6.1,8.7,4.5]},
-        "% Severamente Dannadas":{valor:6.85,hist:[7.3,4.4,6.6,9.1]}
-      }
-    },
-    "RC.CC.05":{
-      muestras:8,
-      controles:{
-        "% Danadas":{valor:1.42,hist:[1.50,1.60,2.05,1.25,1.70,1.65,1.85,1.75]},
-        "% Sev. Danadas":{valor:0.95,hist:[0.50,0.85,0.75,0.45,0.75,1.00,1.15,1.45]}
-      }
-    },
-    "RC.CC.11":{
-      muestras:8,
-      controles:{
-        "% Podrida Broken N":{valor:0.55},
-        "Chias Broken":{valor:0.06},
-        "Punto Cafe":{valor:0.80}
-      }
-    },
-    "RC.CC.13":{
-      muestras:8,
-      controles:{
-        "Tara Promedio (kg)":{valor:0.68},
-        "Peso Neto (kg)":{valor:19.96}
-      }
-    }
-  },
-  "RG 02-CV":{
-    "RC.CC.05":{muestras:6,controles:{"% Danadas":{valor:0.53},"% Sev. Danadas":{valor:0.14}}},
-    "RC.CC.11":{muestras:6,controles:{"% Podrida Broken N":{valor:0.14},"Chias Broken":{valor:0.01},"Punto Cafe":{valor:0.16}}},
-    "RC.CC.13":{muestras:6,controles:{"Tara Promedio (kg)":{valor:0.68},"Peso Neto (kg)":{valor:19.96}}}
-  },
-  "BSI 01":{
-    "RC.CC.13":{muestras:3,controles:{"Tara Promedio (kg)":{valor:0.68},"Peso Neto (kg)":{valor:19.96}}}
-  },
-  "DA 01-CV":{
-    "RC.CC.11":{muestras:1,controles:{"Mat. Extranos":{valor:"AUSENTE"}}}
-  }
-};
-
+/* ============================================================
+   DATOS RUNTIME - AGGREGATES + FECHA
+   ============================================================ */
 const AGGREGATES_BY_TAB=window.AGGREGATES_BY_TAB_GENERATED&&typeof window.AGGREGATES_BY_TAB_GENERATED==="object"
   ? window.AGGREGATES_BY_TAB_GENERATED
   : {};
+const _d=new Date();
+const TODAY_FMT=`${String(_d.getDate()).padStart(2,"0")}/${String(_d.getMonth()+1).padStart(2,"0")}/${_d.getFullYear()}`;
 
 /* ============================================================
    LOGICA DE ESTADOS
@@ -473,6 +429,7 @@ const trimSeries=(arr,maxPoints)=>arr.length>maxPoints?arr.slice(arr.length-maxP
    COMPONENTE PRINCIPAL
    ============================================================ */
 function Dashboard(){
+/* ---- [1] STATE DECLARATIONS ---- */
 const [selectedView,setSelectedView]=useState("PRODUCCION");
 const [selectedTab,setSelectedTab]=useState("TODAS");
 const [selectedRegistro,setSelectedRegistro]=useState("TODOS");
@@ -481,6 +438,9 @@ const [sidebarProdOpen,setSidebarProdOpen]=useState(true);
 const [sidebarQualityOpen,setSidebarQualityOpen]=useState(false);
 const [pdfModalOpen,setPdfModalOpen]=useState(false);
 const [pdfGenerating,setPdfGenerating]=useState(false);
+const [sidebarPPROpen,setSidebarPPROpen]=useState(false);
+const [selectedPPRModule,setSelectedPPRModule]=useState("TODOS");
+/* ---- [2] MEMOS CALIDAD - computedSheets / sheetView / alertas ---- */
 const computedSheets=useMemo(()=>{
   const clone=JSON.parse(JSON.stringify(SHEETS));
   const agg=AGGREGATES_BY_TAB[selectedTab]||{};
@@ -725,6 +685,7 @@ const qualityLotInfo=useMemo(()=>{
     exportado:data.exportado!=null&&data.exportado!==""?data.exportado:"—"
   };
 },[selectedTab]);
+/* ---- [3] MEMOS PRODUCCION - records / tabs / audit ---- */
 const productionRecords=useMemo(()=>{
   const generated=window.PRODUCCION_AGGREGATES_GENERATED&&typeof window.PRODUCCION_AGGREGATES_GENERATED==="object"
     ? window.PRODUCCION_AGGREGATES_GENERATED
@@ -840,6 +801,7 @@ useEffect(()=>{
     setSelectedProdTab(productionKnownTabs[0]);
   }
 },[productionKnownTabs,selectedProdTab]);
+/* ---- [4] MEMO PRODUCCION - calculos kpis / rendimiento / trazabilidad ---- */
 const productionCalc=useMemo(()=>{
   const raw=window.CALCULOS_DASHBOARD_PRODUCCION&&typeof window.CALCULOS_DASHBOARD_PRODUCCION==="object"
     ? window.CALCULOS_DASHBOARD_PRODUCCION
@@ -917,6 +879,7 @@ const productionCalc=useMemo(()=>{
   };
 },[selectedProdTab]);
 
+/* ---- [5] EFFECTS - RESET DE ESTADO ---- */
 useEffect(()=>{
   setSelectedRegistro("TODOS");
 },[selectedTab]);
@@ -924,6 +887,7 @@ useEffect(()=>{
   if(selectedView==="CALIDAD") setSelectedRegistro("TODOS");
 },[selectedView]);
 
+/* ---- [6] EFFECTS - GRAFICOS PRODUCCION (window._p) ---- */
 useEffect(()=>{
 if(window._p)Object.values(window._p).forEach(x=>{try{x.destroy();}catch(e){}});
 window._p={};
@@ -1094,6 +1058,7 @@ if(lotKpis&&productionCalc.selectedData&&productionCalc.selectedData.kpis){
 }
 },[selectedView,productionActive,productionWithData.length,productionPartialCount,productionErrorCount,productionNoDataCount,productionCalc]);
 
+/* ---- [7] EFFECTS - GRAFICOS CALIDAD (window._c) ---- */
 useEffect(()=>{
 if(window._c)Object.values(window._c).forEach(x=>{try{x.destroy();}catch(e){}});
 window._c={};
@@ -1302,6 +1267,104 @@ const e8=document.getElementById("ch8");
 if(e8)window._c.c8=new Chart(e8,{type:"doughnut",data:{labels:["Conforme","Advertencia","No Conforme","Sin Datos/Maestro"],datasets:[{data:[okN,wN,aL,noD],backgroundColor:["rgba(34,197,94,.8)","rgba(245,158,11,.8)","rgba(239,68,68,.8)","rgba(100,116,139,.4)"],borderColor:["#16a34a","#d97706","#b91c1c","#475569"],borderWidth:2}]},options:{responsive:true,plugins:{legend:{labels:{color:"#94a3b8",font:{size:10}}},datalabels:doughnutLabelOptions()}}});
 },[selectedTab,selectedRegistro,activeSheets.length,trendSheets]);
 
+/* ---- [8] EFFECTS - GRAFICOS PPR (window._ppr) ---- */
+useEffect(()=>{
+  if(window._ppr)Object.values(window._ppr).forEach(x=>{try{x.destroy();}catch(e){}});
+  window._ppr={};
+  if(selectedView!=="PPR") return;
+  const D=window.PPR_CHARTS_DATA;
+  if(!D) return;
+  const grd="rgba(255,255,255,0.06)",tk="#64748b";
+
+  /* ---- Chart A: Tendencia Residuos (línea) ---- */
+  const cvA=document.getElementById("ppr-chart-residuos");
+  if(cvA&&D.residuos&&(selectedPPRModule==="TODOS"||selectedPPRModule==="Eliminación Residuos")){
+    const prevA=Chart.getChart(cvA);if(prevA)prevA.destroy();
+    const totales=D.residuos.totales_por_fecha;
+    const fechas=Object.keys(totales).sort();
+    const chias=fechas.map(f=>totales[f].chias||0);
+    const podridas=fechas.map(f=>totales[f].podridas||0);
+    const labels=fechas.map(f=>{const d=new Date(f);return d.toLocaleDateString('es-BO',{month:'short',day:'numeric'});});
+    window._ppr.resA=new Chart(cvA,{
+      type:"line",
+      data:{labels,datasets:[
+        {label:"Chías (kg)",data:chias,borderColor:"#f59e0b",backgroundColor:"rgba(245,158,11,0.12)",tension:0.35,borderWidth:2,pointRadius:3,pointBackgroundColor:"#f59e0b",datalabels:{display:false}},
+        {label:"Podridas (kg)",data:podridas,borderColor:"#ef4444",backgroundColor:"rgba(239,68,68,0.10)",tension:0.35,borderWidth:2,pointRadius:3,pointBackgroundColor:"#ef4444",datalabels:{display:false}}
+      ]},
+      options:{responsive:true,maintainAspectRatio:true,
+        plugins:{legend:{labels:{color:"#cbd5e1",font:{size:10}}},datalabels:{display:false}},
+        scales:{y:{grid:{color:grd},ticks:{color:tk},title:{display:true,text:"kg",color:"#94a3b8",font:{size:9}}},x:{grid:{color:grd},ticks:{color:tk,font:{size:9},maxRotation:45}}}
+      }
+    });
+  }
+
+  /* ---- Chart B: BPM Lavado Ropa por Área (barra apilada horizontal) ---- */
+  const cvB=document.getElementById("ppr-chart-bpm");
+  if(cvB&&D.bpm_lavado&&(selectedPPRModule==="TODOS"||selectedPPRModule==="BPM 2026")){
+    const prevB=Chart.getChart(cvB);if(prevB)prevB.destroy();
+    const areas=Object.keys(D.bpm_lavado.por_area);
+    const pa=D.bpm_lavado.por_area;
+    const shortArea=a=>a.length>28?a.slice(0,26)+"…":a;
+    window._ppr.resB=new Chart(cvB,{
+      type:"bar",
+      data:{labels:areas.map(shortArea),datasets:[
+        {label:"Casaca",data:areas.map(a=>pa[a].casaca||0),backgroundColor:"rgba(251,191,36,0.82)",borderColor:"#d97706",borderWidth:1,datalabels:{display:false}},
+        {label:"Pantalón",data:areas.map(a=>pa[a].pantalon||0),backgroundColor:"rgba(253,230,138,0.75)",borderColor:"#fbbf24",borderWidth:1,datalabels:{display:false}},
+        {label:"Cofia",data:areas.map(a=>pa[a].cofia||0),backgroundColor:"rgba(249,115,22,0.82)",borderColor:"#ea580c",borderWidth:1,datalabels:{display:false}},
+        {label:"Barbijo",data:areas.map(a=>pa[a].barbijo||0),backgroundColor:"rgba(253,186,116,0.75)",borderColor:"#fb923c",borderWidth:1,datalabels:{display:false}}
+      ]},
+      options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:"#cbd5e1",font:{size:10}}},datalabels:{display:false}},
+        scales:{
+          x:{stacked:true,grid:{color:grd},ticks:{color:tk},title:{display:true,text:"Prendas lavadas",color:"#94a3b8",font:{size:9}}},
+          y:{stacked:true,grid:{display:false},ticks:{color:tk,font:{size:9}}}
+        }
+      }
+    });
+  }
+
+  /* ---- Chart C: Riesgo por Área (barra agrupada horizontal) ---- */
+  const cvC=document.getElementById("ppr-chart-riesgo");
+  if(cvC&&D.quebradizos&&(selectedPPRModule==="TODOS"||selectedPPRModule==="Materiales Quebradizos")){
+    const prevC=Chart.getChart(cvC);if(prevC)prevC.destroy();
+    const rpa=D.quebradizos.riesgo_por_area;
+    const areas=Object.keys(rpa);
+    const shortA=a=>a.length>30?a.slice(0,28)+"…":a;
+    window._ppr.resC=new Chart(cvC,{
+      type:"bar",
+      data:{labels:areas.map(shortA),datasets:[
+        {label:"VPC (Vidrio/Plást./Cerám.)",data:areas.map(a=>rpa[a].VPC||0),backgroundColor:"rgba(167,139,250,0.80)",borderColor:"#7c3aed",borderWidth:1,datalabels:{display:false}},
+        {label:"Madera",data:areas.map(a=>rpa[a].MAD||0),backgroundColor:"rgba(251,191,36,0.80)",borderColor:"#d97706",borderWidth:1,datalabels:{display:false}},
+        {label:"Metales",data:areas.map(a=>rpa[a].MET||0),backgroundColor:"rgba(148,163,184,0.80)",borderColor:"#64748b",borderWidth:1,datalabels:{display:false}}
+      ]},
+      options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:"#cbd5e1",font:{size:10}}},datalabels:{display:false}},
+        scales:{
+          x:{grid:{color:grd},ticks:{color:tk},max:9,title:{display:true,text:"Nivel de riesgo (1-9)",color:"#94a3b8",font:{size:9}}},
+          y:{grid:{display:false},ticks:{color:tk,font:{size:9}}}
+        }
+      }
+    });
+  }
+
+  /* ---- Chart D: Inventario Quebradizos Estado (doughnut) ---- */
+  const cvD=document.getElementById("ppr-chart-inventario");
+  if(cvD&&D.quebradizos&&(selectedPPRModule==="TODOS"||selectedPPRModule==="Materiales Quebradizos")){
+    const prevD=Chart.getChart(cvD);if(prevD)prevD.destroy();
+    const inv=D.quebradizos.inventario;
+    const totAcep=inv.reduce((s,r)=>s+(r.aceptable||0),0);
+    const totInacep=inv.reduce((s,r)=>s+(r.inaceptable||0),0);
+    window._ppr.resD=new Chart(cvD,{
+      type:"doughnut",
+      data:{labels:["Aceptable","Inaceptable"],datasets:[{data:[totAcep,totInacep],backgroundColor:["rgba(34,197,94,0.82)","rgba(239,68,68,0.82)"],borderColor:["#16a34a","#b91c1c"],borderWidth:2,datalabels:{display:false}}]},
+      options:{responsive:true,maintainAspectRatio:true,
+        plugins:{legend:{labels:{color:"#cbd5e1",font:{size:10}}},datalabels:{display:false}}
+      }
+    });
+  }
+},[selectedView,selectedPPRModule]);
+
+/* ---- [9] FUNCION - GENERACION PDF INFORME CALIDAD ---- */
 const generarInformePDF=async()=>{
   if(pdfGenerating)return;
   setPdfGenerating(true);
@@ -1502,9 +1565,11 @@ const generarInformePDF=async()=>{
   setPdfGenerating(false);
 };
 
+/* ---- [10] JSX RENDER - INICIO DEL RETURN ---- */
 return(
 <div className="min-h-screen relative">
 
+{/* ---- SIDEBAR NAVEGACION ---- */}
   <div className="fixed left-1 md:left-3 top-16 z-50 w-[140px] rounded-lg border border-cyan-900/50 bg-slate-950/95 p-2 flex flex-col gap-1.5 max-h-screen overflow-y-auto">
     <p className="text-[10px] text-slate-500 uppercase tracking-wide text-center pt-1">Interfaz</p>
     <button
@@ -1568,8 +1633,33 @@ return(
         ))}
       </div>
     )}
+    <div className="border-t border-slate-800/60 mt-0.5"></div>
+    <button
+      onClick={()=>{
+        if(selectedView==="PPR"){setSidebarPPROpen((o)=>!o);return;}
+        setSelectedView("PPR");setSidebarPPROpen(true);
+      }}
+      className={"w-full px-2 py-1.5 rounded text-xs border font-bold "+(selectedView==="PPR"?"bg-amber-900/40 border-amber-500 text-amber-300":"bg-slate-900/40 border-slate-700 text-slate-400")}
+    >PPR</button>
+    {selectedView==="PPR"&&sidebarPPROpen&&(
+      <div className="flex flex-col gap-1 pr-0.5 max-h-56 overflow-y-auto">
+        {["TODOS","BPM 2026","Eliminación Residuos","Materiales Quebradizos","Material Embalaje","Control Plagas"].map((mod)=>(
+          <button key={`ppr-side-${mod}`} onClick={()=>setSelectedPPRModule(mod)}
+            className={"w-full text-left px-2 py-1 rounded text-[10px] border "+(selectedPPRModule===mod?"bg-amber-900/40 border-amber-500 text-amber-200":"bg-slate-900/40 border-slate-700 text-slate-400")}
+          >{mod}</button>
+        ))}
+      </div>
+    )}
   </div>
 
+{/* ================================================================
+     VISTA PRODUCCION (verde)
+     Registros RC.PD — calculos por lote — graficos de produccion
+    ================================================================ */}
+{/* ================================================================
+     VISTA PRODUCCION (verde)
+     Registros RC.PD — calculos por lote — graficos de produccion
+    ================================================================ */}
   {selectedView==="PRODUCCION"?(
   <div className="min-h-screen p-4 md:p-6 md:pl-44">
     <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-green-900/40 pb-4">
@@ -1757,6 +1847,229 @@ return(
       </div>
     </div>
   </div>
+  ):selectedView==="PPR"?(
+<div className="min-h-screen p-4 md:p-6 md:pl-44">
+  {/* ===== HEADER PPR ===== */}
+  <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-amber-900/40 pb-4">
+    <div>
+      <h1 className="text-2xl md:text-3xl font-extrabold text-amber-400 tracking-tight">CONTROL ROOM - PROGRAMAS DE PRERREQUISITOS</h1>
+      <p className="text-slate-400 text-sm mt-1">INGAMA Beneficiadora &mdash; FSSC 22000 / ISO 22002-1 &mdash; 5 Módulos PPR activos</p>
+    </div>
+    <div className="text-right mono text-xs space-y-1">
+      <div className="text-amber-400 font-bold">MODO PPR</div>
+      <div className="text-slate-500">{`Ultima actualizacion: ${TODAY_FMT}`}</div>
+    </div>
+  </div>
+  {/* ===== KPIs ===== */}
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div className="card-base card-dark p-4">
+      <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">Módulos PPR</p>
+      <p className="text-3xl font-bold text-amber-400">{(window.PPR_CHARTS_DATA&&window.PPR_CHARTS_DATA.resumen&&window.PPR_CHARTS_DATA.resumen.modulos_activos)||5}</p>
+      <p className="text-slate-600 text-xs mt-1">BPM · Residuos · Quebradizos · Embalaje · Plagas</p>
+    </div>
+    <div className="card-base card-dark p-4">
+      <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">Prendas Lavadas</p>
+      <p className="text-3xl font-bold text-amber-300">{(window.PPR_CHARTS_DATA&&window.PPR_CHARTS_DATA.resumen&&window.PPR_CHARTS_DATA.resumen.total_prendas_lavadas)||"—"}</p>
+      <p className="text-slate-600 text-xs mt-1">{(window.PPR_CHARTS_DATA&&window.PPR_CHARTS_DATA.resumen&&window.PPR_CHARTS_DATA.resumen.registros_lavado)||0} registros BPM lavado</p>
+    </div>
+    <div className="card-base card-dark p-4">
+      <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">Total Residuos (kg)</p>
+      <p className="text-3xl font-bold text-orange-400">{(window.PPR_CHARTS_DATA&&window.PPR_CHARTS_DATA.resumen&&window.PPR_CHARTS_DATA.resumen.total_residuos_kg!=null)?window.PPR_CHARTS_DATA.resumen.total_residuos_kg.toLocaleString('es-BO',{maximumFractionDigits:0}):"—"}</p>
+      <p className="text-slate-600 text-xs mt-1">{(window.PPR_CHARTS_DATA&&window.PPR_CHARTS_DATA.resumen&&window.PPR_CHARTS_DATA.resumen.areas_residuos)||0} áreas · chías + podridas</p>
+    </div>
+    <div className="card-base card-dark p-4">
+      <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">Áreas Alto Riesgo QB</p>
+      <p className="text-3xl font-bold text-red-400">{(window.PPR_CHARTS_DATA&&window.PPR_CHARTS_DATA.resumen&&window.PPR_CHARTS_DATA.resumen.areas_alto_riesgo)||"—"}</p>
+      <p className="text-slate-600 text-xs mt-1">{(window.PPR_CHARTS_DATA&&window.PPR_CHARTS_DATA.resumen&&window.PPR_CHARTS_DATA.resumen.total_elementos_quebradizos)||0} elementos inventariados</p>
+    </div>
+  </div>
+  {/* ===== GRÁFICOS PPR ===== */}
+  {window.PPR_CHARTS_DATA&&(
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    {/* Chart A — Tendencia Residuos */}
+    {(selectedPPRModule==="TODOS"||selectedPPRModule==="Eliminación Residuos")&&(
+    <div className="card-base card-dark p-4 border border-red-700/30">
+      <h3 className="text-xs font-bold text-red-300 uppercase tracking-wide mb-3">Tendencia de Residuos por Fecha</h3>
+      <canvas id="ppr-chart-residuos" style={{maxHeight:"240px"}}></canvas>
+    </div>
+    )}
+    {/* Chart B — BPM Lavado Ropa */}
+    {(selectedPPRModule==="TODOS"||selectedPPRModule==="BPM 2026")&&(
+    <div className="card-base card-dark p-4 border border-amber-700/30" style={{minHeight:"280px"}}>
+      <h3 className="text-xs font-bold text-amber-300 uppercase tracking-wide mb-3">BPM · Prendas Lavadas por Área</h3>
+      <div style={{position:"relative",height:"240px"}}>
+        <canvas id="ppr-chart-bpm"></canvas>
+      </div>
+    </div>
+    )}
+    {/* Chart C — Riesgo Quebradizos por Área */}
+    {(selectedPPRModule==="TODOS"||selectedPPRModule==="Materiales Quebradizos")&&(
+    <div className="card-base card-dark p-4 border border-purple-700/30" style={{minHeight:"380px"}}>
+      <h3 className="text-xs font-bold text-purple-300 uppercase tracking-wide mb-3">Nivel de Riesgo por Área (Materiales Quebradizos)</h3>
+      <div style={{position:"relative",height:"340px"}}>
+        <canvas id="ppr-chart-riesgo"></canvas>
+      </div>
+    </div>
+    )}
+    {/* Chart D — Inventario Quebradizos Estado */}
+    {(selectedPPRModule==="TODOS"||selectedPPRModule==="Materiales Quebradizos")&&(
+    <div className="card-base card-dark p-4 border border-purple-700/20 flex flex-col items-center justify-center">
+      <h3 className="text-xs font-bold text-purple-300 uppercase tracking-wide mb-3 self-start">Inventario Quebradizos · Estado</h3>
+      <canvas id="ppr-chart-inventario" style={{maxHeight:"240px",maxWidth:"280px"}}></canvas>
+      <p className="text-slate-600 text-xs mt-2">{(window.PPR_CHARTS_DATA.resumen.total_elementos_quebradizos||0)} elementos totales inventariados</p>
+    </div>
+    )}
+  </div>
+  )}
+  {/* ===== FLUJO DE PROCESOS ===== */}
+  {(selectedPPRModule==="TODOS"||selectedPPRModule==="Materiales Quebradizos")&&(
+  <div className="card-base card-dark p-4 mb-6">
+    <h2 className="text-sm font-bold text-amber-300 uppercase tracking-wide mb-3">Flujo de Procesos Cubiertos por Materiales Quebradizos</h2>
+    <div className="flex flex-wrap gap-2">
+      {["Recepción MPH","Pre-limpieza y Clasificado","Secado MPH","Selec./Clasif. MPS","Almacenado MPSC","Sancochado","Pelado Mecánico","Selec. Alm. Pelada Cruda","Clasificado Alm. Cruda","Recorte","Deshidratado","Enfriado","Selec. Alm. Deshidratada","Embalado Broken","Pesado y Sellado","Prod. Terminado A","Almacenado Prod. Ter. B","Depósito PT B","Depósito Residuos"].map((p,i)=>(
+        <span key={i} className="px-2 py-0.5 rounded text-[11px] bg-amber-900/20 border border-amber-700/30 text-amber-200">{i+1}. {p}</span>
+      ))}
+    </div>
+  </div>
+  )}
+  {/* ===== MÓDULOS ===== */}
+  <h2 className="text-base font-bold text-amber-400 mb-4 uppercase tracking-wide">Módulos de Programas de Prerrequisitos</h2>
+  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
+    {/* BPM 2026 */}
+    {(selectedPPRModule==="TODOS"||selectedPPRModule==="BPM 2026")&&(
+    <div className="card-base card-dark p-4 border border-amber-700/40">
+      <div className="flex items-center justify-between mb-3">
+        <span className="mono text-xs bg-amber-900/50 border border-amber-700/50 text-amber-300 px-2 py-0.5 rounded font-bold">BPM 2026</span>
+        <span className="text-xs text-amber-400 font-bold">5 REGISTROS</span>
+      </div>
+      <h3 className="text-sm font-bold text-white mb-1">Buenas Prácticas de Manufactura</h3>
+      <p className="text-xs text-slate-400 mb-3">Higiene Personal, EPP, Enfermedades y Limpieza — ISO 22002-1</p>
+      <div className="space-y-1.5">
+        {[
+          {cod:"RC.HP.02",nom:"Control Entrega/Dev. EPP",tipo:"gsheet",fecha:"2026"},
+          {cod:"RC.HP.03",nom:"Higiene Personal (Para Implementar)",tipo:"gsheet",fecha:"2026"},
+          {cod:"RC.HP.04",nom:"Control de Enfermedades",tipo:"gsheet",fecha:"2026"},
+          {cod:"RC.HP.05",nom:"Control de Lavado de Ropa",tipo:"xlsx",fecha:"21/01/2026"},
+          {cod:"RC.LD",nom:"Limpieza y Desinfección",tipo:"gsheet",fecha:"2026"},
+        ].map((a,i)=>(
+          <div key={i} className="flex items-center justify-between bg-black/20 rounded p-2 text-xs">
+            <div><span className="mono text-amber-400 font-bold mr-2">{a.cod}</span><span className="text-slate-300">{a.nom}</span></div>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className={a.tipo==="xlsx"?"text-green-400":"text-cyan-400"}>{a.tipo.toUpperCase()}</span>
+              <span className="text-slate-600 mono">{a.fecha}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-3 p-2 bg-amber-900/20 border border-amber-700/30 rounded text-xs">
+        <p className="text-amber-300 font-bold mb-1">Responsables RC.HP.05</p>
+        <p className="text-slate-300">Control: Ana Paola Yanamo</p>
+        <p className="text-slate-300">Seguimiento: Tania Rojas Quette</p>
+      </div>
+    </div>
+    )}
+    {/* Eliminación Residuos */}
+    {(selectedPPRModule==="TODOS"||selectedPPRModule==="Eliminación Residuos")&&(
+    <div className="card-base card-dark p-4 border border-red-700/30">
+      <div className="flex items-center justify-between mb-3">
+        <span className="mono text-xs bg-red-900/40 border border-red-700/40 text-red-300 px-2 py-0.5 rounded font-bold">RC.RE</span>
+        <span className="text-xs text-red-400 font-bold">3 REGISTROS</span>
+      </div>
+      <h3 className="text-sm font-bold text-white mb-1">Eliminación de Residuos y Desperdicios</h3>
+      <p className="text-xs text-slate-400 mb-3">Control de gestión de residuos sólidos y desperdicios del proceso productivo</p>
+      <div className="space-y-1.5">
+        {[
+          {cod:"RC.RE.03",nom:"Registros Eliminación de Residuos",tipo:"gsheet"},
+          {cod:"ELIM-01",nom:"Planilla Eliminación (Automatizada)",tipo:"xlsm"},
+          {cod:"ELIM-02",nom:"Planilla Eliminación Rev. Anterior",tipo:"xls"},
+        ].map((a,i)=>(
+          <div key={i} className="flex items-center justify-between bg-black/20 rounded p-2 text-xs">
+            <div><span className="mono text-red-400 font-bold mr-2">{a.cod}</span><span className="text-slate-300">{a.nom}</span></div>
+            <span className={a.tipo==="gsheet"?"text-cyan-400":a.tipo==="xlsm"?"text-green-400":"text-yellow-400"}>{a.tipo.toUpperCase()}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+    )}
+    {/* Material de Embalaje */}
+    {(selectedPPRModule==="TODOS"||selectedPPRModule==="Material Embalaje")&&(
+    <div className="card-base card-dark p-4 border border-blue-700/30">
+      <div className="flex items-center justify-between mb-3">
+        <span className="mono text-xs bg-blue-900/40 border border-blue-700/40 text-blue-300 px-2 py-0.5 rounded font-bold">RC.IS</span>
+        <span className="text-xs text-blue-400 font-bold">2 REGISTROS</span>
+      </div>
+      <h3 className="text-sm font-bold text-white mb-1">Material de Embalaje e Insumos</h3>
+      <p className="text-xs text-slate-400 mb-3">Control de materiales de contacto directo e indirecto con el producto</p>
+      <div className="space-y-1.5">
+        {[
+          {cod:"RC.IS.01",nom:"Materiales e Insumos",tipo:"gsheet"},
+          {cod:"RC.IS.02",nom:"Material de Embalaje",tipo:"gsheet"},
+        ].map((a,i)=>(
+          <div key={i} className="flex items-center justify-between bg-black/20 rounded p-2 text-xs">
+            <div><span className="mono text-blue-400 font-bold mr-2">{a.cod}</span><span className="text-slate-300">{a.nom}</span></div>
+            <span className="text-cyan-400">{a.tipo.toUpperCase()}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+    )}
+    {/* Control de Plagas */}
+    {(selectedPPRModule==="TODOS"||selectedPPRModule==="Control Plagas")&&(
+    <div className="card-base card-dark p-4 border border-green-700/30">
+      <div className="flex items-center justify-between mb-3">
+        <span className="mono text-xs bg-green-900/40 border border-green-700/40 text-green-300 px-2 py-0.5 rounded font-bold">RC.CP</span>
+        <span className="text-xs text-green-400 font-bold">3 REGISTROS</span>
+      </div>
+      <h3 className="text-sm font-bold text-white mb-1">Control de Plagas</h3>
+      <p className="text-xs text-slate-400 mb-3">Monitoreo y control de vectores en instalaciones productivas — ISO 22002-1 §9</p>
+      <div className="space-y-1.5">
+        {[
+          {cod:"RC.CP.01",nom:"Registros de Control Plagas 2025",tipo:"gsheet"},
+          {cod:"RC.CP.02",nom:"Registros y Control Plagas",tipo:"gsheet"},
+          {cod:"RC.CP.DASH",nom:"Dashboard Control de Plagas",tipo:"gsheet"},
+        ].map((a,i)=>(
+          <div key={i} className="flex items-center justify-between bg-black/20 rounded p-2 text-xs">
+            <div><span className="mono text-green-400 font-bold mr-2">{a.cod}</span><span className="text-slate-300">{a.nom}</span></div>
+            <span className="text-cyan-400">{a.tipo.toUpperCase()}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+    )}
+    {/* Materiales Quebradizos - ocupa 2 columnas */}
+    {(selectedPPRModule==="TODOS"||selectedPPRModule==="Materiales Quebradizos")&&(
+    <div className="card-base card-dark p-4 border border-purple-700/30 md:col-span-2 xl:col-span-2">
+      <div className="flex items-center justify-between mb-3">
+        <span className="mono text-xs bg-purple-900/40 border border-purple-700/40 text-purple-300 px-2 py-0.5 rounded font-bold">RC.QB</span>
+        <span className="text-xs text-purple-400 font-bold">56+ REGISTROS · 3 MATERIALES · 19 ÁREAS</span>
+      </div>
+      <h3 className="text-sm font-bold text-white mb-1">Control de Materiales Quebradizos y Duros</h3>
+      <p className="text-xs text-slate-400 mb-3">Registro de vidrio, plástico duro, cerámica, madera y metales por área de proceso — ISO 22002-1 §10</p>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {[
+          {nombre:"Plástico / Vidrio / Cerámica",archivos:18,color:"purple",areas:["Recepción MPH","Pre-limpieza y Clasificado","Secado MPH","Selec./Clasif. MPS","Almacenado MPSC","Sancochado","Pelado Mecánico","Selec. Alm. Pelada Cruda","Clasificado Alm. Cruda","Deshidratado","Enfriado","Selec. Alm. Deshidratada","Embalado Broken","Pesado y Sellado","Prod. Term. A","Almacenado Prod. Ter. B","Depósito PT B","Depósito Residuos"]},
+          {nombre:"Madera",archivos:19,color:"amber",areas:["Recepción MPH","Pre-limpieza y Clasificado","Secado MPH","Selec./Clasif. MPS","Almacenado MPSC","Sancochado","Pelado Mecánico","Selec. Alm. Pelada Cruda","Clasificado Alm. Cruda","Recorte","Deshidratado","Enfriado","Selec. Alm. Deshidratada","Embalado Broken","Pesado y Sellado","Prod. Term. A","Almacenado Prod. Ter. B","Depósito PT B","Depósito Residuos"]},
+          {nombre:"Metales",archivos:19,color:"slate",areas:["Recepción MPH","Pre-limpieza y Clasificado","Secado MPH","Selec./Clasif. MPS","Almacenado MPSC","Sancochado","Pelado Mecánico","Selec. Alm. Pelada Cruda","Clasificado Alm. Cruda","Recorte","Deshidratado","Enfriado","Selec. Alm. Deshidratada","Embalado Broken","Pesado y Sellado","Prod. Term. A","Almacenado Prod. Ter. B","Depósito PT B","Depósito Residuos"]},
+        ].map((mat,i)=>(
+          <div key={i} className={`rounded-lg border p-3 ${mat.color==="purple"?"border-purple-700/40 bg-purple-950/20":mat.color==="amber"?"border-amber-700/30 bg-amber-950/10":"border-slate-600/30 bg-slate-950/20"}`}>
+            <p className={`font-bold text-xs mb-1 ${mat.color==="purple"?"text-purple-300":mat.color==="amber"?"text-amber-300":"text-slate-300"}`}>{mat.nombre}</p>
+            <p className="text-slate-500 text-xs mb-2">{mat.archivos} áreas · {mat.archivos} archivos .xlsx</p>
+            <div className="space-y-0.5 max-h-44 overflow-y-auto pr-1">
+              {mat.areas.map((a,j)=>(
+                <p key={j} className="text-[10px] text-slate-400">{j+1}. {a}</p>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+    )}
+  </div>
+  {/* ===== FOOTER PPR ===== */}
+  <div className="text-center py-3 border-t border-slate-800/40">
+    <p className="text-slate-700 text-xs">{`Programas de Prerrequisitos FSSC 22000 / ISO 22002-1 — INGAMA Beneficiadora — ${TODAY_FMT}`}</p>
+  </div>
+</div>
   ):(
 <div className="min-h-screen p-4 md:p-6 md:pl-44">
 
@@ -1768,7 +2081,7 @@ return(
     </div>
     <div className="text-right mono text-xs space-y-1">
       <div className="text-green-400 font-bold">SISTEMA ACTIVO</div>
-      <div className="text-slate-500">Ultima actualizacion: 31/03/2026</div>
+      <div className="text-slate-500">{`Ultima actualizacion: ${TODAY_FMT}`}</div>
       <button onClick={()=>setPdfModalOpen(true)} disabled={pdfGenerating} className="mt-2 px-3 py-1.5 text-xs rounded-lg bg-cyan-800/70 hover:bg-cyan-700 border border-cyan-600/50 text-cyan-100 font-bold disabled:opacity-50" style={{fontFamily:"inherit"}}>
         {pdfGenerating?"Generando PDF...":"⬇ Exportar PDF"}
       </button>
@@ -1964,7 +2277,7 @@ return(
   </div>
 
   <div className="text-center py-3 border-t border-slate-800/40">
-    <p className="text-slate-700 text-xs">Dashboard FSSC 22000 - INGAMA Beneficiadora - 14 Registros Reales Verificados - 31/03/2026</p>
+    <p className="text-slate-700 text-xs">{`Dashboard FSSC 22000 - INGAMA Beneficiadora - 14 Registros Reales Verificados - ${TODAY_FMT}`}</p>
   </div>
 
   <div className="mt-8">

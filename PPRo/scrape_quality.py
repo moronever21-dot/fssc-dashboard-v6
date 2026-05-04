@@ -850,15 +850,11 @@ def build_dashboard_files():
     metadata_json = json.dumps(metadata_payload, ensure_ascii=False, indent=2)
 
     Path('aggregates_by_tab_generated.json').write_text(aggregate_json, encoding='utf-8')
-    Path('aggregates_by_tab_generated.js').write_text(
-        'window.AGGREGATES_BY_TAB_GENERATED = ' + aggregate_json + ';',
-        encoding='utf-8',
-    )
+    aggregates_js = 'window.AGGREGATES_BY_TAB_GENERATED = ' + aggregate_json + ';\nwindow.AGGREGATES_BY_TAB = window.AGGREGATES_BY_TAB_GENERATED;'
+    Path('aggregates_by_tab_generated.js').write_text(aggregates_js, encoding='utf-8')
     Path('dashboard_meta_generated.json').write_text(metadata_json, encoding='utf-8')
-    Path('dashboard_meta_generated.js').write_text(
-        'window.DASHBOARD_META_GENERATED = ' + metadata_json + ';',
-        encoding='utf-8',
-    )
+    meta_js = 'window.DASHBOARD_META_GENERATED = ' + metadata_json + ';\nwindow.DASHBOARD_META = window.DASHBOARD_META_GENERATED;'
+    Path('dashboard_meta_generated.js').write_text(meta_js, encoding='utf-8')
     return {
         'aggregatesTabs': len(aggregate_payload),
         'metadataLots': len(metadata_payload['lotAudit']),
