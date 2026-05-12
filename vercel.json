@@ -1,4 +1,7 @@
 {
   "outputDirectory": "PPRo",
-  "cleanUrls": true
+  "cleanUrls": true,
+  "redirects": [
+    { "source": "/fssc", "destination": "/fssc-dashboard/", "permanent": false }
+  ]
 }
