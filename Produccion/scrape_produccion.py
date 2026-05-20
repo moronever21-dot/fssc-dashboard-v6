@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from sheets_config import RC_PD_SHEETS
 
 # RC.PD.01 es la hoja maestra/consolidado — no se scrapea directamente aquí
-PRODUCTION_SHEETS = {k: v for k, v in RC_PD_SHEETS.items() if k not in ("RC.PD.01", "RC.PD.04")}
+PRODUCTION_SHEETS = {k: v for k, v in RC_PD_SHEETS.items() if k not in ("RC.PD.01",)}
 
 
 class TableParser(HTMLParser):
@@ -523,9 +523,10 @@ def build_all():
 
 def write_files(payload):
     json_text = json.dumps(payload, ensure_ascii=False, indent=2)
-    Path("produccion_aggregates_generated.json").write_text(json_text, encoding="utf-8")
+    out_dir = Path(__file__).parent
+    (out_dir / "produccion_aggregates_generated.json").write_text(json_text, encoding="utf-8")
     js_content = "window.PRODUCCION_AGGREGATES_GENERATED = " + json_text + ";\nwindow.PRODUCCION_AGGREGATES = window.PRODUCCION_AGGREGATES_GENERATED;"
-    Path("produccion_aggregates_generated.js").write_text(js_content, encoding="utf-8")
+    (out_dir / "produccion_aggregates_generated.js").write_text(js_content, encoding="utf-8")
 
 
 def fetch_csv_text(url):

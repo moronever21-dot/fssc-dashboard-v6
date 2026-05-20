@@ -216,24 +216,24 @@ const SHEETS=[
 ];
 
 /* Pestañas tomadas del enlace guía RC.CC.1.1 (orden izquierda→derecha de la hoja) */
-const TAB_REFERENCE=["RG 01-CV","RG 02-CV","BSI 01","DA 01-CV","AA 01-26","AA 02-26","RG 03-CV","AA 03-26","RG 04-CV","FV 01-CV"];
+const TAB_REFERENCE=["RG 01-CV","RG 02-CV","BSI 01","DA 01-CV","AA 01-26","AA 02-26","RG 03-CV","AA 03-26","RG 04-CV","FV 01-CV","DA 02-CV","RE 01-CV","FV 02-CV"];
 
 /* Mapa de coincidencia de pestañas por registro (extraído de htmlview público) */
 const SHEET_TAB_MAP={
-  1:["RG 01-CV","RG 02-CV","BSI 01","DA 01-CV","AA 01-26"],
-  2:["RG 01-CV","RG 02-CV","DA 01-CV","AA 01-26","AA 02-26","RG 03-CV"],
-  3:["RG 01-CV","RG 02-CV","DA 01-CV"],
-  4:["RG 01-CV","RG 02-CV","DA 01-CV"],
-  5:["RG 01-CV","RG 02-CV","DA 01-CV"],
-  6:["RG 01-CV","RG 02-CV","BSI 01","DA 01-CV"],
-  7:["RG 01-CV","RG 02-CV","DA 01-CV"],
-  8:["RG 01-CV","RG 02-CV","BSI 01","RG 03-CV","AA 01-26"],
-  9:["RG 01-CV","RG 02-CV","BSI 01","DA 01-CV","AA 01-26"],
-  10:["RG 01-CV"],
-  11:["RG 01-CV","RG 02-CV","DA 01-CV"],
-  12:["RG 01-CV","RG 02-CV","BSI 01","DA 01-CV"],
-  13:["RG 01-CV","RG 02-CV","AA 01-26","AA 02-26","DA 01-CV","RG 03-CV","BSI 01","AA 03-26","RG 04-CV","FV 01-CV"],
-  14:["RG 01-CV","RG 02-CV","BSI 01"]
+  1:["RG 01-CV","RG 02-CV","BSI 01","DA 01-CV","AA 01-26","RG 03-CV","AA 03-26","RG 04-CV","FV 01-CV"],
+  2:["RG 01-CV","RG 02-CV","DA 01-CV","AA 01-26","AA 02-26","RG 03-CV","AA 03-26"],
+  3:["RG 01-CV","RG 02-CV","RG 03-CV","RG 04-CV","DA 01-CV","DA 02-CV","BSI 01","AA 01-26","AA 02-26","FV 01-CV"],
+  4:["RG 01-CV","RG 02-CV","RG 03-CV","RG 04-CV","DA 01-CV","DA 02-CV","BSI 01","AA 01-26","AA 02-26","FV 01-CV"],
+  5:["RG 01-CV","RG 02-CV","RG 03-CV","RG 04-CV","DA 01-CV","DA 02-CV","BSI 01","AA 01-26","AA 02-26","FV 01-CV"],
+  6:["RG 01-CV","RG 02-CV","BSI 01","DA 01-CV","DA 02-CV","FV 01-CV","RE 01-CV","RG 03-CV","RG 04-CV","AA 01-26","AA 02-26"],
+  7:["RG 01-CV","RG 02-CV","RG 03-CV","RG 04-CV","BSI 01","DA 01-CV","AA 01-26","AA 02-26"],
+  8:["RG 01-CV","RG 02-CV","BSI 01","RG 03-CV","RG 04-CV","DA 01-CV","AA 01-26","AA 02-26","FV 01-CV"],
+  9:["RG 01-CV","RG 02-CV","BSI 01","DA 01-CV","AA 01-26","AA 02-26","RG 03-CV","RG 04-CV"],
+  10:["RG 01-CV","RG 02-CV","BSI 01","DA 01-CV","AA 01-26","AA 02-26"],
+  11:["RG 01-CV","RG 02-CV","RG 03-CV","DA 01-CV","DA 02-CV","AA 01-26","AA 02-26","BSI 01"],
+  12:["RG 01-CV","RG 02-CV","RG 03-CV","RG 04-CV","BSI 01","DA 01-CV","DA 02-CV","AA 01-26","AA 02-26"],
+  13:["RG 01-CV","RG 02-CV","AA 01-26","AA 02-26","DA 01-CV","RG 03-CV","BSI 01","AA 03-26","RG 04-CV","FV 01-CV","DA 02-CV"],
+  14:["RG 01-CV","RG 02-CV","RG 03-CV","RG 04-CV","BSI 01","DA 01-CV","DA 02-CV","FV 01-CV","FV 02-CV","AA 01-26","AA 02-26"]
 };
 
 /* Ubicación observada del dato lote/proveedor: no siempre está en C7 */
@@ -260,6 +260,7 @@ const CELL_REFERENCE_MAP={
 const PRODUCTION_LINKS=[
   {codigo:"RC.PD.02",id:"1_aWiCwHrAx1bHpJ3twchTRwX0sCRtmwglVkPE7WrN04"},
   {codigo:"RC.PD.03",id:"1Ueb02r1KKiCSlsgr0DFm4LJNLSvHwMtpjsnMmLf82d8"},
+  {codigo:"RC.PD.04",id:"1fOGAkJ1Yes7WDPusEEjbt71LBw6SP72bReHnCa44wKE"},
   {codigo:"RC.PD.05",id:"1l_WaU1PekIp_Cyk79jGhEGhtZkWJ0X6pOnupCnAhSQQ"},
   {codigo:"RC.PD.06",id:"17KcWzCQeIyGdsn9YNTjPNtqd7dq1kcB7aQVIGqXKyL8"},
   {codigo:"RC.PD.07",id:"1z7zUKc2-kS2BZA6e7Wakzuk0tgoBeV5_F8quvTu2qrA"},
@@ -274,9 +275,10 @@ const PRODUCTION_LINKS=[
   url:`https://docs.google.com/spreadsheets/d/${item.id}/edit`
 }));
 /* Orden izquierda→derecha de hojas en RC.PD.02 */
-const PRODUCTION_TAB_FALLBACK=["RG 01-CV","RG 02-CV","BSI 01","DA 01-CV","AA 01-26","AA 02-26"];
+const PRODUCTION_TAB_FALLBACK=["RG 01-CV","RG 02-CV","BSI 01","DA 01-CV","AA 01-26","AA 02-26","RG 03-CV","RG 04-CV","FV 01-CV","DA 02-CV","RE 01-CV","AA 03-26","FV 02-CV"];
 const PRODUCTION_TRACE_FLOW=[
   {codigo:"RC.PD.02",titulo:"Kilos Recibidos",detalle:"Entrada base del lote y punto de partida para trazabilidad."},
+  {codigo:"RC.PD.04",titulo:"Pre-Limpieza",detalle:"Registro de pre-limpieza de la almendra en cascara."},
   {codigo:"RC.PD.08",titulo:"Rendimiento de Pelado",detalle:"% Corte, calibres y rendimiento de almendra clasificada."},
   {codigo:"RC.PD.09",titulo:"Humedad Final y PCC",detalle:"Temperatura del proceso y control de humedad por hora/dia."},
   {codigo:"RC.PD.11",titulo:"Cajas Selladas",detalle:"Salida empacada y conteo final de unidades selladas."},

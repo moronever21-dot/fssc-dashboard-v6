@@ -17,8 +17,6 @@ Thumbs.db
 
 # Editors
 .vscode/*
-!.vscode/settings.json
-!.vscode/extensions.json
 
 # Logs and temp
 *.log
@@ -33,3 +31,10 @@ PPRo/err.txt
 # Large generated artifacts (keep tracked if needed by dashboard)
 # PPRo/aggregates_by_tab_generated.json
 # Produccion/produccion_aggregates_generated.json
+
+# Agent Manager worktrees (Kilo/Claude infrastructure)
+.claude/
+.kilo/worktrees/
+
+# Machine-specific copies
+*-DESKTOP-*

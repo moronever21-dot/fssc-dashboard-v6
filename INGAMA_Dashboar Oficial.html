@@ -1,0 +1,5097 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INGAMA — Sistema FSSC 22000 v6</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+
+/* ── TOKENS ─────────────────────────────────────────── */
+:root{
+  --bg:#FFFFFF; --panel:#F8F6F2; --ink:#1A1A17; --ink2:#4A4A44; --ink3:#8A8881;
+  --line:#D9D5CA; --line2:#E8E5DB;
+  --accent:#2C4A3E; --accent2:#8B3A2E; --gold:#B08A3E;
+  --ok:#2E7D5B; --ok-bg:#E8F1EC;
+  --warn:#C17917; --warn-bg:#FAF2E4;
+  --fail:#B23E3E; --fail-bg:#F7E8E8;
+  --neutral:#6B6964;
+  --serif:'Fraunces',Georgia,serif;
+  --sans:'Inter',system-ui,sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --sb-bg:#0f1e35; --sb-border:rgba(6,182,212,.12);
+  --sb-cyan:#67e8f9; --sb-cyan2:#06b6d4; --sb-green:#4ade80; --sb-purple:#a78bfa;
+}
+
+/* Dark mode when dashboard is in dark view */
+.dark-mode{
+  --bg:#060d18; --panel:#0a1628; --ink:#f8fafc; --ink2:#cbd5e1; --ink3:#94a3b8;
+  --line:#1e293b; --line2:#0f172a;
+  --accent:#67e8f9; --accent2:#c084fc; --gold:#fde68a;
+  --ok:#4ade80; --ok-bg:rgba(5,46,22,.6);
+  --warn:#fde047; --warn-bg:rgba(69,26,3,.6);
+  --fail:#fca5a5; --fail-bg:rgba(69,10,10,.6);
+  --neutral:#64748b;
+  --sb-bg:#020810; --sb-border:rgba(6,182,212,.2);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.55;transition:background .3s,color .3s}
+body{min-height:100vh}
+
+/* ── LAYOUT ──────────────────────────────────────────── */
+.sidebar{
+  position:fixed;left:0;top:0;bottom:0;width:224px;
+  background:var(--sb-bg);
+  border-right:1px solid var(--sb-border);
+  z-index:200;display:flex;flex-direction:column;overflow-y:auto;
+  transition:transform .25s
+}
+.main-area{margin-left:224px;min-height:100vh}
+
+/* ── SIDEBAR ─────────────────────────────────────────── */
+.sb-logo{padding:20px 16px 16px;border-bottom:1px solid var(--sb-border)}
+.sb-badge{
+  font-family:var(--mono);font-size:9px;font-weight:600;
+  letter-spacing:.14em;color:var(--sb-cyan2);
+  background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.18);
+  border-radius:3px;padding:2px 7px;display:inline-block;margin-bottom:8px
+}
+.sb-name{font-family:var(--serif);font-size:20px;font-weight:600;color:#f8fafc;letter-spacing:-.01em}
+.sb-name em{font-style:italic;font-weight:300;color:var(--sb-cyan)}
+.sb-sub{font-family:var(--mono);font-size:10px;color:#64748b;margin-top:3px;letter-spacing:.04em}
+.sb-sec{padding:12px 8px 2px}
+.sb-sec-lbl{
+  font-family:var(--mono);font-size:9px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.14em;
+  color:#475569;padding:0 6px;margin-bottom:5px
+}
+.sb-btn{
+  width:100%;text-align:left;background:transparent;
+  border:1px solid transparent;border-radius:7px;
+  padding:9px 12px;cursor:pointer;
+  font-family:var(--sans);font-size:12px;font-weight:500;
+  color:#94a3b8;display:flex;align-items:center;gap:9px;
+  transition:all .15s;margin-bottom:2px
+}
+.sb-btn:hover{background:rgba(255,255,255,.05);color:#e2e8f0}
+.sb-btn.ac{background:rgba(8,145,178,.14);border-color:rgba(6,182,212,.35);color:var(--sb-cyan)}
+.sb-btn.ag{background:rgba(21,128,61,.14);border-color:rgba(34,197,94,.35);color:var(--sb-green)}
+.sb-btn.ap{background:rgba(124,58,237,.14);border-color:rgba(167,139,250,.35);color:var(--sb-purple)}
+.sb-div{height:1px;background:rgba(255,255,255,.06);margin:8px 10px}
+.sb-lbl{font-family:var(--mono);font-size:9px;color:#475569;text-transform:uppercase;letter-spacing:.1em;padding:5px 14px 3px}
+.sb-lote{
+  width:100%;text-align:left;background:transparent;
+  border:1px solid transparent;border-radius:5px;
+  padding:5px 12px;cursor:pointer;
+  font-family:var(--mono);font-size:10px;color:#475569;
+  transition:all .12s;margin-bottom:1px
+}
+.sb-lote:hover{background:rgba(255,255,255,.04);color:#94a3b8}
+.sb-lote.al{background:rgba(8,145,178,.1);border-color:rgba(6,182,212,.22);color:var(--sb-cyan)}
+.sb-foot{
+  margin-top:auto;padding:12px 16px;
+  border-top:1px solid rgba(255,255,255,.05);
+  font-family:var(--mono);font-size:9px;color:#334155;line-height:1.6
+}
+.sb-theme-btn{
+  width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:5px;padding:5px;cursor:pointer;
+  font-family:var(--mono);font-size:9px;color:#64748b;margin-top:8px;
+  transition:all .15s
+}
+.sb-theme-btn:hover{background:rgba(255,255,255,.1);color:#94a3b8}
+
+/* ── TOP BAR ─────────────────────────────────────────── */
+.topbar{
+  padding:14px 28px;border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;
+  gap:14px;flex-wrap:wrap;
+  background:var(--panel);
+  position:sticky;top:0;z-index:100
+}
+.tb-title{font-family:var(--serif);font-size:20px;font-weight:500;letter-spacing:-.01em;color:var(--ink)}
+.tb-sub{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:2px;letter-spacing:.04em;text-transform:uppercase}
+.tb-right{display:flex;align-items:center;gap:10px}
+.status-live{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:var(--mono);font-size:10px;color:var(--ok)
+}
+.status-live::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--ok);animation:pg 2s infinite
+}
+@keyframes pg{0%,100%{box-shadow:0 0 0 0 rgba(46,125,91,.4)}50%{box-shadow:0 0 0 5px rgba(46,125,91,0)}}
+.print-btn{
+  background:transparent;border:1px solid var(--line);
+  color:var(--ink3);padding:5px 12px;
+  font-family:var(--mono);font-size:10px;cursor:pointer;
+  transition:all .15s;letter-spacing:.04em
+}
+.print-btn:hover{border-color:var(--ink2);color:var(--ink)}
+
+/* ── CONTENT AREA ────────────────────────────────────── */
+.content{padding:28px 28px 80px}
+.view{display:none}
+.view.active{display:block}
+
+/* ── V1 TYPOGRAPHY CLASSES ───────────────────────────── */
+.section-label{
+  font-family:var(--mono);font-size:10px;text-transform:uppercase;
+  letter-spacing:.15em;color:var(--ink3);
+  margin-bottom:14px;display:flex;align-items:center;gap:10px
+}
+.section-label::before{content:"";display:inline-block;width:20px;height:1px;background:var(--ink3)}
+.process-title{
+  font-family:var(--serif);font-size:24px;font-weight:500;
+  letter-spacing:-.01em;margin:36px 0 16px;
+  padding-bottom:12px;border-bottom:1px solid var(--line);
+  display:flex;align-items:baseline;gap:14px
+}
+.process-title em{font-style:italic;font-weight:300;color:var(--accent);font-size:18px}
+
+/* ── HERO METRICS (Informe) ──────────────────────────── */
+.hero{
+  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;
+  margin-bottom:28px;
+  border:1px solid var(--line)
+}
+.hero-cell{padding:20px 22px;border-right:1px solid var(--line)}
+.hero-cell:last-child{border-right:none}
+.hero-cell.primary{background:var(--accent);color:#fff}
+.hero-cell.primary .hl{color:rgba(255,255,255,.55)}
+.hero-cell.primary .hs{color:rgba(255,255,255,.7)}
+.hero-cell.primary .hv{color:#fff}
+.hl{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--ink3);margin-bottom:10px}
+.hv{font-family:var(--serif);font-size:38px;font-weight:300;line-height:1;letter-spacing:-.02em;color:var(--ink)}
+.hv em{font-style:italic;font-weight:500}
+.hs{font-size:12px;color:var(--ink3);margin-top:6px}
+.pill{display:inline-block;padding:2px 8px;border-radius:2px;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:500}
+.p-ok{background:var(--ok-bg);color:var(--ok)}
+.p-warn{background:var(--warn-bg);color:var(--warn)}
+.p-fail{background:var(--fail-bg);color:var(--fail)}
+
+/* ── STAGES (Proceso) ────────────────────────────────── */
+.stage{background:var(--panel);border:1px solid var(--line);margin-bottom:10px;transition:border-color .15s}
+.stage:hover{border-color:var(--line2)}
+.stage-head{display:flex;align-items:center;gap:18px;padding:16px 20px;cursor:pointer;user-select:none}
+.stage-num{font-family:var(--serif);font-size:30px;font-weight:300;color:var(--ink3);letter-spacing:-.04em;width:32px;flex-shrink:0}
+.stage-info{flex:1;min-width:0}
+.stage-nm{font-family:var(--serif);font-size:18px;font-weight:500;color:var(--ink);letter-spacing:-.01em}
+.stage-rc{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:3px;letter-spacing:.04em}
+.stage-right{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.chev{font-size:13px;color:var(--ink3);transition:transform .2s;font-family:var(--mono)}
+.chev.open{transform:rotate(90deg)}
+.stage-body{display:none;padding:6px 20px 22px;border-top:1px solid var(--line2)}
+.stage-body.open{display:block}
+
+/* INDICATOR GRID */
+.ind-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));margin-top:16px;border-top:1px solid var(--line2);border-left:1px solid var(--line2)}
+.ind{padding:14px 16px;border-right:1px solid var(--line2);border-bottom:1px solid var(--line2);position:relative;background:var(--panel)}
+.ind-dot-wrap{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.ind-dot{width:8px;height:8px;border-radius:50%}
+.d-ok{background:var(--ok);box-shadow:0 0 0 3px var(--ok-bg)}
+.d-warn{background:var(--warn);box-shadow:0 0 0 3px var(--warn-bg)}
+.d-fail{background:var(--fail);box-shadow:0 0 0 3px var(--fail-bg);animation:blk .9s infinite}
+@keyframes blk{0%,100%{opacity:1}50%{opacity:.4}}
+.d-nd{background:var(--neutral);box-shadow:0 0 0 3px rgba(107,105,100,.1)}
+.ind-tag{font-family:var(--mono);font-size:9px;color:var(--ink3);letter-spacing:.05em}
+.ind-tag.pcc{color:var(--accent2);font-weight:600}
+.ind-lbl{font-size:11px;color:var(--ink2);margin-bottom:6px;line-height:1.3}
+.ind-val{font-family:var(--serif);font-size:24px;font-weight:300;letter-spacing:-.01em;color:var(--ink);line-height:1}
+.ind-val em{font-family:var(--mono);font-size:13px;font-style:normal;color:var(--ink3);margin-left:2px}
+.ind-lim{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:5px}
+.bar{height:3px;background:var(--line2);margin-top:10px;overflow:hidden}
+.bar-f{height:100%;transition:width .4s}
+.bar-ok{background:var(--ok)}
+.bar-warn{background:var(--warn)}
+.bar-fail{background:var(--fail)}
+
+/* COMP TABLE */
+.comp-wrap{border:1px solid var(--line);background:var(--panel);margin-top:24px}
+.comp-head{padding:16px 20px;border-bottom:1px solid var(--line2)}
+.comp-body{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{
+  font-family:var(--mono);font-size:9px;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--ink3);
+  padding:10px 14px;border-bottom:1px solid var(--line);
+  text-align:left;font-weight:500;white-space:nowrap
+}
+.tbl td{padding:10px 14px;border-bottom:1px solid var(--line2);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(0,0,0,.025)}
+.tbl .c-ok{color:var(--ok)}
+.tbl .c-warn{color:var(--warn)}
+.tbl .c-fail{color:var(--fail)}
+.t-pill{padding:2px 7px;border-radius:2px;font-family:var(--mono);font-size:10px;font-weight:500}
+
+/* TAB BAR */
+.tab-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.tab-btn{
+  background:var(--panel);border:1px solid var(--line);
+  padding:6px 14px;cursor:pointer;
+  font-family:var(--mono);font-size:10px;color:var(--ink3);
+  transition:all .14s;font-weight:500;letter-spacing:.04em
+}
+.tab-btn:hover{border-color:var(--ink2);color:var(--ink2)}
+.tab-btn.active{background:var(--ink);border-color:var(--ink);color:#fff}
+
+/* KPIs */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0;margin-bottom:24px;border:1px solid var(--line)}
+.kpi{padding:18px 20px;border-right:1px solid var(--line);background:var(--panel)}
+.kpi:last-child{border-right:none}
+.kpi-lbl{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:var(--ink3);margin-bottom:8px}
+.kpi-val{font-family:var(--serif);font-size:32px;font-weight:300;line-height:1;letter-spacing:-.02em;color:var(--ink)}
+.kpi-val.ok{color:var(--ok)}
+.kpi-val.fail{color:var(--fail)}
+.kpi-val.warn{color:var(--warn)}
+.kpi-sub{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:5px}
+
+/* RC CARDS */
+.g3{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1px;background:var(--line);margin-bottom:1px}
+.rc{padding:16px;background:var(--panel)}
+.rc.ok-bg{border-left:3px solid var(--ok)}
+.rc.warn-bg{border-left:3px solid var(--warn)}
+.rc.fail-bg{border-left:3px solid var(--fail);animation:left-pulse 1.4s infinite}
+@keyframes left-pulse{0%,100%{border-left-color:var(--fail)}50%{border-left-color:rgba(178,62,62,.3)}}
+.rc.nd-bg{border-left:3px solid var(--line);opacity:.7}
+.rc-code{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.04em;padding:2px 7px;border-radius:2px}
+.rc-code.ok{background:var(--ok-bg);color:var(--ok)}
+.rc-code.warn{background:var(--warn-bg);color:var(--warn)}
+.rc-code.fail{background:var(--fail-bg);color:var(--fail)}
+.rc-code.nd{background:var(--line2);color:var(--ink3)}
+.rc-name{font-family:var(--serif);font-size:13px;font-weight:500;color:var(--ink);margin:6px 0 2px;line-height:1.3}
+.rc-meta{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-bottom:10px}
+.ctrl{padding:8px 10px;border-left:2px solid var(--line2);margin-bottom:5px;font-size:12px}
+.ctrl.warn{border-left-color:var(--warn);background:var(--warn-bg)}
+.ctrl.fail{border-left-color:var(--fail);background:var(--fail-bg)}
+.ctrl-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:3px}
+.ctrl-name{color:var(--ink2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
+.ctrl-val{font-family:var(--mono);font-weight:500;font-size:11px;flex-shrink:0}
+.ctrl-val.ok{color:var(--ok)} .ctrl-val.warn{color:var(--warn)} .ctrl-val.fail{color:var(--fail)}
+.ctrl-lim{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--ink3)}
+.ctrl-tag{font-size:9px;font-weight:600;padding:1px 5px;border-radius:2px;font-family:var(--mono)}
+.ctrl-tag.fail{background:var(--fail-bg);color:var(--fail)}
+.ctrl-tag.warn{background:var(--warn-bg);color:var(--warn)}
+.ind-bar{height:3px;background:var(--line2);margin-top:6px;overflow:hidden}
+.ind-bar-f{height:100%;transition:width .4s}
+.ind-bar-f.ok{background:var(--ok)} .ind-bar-f.warn{background:var(--warn)} .ind-bar-f.fail{background:var(--fail)}
+.card-foot{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:10px;padding-top:8px;border-top:1px solid var(--line2)
+}
+.go-link{
+  font-family:var(--mono);font-size:10px;color:var(--accent2);
+  text-decoration:none;letter-spacing:.04em
+}
+.go-link:hover{color:var(--ink)}
+
+/* ALERT BANNER */
+.alert-banner{
+  border:1px solid var(--fail);border-left:4px solid var(--fail);
+  background:var(--fail-bg);padding:16px;margin-bottom:24px
+}
+.alert-title{
+  font-family:var(--serif);font-size:16px;font-weight:500;color:var(--fail);
+  display:flex;align-items:center;gap:8px;margin-bottom:10px
+}
+.alert-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.alert-card{background:var(--panel);border:1px solid var(--fail);padding:12px}
+.alert-card-code{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--fail);margin-bottom:5px}
+
+/* PPR CARDS */
+.ppr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:0;background:var(--line);margin-bottom:1px}
+.ppr-card{background:var(--panel);padding:16px;transition:background .15s;cursor:pointer}
+.ppr-card:hover{background:var(--line2)}
+.ppr-card.activo{border-top:3px solid var(--ok)}
+.ppr-card.revision{border-top:3px solid var(--warn)}
+.ppr-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--accent2);margin-bottom:6px;letter-spacing:.08em}
+.ppr-ref{font-family:var(--mono);font-size:9px;color:var(--ink3);letter-spacing:.06em;margin-bottom:4px}
+.ppr-name{font-family:var(--serif);font-size:15px;font-weight:500;color:var(--ink);margin-bottom:5px;line-height:1.3}
+.ppr-norm{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-bottom:8px}
+.ppr-reqs{font-size:11px;color:var(--ink2);line-height:1.6;margin-bottom:10px}
+.ppr-est{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9px;font-weight:600;padding:2px 8px;border-radius:2px}
+.ppr-est.ok{background:var(--ok-bg);color:var(--ok)}
+.ppr-est.rev{background:var(--warn-bg);color:var(--warn)}
+.ppr-docs-lbl{font-family:var(--mono);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);margin:10px 0 5px;padding-top:10px;border-top:1px solid var(--line2)}
+.ppr-doc{font-family:var(--mono);font-size:10px;color:var(--ink2);padding:2px 0;display:flex;align-items:center;gap:6px}
+.ppr-link{font-family:var(--mono);font-size:10px;color:var(--accent2);text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-top:8px}
+.ppr-link:hover{color:var(--ink)}
+.ppr-data-box{background:var(--bg);border:1px solid var(--line2);padding:8px 10px;margin-top:8px;font-family:var(--mono);font-size:10px}
+.ppr-data-row{display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--line2);color:var(--ink3)}
+.ppr-data-row:last-child{border-bottom:none}
+.ppr-data-row span:last-child{color:var(--accent)}
+
+/* PROD CARDS */
+.prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0;background:var(--line)}
+.prod-card{background:var(--panel);padding:16px;border-top:3px solid var(--ok)}
+.prod-code{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--accent);letter-spacing:.06em;margin-bottom:5px}
+.prod-name{font-family:var(--serif);font-size:14px;font-weight:500;color:var(--ink);margin-bottom:4px}
+.prod-desc{font-size:11px;color:var(--ink2);line-height:1.6;margin-bottom:8px}
+.prod-badge{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:600;padding:2px 7px;border-radius:2px;margin-bottom:6px}
+.prod-badge.d{background:rgba(6,182,212,.12);color:var(--accent)}
+.prod-badge.f{background:var(--line2);color:var(--ink3)}
+.prod-dato{font-family:var(--mono);font-size:10px;color:var(--accent2);background:var(--bg);border:1px solid var(--line2);padding:6px 8px;line-height:1.5}
+.prod-stat{display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:7px;border-top:1px solid var(--line2);font-family:var(--mono);font-size:10px}
+
+/* CHART CARDS */
+.chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:0;background:var(--line);margin-bottom:1px}
+.chart-card{background:var(--panel);padding:20px}
+.chart-title{font-family:var(--serif);font-size:17px;font-weight:500;letter-spacing:-.01em;color:var(--ink);margin-bottom:3px}
+.chart-sub{font-family:var(--mono);font-size:10px;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px}
+.chart-wrap{position:relative}
+.chart-wrap.h220{height:220px}
+.chart-wrap.h260{height:260px}
+.chart-wrap.h300{height:300px}
+
+/* COVERAGE */
+.coverage-item{
+  padding:8px 10px;margin-bottom:5px;
+  border-left:3px solid var(--line2);background:var(--panel);
+  font-family:var(--mono);font-size:10px
+}
+.coverage-item.ok{border-left-color:var(--ok)}
+.coverage-item.partial{border-left-color:var(--warn)}
+
+/* MISC */
+#loader{text-align:center;padding:60px;color:var(--ink3);font-family:var(--mono)}
+@media(max-width:800px){
+  .sidebar{display:none}
+  .main-area{margin-left:0}
+  .content{padding:16px}
+  .hero{grid-template-columns:1fr 1fr}
+  .chart-grid{grid-template-columns:1fr}
+}
+@media print{
+  .sidebar,.topbar{display:none}
+  .main-area{margin-left:0}
+  .view{display:block!important}
+  body{background:white}
+}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+
+/* ── DARK MODE VISIBILITY ── */
+.dark-mode .topbar{background:var(--panel);border-bottom:1px solid var(--line)}
+.dark-mode .tb-title{color:#f8fafc!important}
+.dark-mode .tb-sub{color:#94a3b8!important}
+.dark-mode .section-label{color:#64748b!important}
+.dark-mode .process-title{color:#f8fafc!important}
+.dark-mode .process-title em{color:#94a3b8!important}
+.dark-mode .hero{border:1px solid var(--line)}
+.dark-mode .hero-cell{background:var(--panel);border-right:1px solid var(--line)}
+.dark-mode .hero-cell.primary{background:linear-gradient(135deg,#0a2540,#0f2d4a)!important;color:#f8fafc!important}
+.dark-mode .hl{color:#94a3b8!important}
+.dark-mode .hv{color:#f8fafc!important;font-weight:800}
+.dark-mode .hs{color:#94a3b8!important}
+.dark-mode .kpi{background:var(--panel);border-right:1px solid var(--line)}
+.dark-mode .kpi-lbl{color:#94a3b8!important}
+.dark-mode .kpi-val{color:#f8fafc!important;font-weight:800}
+.dark-mode .kpi-val.ok{color:#4ade80!important}
+.dark-mode .kpi-val.warn{color:#fde047!important}
+.dark-mode .kpi-val.fail{color:#fca5a5!important}
+.dark-mode .kpi-sub{color:#94a3b8!important}
+.dark-mode .p-ok{background:rgba(74,222,128,.15);color:#4ade80}
+.dark-mode .p-warn{background:rgba(253,224,71,.12);color:#fde047}
+.dark-mode .p-fail{background:rgba(252,165,165,.15);color:#fca5a5}
+.dark-mode .stage{background:var(--panel);border:1px solid var(--line)}
+.dark-mode .stage-head{background:var(--line)}
+.dark-mode .stage-nm{color:#f8fafc!important;font-weight:700}
+.dark-mode .stage-num{color:#67e8f9!important}
+.dark-mode .stage-rc,.dark-mode .stage-info{color:#94a3b8!important}
+.dark-mode .ind-grid,.dark-mode .ind{background:var(--panel);border-color:var(--line)}
+.dark-mode .ind-lbl{color:#cbd5e1!important}
+.dark-mode .ind-val{color:#f8fafc!important;font-weight:800}
+.dark-mode .ind-lim{color:#64748b!important}
+.dark-mode .ind-bar{background:rgba(255,255,255,.08)}
+.dark-mode .ind-bar-f.ok{background:#4ade80!important}
+.dark-mode .ind-bar-f.warn{background:#fde047!important}
+.dark-mode .ind-bar-f.fail{background:#fca5a5!important}
+.dark-mode .ind-dot.ok{background:#4ade80!important;border-color:#4ade80}
+.dark-mode .ind-dot.warn{background:#fde047!important;border-color:#fde047}
+.dark-mode .ind-dot.fail{background:#fca5a5!important;border-color:#fca5a5}
+.dark-mode .ind-tag.pcc{color:#67e8f9!important;font-weight:700}
+.dark-mode .ctrl{background:var(--panel);border:1px solid var(--line)}
+.dark-mode .ctrl-name{color:#cbd5e1!important}
+.dark-mode .ctrl-val{color:#f8fafc!important}
+.dark-mode .ctrl-val.ok{color:#4ade80!important}
+.dark-mode .ctrl-val.warn{color:#fde047!important}
+.dark-mode .ctrl-val.fail{color:#fca5a5!important}
+.dark-mode .ctrl-lim{color:#64748b!important}
+.dark-mode .chart-card{background:var(--panel);border:1px solid var(--line)}
+.dark-mode .chart-title{color:#f8fafc!important}
+.dark-mode .chart-sub{color:#64748b!important}
+.dark-mode .tbl{background:var(--panel)}
+.dark-mode .tbl th{background:var(--line);color:#cbd5e1!important}
+.dark-mode .tbl td{color:#f8fafc!important;border:1px solid var(--line)}
+.dark-mode .tbl .c-ok{color:#4ade80!important}
+.dark-mode .tbl .c-warn{color:#fde047!important}
+.dark-mode .tbl .c-fail{color:#fca5a5!important}
+.dark-mode .t-pill.p-ok{background:rgba(74,222,128,.15);color:#4ade80}
+.dark-mode .t-pill.p-warn{background:rgba(253,224,71,.12);color:#fde047}
+.dark-mode .t-pill.p-fail{background:rgba(252,165,165,.15);color:#fca5a5}
+.dark-mode .tab-btn{background:var(--panel);border:1px solid var(--line);color:#94a3b8}
+.dark-mode .tab-btn.al,.dark-mode .tab-btn.active{background:#0a2540;border-color:#67e8f9;color:#67e8f9}
+.dark-mode .card-dark{background:var(--panel);border:1px solid var(--line)}
+.dark-mode .go-link{color:#67e8f9!important}
+.dark-mode .ppr-card{background:var(--panel);border:1px solid var(--line)}
+.dark-mode .ppr-name{color:#f8fafc!important}
+.dark-mode .ppr-num{color:#67e8f9!important}
+.dark-mode .ppr-norm,.dark-mode .ppr-ref{color:#64748b!important}
+.dark-mode .ppr-est.ok{color:#4ade80!important}
+.dark-mode .hm-ok{background:rgba(74,222,128,.15)!important;color:#4ade80!important}
+.dark-mode .hm-warn{background:rgba(253,224,71,.12)!important;color:#fde047!important}
+.dark-mode .hm-fail{background:rgba(252,165,165,.15)!important;color:#fca5a5!important}
+.dark-mode .ascii-block{background:#000810;color:#94a3b8}
+.dark-mode .prod-card{background:var(--panel);border:1px solid var(--line)}
+.dark-mode .prod-code{color:#67e8f9!important}
+.dark-mode .prod-name{color:#f8fafc!important}
+.dark-mode .alert-card{background:rgba(252,165,165,.08);border:1px solid rgba(252,165,165,.2)}
+.dark-mode .alert-title{color:#fca5a5!important}
+.kpi-val{font-family:var(--mono);font-size:32px;font-weight:800;line-height:1;color:var(--ink);margin:6px 0 4px}
+.kpi-val.ok{color:var(--ok)}.kpi-val.warn{color:var(--warn)}.kpi-val.fail{color:var(--fail)}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-badge">FSSC 22000 v6</div>
+    <div class="sb-name">INGAMA <em>Beneficiadora</em></div>
+    <div class="sb-sub">Riberalta · Bolivia</div>
+  </div>
+
+  <div class="sb-sec">
+    <div class="sb-sec-lbl">Módulos</div>
+    <button class="sb-btn" id="sb-calidad" onclick="setView('calidad')">
+      <span>📊</span> Calidad (RC.CC)
+    </button>
+    <button class="sb-btn" id="sb-produccion" onclick="setView('produccion')">
+      <span>🏭</span> Producción (RC.PD)
+    </button>
+    <button class="sb-btn" id="sb-ppr" onclick="setView('ppr')">
+      <span>🛡️</span> PPR / FSSC 22000
+    </button>
+  </div>
+
+  <div class="sb-div"></div>
+
+  <div id="sbLotesSection">
+    <div class="sb-lbl">Lote activo</div>
+    <div id="sbLotes"></div>
+  </div>
+
+
+  <div class="sb-div"></div>
+  <div id="sbPPRSection" style="display:none">
+    <div class="sb-lbl">PPR · FSSC 22000 v6</div>
+    <div id="sbPPRList"></div>
+  </div>
+  <div class="sb-foot">
+    Actualizado: 31/03/2026<br>
+    FSSC 22000 v6 · ISO/TS 22002-1
+    <button class="sb-theme-btn" onclick="toggleTheme()">☀ / 🌙 Cambiar tema</button>
+  </div>
+</div>
+
+<!-- MAIN AREA -->
+<div class="main-area">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div>
+      <div class="tb-title" id="tbTitle">Control Room — Calidad</div>
+      <div class="tb-sub" id="tbSub">14 Registros RC.CC · INGAMA Beneficiadora · Riberalta</div>
+    </div>
+    <div class="tb-right">
+      <span class="status-live">SISTEMA ACTIVO</span>
+      <button class="print-btn" onclick="window.print()">↓ PDF</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div id="loader">Iniciando sistema...</div>
+
+    <!-- ═══════════ CALIDAD ═══════════ -->
+    <div class="view" id="view-calidad">
+
+      <!-- Lote selector -->
+      <div class="section-label">Seleccionar lote de trazabilidad</div>
+      <div id="loteGrid" class="tab-row" style="margin-bottom:24px"></div>
+
+      <!-- Hero KPIs (V1 style) -->
+      <div id="heroSection"></div>
+
+      <!-- Informe: 6 etapas productivas (V1 style) -->
+      <h2 class="process-title">Cadena productiva <em>· 6 etapas</em></h2>
+      <div id="stagesContainer"></div>
+
+      <!-- Análisis gráfico del lote -->
+      <h2 class="process-title">Análisis gráfico <em>· del lote seleccionado</em></h2>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-title">Evolución % Podrida y Ombligo</div>
+          <div class="chart-sub">RC.CC.01 · Caída Lona · Lím: Podrida &lt;3% / Ombligo &lt;2%</div>
+          <div class="chart-wrap h220"><canvas id="chartTrend"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Distribución por tipo de almendra</div>
+          <div class="chart-sub">Clasificación Large / Medium / Midget / Tiny</div>
+          <div class="chart-wrap h220"><canvas id="chartTypes"></canvas></div>
+        </div>
+      </div>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-title">Radar — Indicadores vs límites críticos</div>
+          <div class="chart-sub">Comparativo de indicadores clave · lote actual</div>
+          <div class="chart-wrap h260"><canvas id="chartRadar"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Cajas Producto Terminado (RC.CC.06)</div>
+          <div class="chart-sub">Aprobadas vs pinchadas / reembaladas</div>
+          <div class="chart-wrap h260"><canvas id="chartCajas"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Vista comparativa todos los lotes -->
+      <h2 class="process-title">Vista comparativa <em>· todos los lotes</em></h2>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-title">% Humedad en recepción por lote</div>
+          <div class="chart-sub">RC.CC.14 · Límite PPROP-02: ≤ 25%</div>
+          <div class="chart-wrap h260"><canvas id="chartHumAll"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">% Podrida promedio por lote</div>
+          <div class="chart-sub">RC.CC.01 · Límite PPROP-04: &lt; 3%</div>
+          <div class="chart-wrap h260"><canvas id="chartPodAll"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Tabla comparativa -->
+      <div class="comp-wrap">
+        <div class="comp-head">
+          <div class="chart-title">Resumen comparativo — todos los lotes RC.CC</div>
+          <div class="chart-sub" style="margin-bottom:0">Vista consolidada de límites críticos por lote</div>
+        </div>
+        <div class="comp-body"><table class="tbl" id="compTable"></table></div>
+      </div>
+
+      <!-- Alert banner -->
+      <div id="alertCalidad" style="margin-top:24px"></div>
+
+      <!-- Los 14 registros RC.CC -->
+      <h2 class="process-title">Los 14 registros <em>· RC.CC</em></h2>
+      <div class="section-label">Lote seleccionado: <span id="currentTabLabel">—</span></div>
+      <div class="tab-row" id="tabRowCalidad"></div>
+      <div class="g3" id="registrosGrid"></div>
+
+      <!-- Cobertura + Donut -->
+      <h2 class="process-title">Estado global <em>· conformidad</em></h2>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-title">Estado Global — 14 Registros</div>
+          <div class="chart-sub">Conformidad para el lote seleccionado</div>
+          <div class="chart-wrap h220"><canvas id="chartDonut"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Cobertura de Lotes</div>
+          <div class="chart-sub">Registros presentes vs faltantes</div>
+          <div id="coveragePanel" style="max-height:220px;overflow-y:auto;padding-top:4px"></div>
+        </div>
+      </div>
+
+    </div><!-- end view-calidad -->
+
+    <!-- ═══════════ PRODUCCIÓN ═══════════ -->
+    <div class="view" id="view-produccion">
+      <div class="section-label">Registros de producción · RC.PD</div>
+
+      <div class="kpi-row" style="margin-bottom:28px">
+        <div class="kpi"><div class="kpi-lbl">Lote Principal</div><div class="kpi-val">CONV.01</div><div class="kpi-sub mono">Ricardo Gamarra · RG.01-CV</div></div>
+        <div class="kpi"><div class="kpi-lbl">Kilos Recibidos</div><div class="kpi-val ok">52,952</div><div class="kpi-sub">8 recepciones · 832 sacos</div></div>
+        <div class="kpi"><div class="kpi-lbl">Tipo Principal</div><div class="kpi-val" style="font-size:22px;padding-top:4px">Midget</div><div class="kpi-sub">Medium / Midget / Tiny</div></div>
+        <div class="kpi"><div class="kpi-lbl">Certificación</div><div class="kpi-val warn" style="font-size:22px;padding-top:4px">CONV.</div><div class="kpi-sub">BO-BIO-140 · Riberalta</div></div>
+      </div>
+
+      <h2 class="process-title">Análisis de Recepción <em>· RC.PD.01</em></h2>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-title">Kilos recibidos por convoy (RG.01-CV)</div>
+          <div class="chart-sub">RC.PD.01 · Peso neto kg por orden de recepción</div>
+          <div class="chart-wrap h220"><canvas id="chartProdKilos"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Rendimiento de clasificado (RC.PD.03)</div>
+          <div class="chart-sub">Large / Medium / Midget / Tiny / Otros · Kg producidos</div>
+          <div class="chart-wrap h220"><canvas id="chartProdTipos"></canvas></div>
+        </div>
+      </div>
+
+      <h2 class="process-title">Flujo del proceso <em>· 14 registros RC.PD</em></h2>
+      <div class="prod-grid" id="prodGrid"></div>
+    </div>
+
+    <!-- ═══════════ PPR ═══════════ -->
+    <div class="view" id="view-ppr">
+
+      <!-- PPR Section selector (like lote tabs in Calidad) -->
+      <div class="section-label">Programas de Prerrequisitos · FSSC 22000 v6 · Cláusula 8.2.4</div>
+      <div class="tab-row" id="pprTabRow" style="margin-bottom:20px"></div>
+
+      <!-- PPR KPIs always visible -->
+      <div class="kpi-row" style="margin-bottom:22px">
+        <div class="kpi"><div class="kpi-lbl">PPR Total</div><div class="kpi-val" style="color:var(--accent2);font-size:26px">11</div><div class="kpi-sub">Cláusulas ISO/TS 22002-1</div></div>
+        <div class="kpi"><div class="kpi-lbl">Con Carpeta Drive</div><div class="kpi-val ok">11</div><div class="kpi-sub">Estructura creada</div></div>
+        <div class="kpi"><div class="kpi-lbl">Activos con datos</div><div class="kpi-val ok">5</div><div class="kpi-sub">Registros verificados</div></div>
+        <div class="kpi"><div class="kpi-lbl">Norma</div><div class="kpi-val" style="font-size:16px;padding-top:5px;color:var(--accent)">FSSC v6</div><div class="kpi-sub">ISO/TS 22002-1:2009</div></div>
+      </div>
+
+      <!-- PPR SUB-SECCIONES -->
+
+      <!-- §1 PANEL GENERAL -->
+      <div class="ppr-sec" id="ppr-s1">
+        <h2 class="process-title" style="margin-top:0">Panel general <em>· cumplimiento por categoría</em></h2>
+        <div class="card-dark" style="overflow-x:auto;margin-bottom:14px">
+          <table id="pprHeatmap" style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px"></table>
+        </div>
+        <div style="display:flex;gap:14px;font-family:var(--mono);font-size:10px;color:var(--ink3);flex-wrap:wrap;padding:6px 0">
+          <span style="background:rgba(46,125,91,.2);color:var(--ok);padding:2px 8px;border-radius:3px">≥90% Conforme</span>
+          <span style="background:rgba(193,121,23,.2);color:var(--warn);padding:2px 8px;border-radius:3px">75–89% Atención</span>
+          <span style="background:rgba(178,62,62,.2);color:var(--fail);padding:2px 8px;border-radius:3px">&lt;75% Crítico</span>
+          <span style="color:var(--ink3)">▲▲ mejora fuerte · ▲ mejora · ► estable · ▼ baja · ▼▼ baja fuerte</span>
+        </div>
+      </div>
+
+      <!-- §2 RANKING -->
+      <div class="ppr-sec" id="ppr-s2" style="display:none">
+        <h2 class="process-title" style="margin-top:0">Ranking <em>· cumplimiento descendente</em></h2>
+        <div class="chart-card" style="margin-bottom:14px">
+          <div class="chart-title">Barras horizontales — Cumplimiento Mar 2026</div>
+          <div class="chart-sub" style="margin-bottom:14px">Orden descendente · Línea roja = meta 90%</div>
+          <div id="pprRanking"></div>
+        </div>
+      </div>
+
+      <!-- §3 TENDENCIAS -->
+      <div class="ppr-sec" id="ppr-s3" style="display:none">
+        <h2 class="process-title" style="margin-top:0">Tendencias individuales <em>· Plagas · Limpieza · Alérgenos</em></h2>
+        <div id="pprTrends"></div>
+      </div>
+
+      <!-- §4 DISTRIBUCIÓN NCs -->
+      <div class="ppr-sec" id="ppr-s4" style="display:none">
+        <h2 class="process-title" style="margin-top:0">Distribución <em>· no conformidades por categoría</em></h2>
+        <div class="chart-grid">
+          <div class="chart-card">
+            <div class="chart-title">Donut — NCs por categoría PPR</div>
+            <div class="chart-sub" style="margin-bottom:14px">Segmento mayor explotado · Total NCs</div>
+            <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+              <svg id="pprDonut" width="200" height="200" viewBox="0 0 200 200" style="flex-shrink:0"></svg>
+              <div id="pprDonutLeg" style="flex:1;min-width:180px"></div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">§7 Pareto — NCs acumuladas</div>
+            <div class="chart-sub" style="margin-bottom:14px">Barras + línea 80% · Limpieza+Plagas = 58% NCs</div>
+            <div id="pprPareto"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- §5 MATRIZ RIESGO -->
+      <div class="ppr-sec" id="ppr-s5" style="display:none">
+        <h2 class="process-title" style="margin-top:0">Matriz de riesgo <em>· Probabilidad × Severidad</em></h2>
+        <div class="chart-grid">
+          <div class="chart-card">
+            <div class="chart-title">Matriz 3×3 — Posición de cada PRP</div>
+            <div class="chart-sub" style="margin-bottom:10px">🔴 riesgo ≥6 · 🟡 4–5 · 🟢 ≤3 · Datos RC.PL.02</div>
+            <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start">
+              <div>
+                <div style="font-family:var(--mono);font-size:9px;color:var(--ink3);margin-bottom:5px;text-align:center">↑ Probabilidad</div>
+                <div id="pprRiskMatrix" style="display:grid;grid-template-columns:24px 1fr 1fr 1fr;gap:3px;width:min(100%,320px)"></div>
+                <div style="font-family:var(--mono);font-size:9px;color:var(--ink3);margin-top:5px;text-align:center">Severidad →</div>
+              </div>
+              <div style="flex:1;min-width:200px" id="pprRiskDetail"></div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">§8 Eisenhower — Priorización de acciones</div>
+            <div class="chart-sub" style="margin-bottom:10px">Urgencia (Y) × Importancia (X) · Hover para detalle</div>
+            <div style="position:relative;padding:16px 16px 36px 44px">
+              <div id="pprEisen" style="position:relative;border-left:2px solid var(--ink3);border-bottom:2px solid var(--ink3);width:min(100%,280px);height:240px">
+                <div style="position:absolute;bottom:-22px;right:0;font-family:var(--mono);font-size:9px;color:var(--ink3)">Importancia →</div>
+                <div style="position:absolute;left:-36px;height:100%;display:flex;align-items:center;writing-mode:vertical-rl;transform:rotate(180deg);font-family:var(--mono);font-size:9px;color:var(--ink3)">← Urgencia</div>
+                <div style="position:absolute;left:3px;top:3px;font-family:var(--mono);font-size:8px;color:var(--ink3);font-weight:600">I·Hacer ya</div>
+                <div style="position:absolute;right:3px;top:3px;font-family:var(--mono);font-size:8px;color:var(--ink3);font-weight:600;text-align:right">II·Planif.</div>
+                <div style="position:absolute;left:3px;bottom:3px;font-family:var(--mono);font-size:8px;color:var(--ink3);font-weight:600">III·Deleg.</div>
+                <div style="position:absolute;right:3px;bottom:3px;font-family:var(--mono);font-size:8px;color:var(--ink3);font-weight:600;text-align:right">IV·Elim.</div>
+                <div id="eisenTip" style="display:none;position:absolute;background:var(--panel);border:1px solid var(--accent);color:var(--ink);padding:6px 10px;border-radius:5px;font-family:var(--mono);font-size:9px;z-index:100;white-space:normal;max-width:200px;line-height:1.4;pointer-events:none"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- §6 KPIs ESTRATÉGICOS -->
+      <div class="ppr-sec" id="ppr-s6" style="display:none">
+        <h2 class="process-title" style="margin-top:0">KPIs estratégicos <em>· bullet graph</em></h2>
+        <div class="chart-card" style="margin-bottom:14px">
+          <div class="chart-title">Bullet Graph — 3 KPIs Clave FSSC 22000 v6</div>
+          <div class="chart-sub" style="margin-bottom:16px">Bandas: &lt;75% crítico · 75–89% advertencia · ≥90% meta</div>
+          <div id="pprBullet"></div>
+        </div>
+      </div>
+
+      <!-- §9 SPARKLINES -->
+      <div class="ppr-sec" id="ppr-s9" style="display:none">
+        <h2 class="process-title" style="margin-top:0">Sparklines <em>· tabla de tendencia 4 meses</em></h2>
+        <div class="comp-wrap" style="margin-bottom:14px">
+          <div class="comp-head">
+            <div class="chart-title">Minigráficos Unicode ▁▂▃▄▅▆▇█</div>
+            <div class="chart-sub" style="margin-bottom:0">Plagas · Limpieza · Alérgenos · 4 meses</div>
+          </div>
+          <div class="comp-body"><table id="pprSparkTable" style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--mono)"></table></div>
+        </div>
+        <div id="pprSparkDetail"></div>
+      </div>
+
+      <!-- SIEMPRE VISIBLE: Tarjetas PPR -->
+      <h2 class="process-title">Las 11 cláusulas PPR <em>· estructura actualizada Drive</em></h2>
+      <div class="ppr-grid" id="pprGrid"></div>
+
+      <!-- Marco normativo -->
+      <h2 class="process-title">Marco normativo <em>· FSSC 22000 v6</em></h2>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-title" style="font-family:var(--serif)">Requisitos FSSC 22000 v6 para PPRs</div>
+          <div class="chart-sub" style="margin-bottom:12px">Obligaciones documentales</div>
+          <div style="font-size:12px;color:var(--ink2);line-height:1.9">
+            <div style="margin-bottom:6px">📌 <strong>ISO 22000:2018 §7.2</strong> — PPRs documentados, implementados, verificados y mantenidos.</div>
+            <div style="margin-bottom:6px">📌 <strong>ISO/TS 22002-1:2009</strong> — 11 cláusulas específicas de PPR para elaboración de alimentos.</div>
+            <div style="margin-bottom:6px">📌 <strong>FSSC 22000 v6 adicionales</strong> — Gestión de alérgenos, cultura de inocuidad, VACCP.</div>
+            <div style="margin-bottom:6px">📌 <strong>Verificación periódica</strong> — Frecuencia definida, responsable asignado, evidencias.</div>
+            <div>📌 <strong>Evidencia objetiva</strong> — Tus carpetas en Drive cuentan como evidencia para la auditoría.</div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title" style="font-family:var(--serif)">Mapa PPR → Peligros controlados</div>
+          <div class="chart-sub" style="margin-bottom:12px">Por cláusula ISO/TS 22002-1</div>
+          <div style="font-size:11px;font-family:var(--mono);line-height:2">
+            <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--line2);padding-bottom:3px;margin-bottom:3px;color:var(--ink3)"><span>Cláusula</span><span>Peligros</span></div>
+            ${[['a,b) Infraestructuras','Físico · Biológico'],['c) Servicios','Biológico · Químico'],['d) Plagas / Residuos','Biológico · Físico'],['e) Equipos / Limpieza','Biológico · Químico'],['f) Proveedores','Biológico · Químico'],['g) Mat. Comprados','Químico · Físico'],['h) Cont. Cruzada','Biológico · Químico'],['i) Sanitización','Biológico · Químico'],['j) Higiene Personal','Biológico'],['k) Info Producto','Todos'],['Otros Aspectos','Todos']].map(([p,d])=>'<div style="display:flex;justify-content:space-between"><span style="color:var(--ink2)">'+p+'</span><span style="color:var(--ink3)">'+d+'</span></div>').join('')}
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end view-ppr -->
+
+  </div><!-- content -->
+</div><!-- main-area -->
+
+<!-- DATA -->
+<script>
+window.AGGREGATES_BY_TAB_GENERATED = {
+  "RG 01-CV": {
+    "RC.CC.01": {
+      "muestras": 1,
+      "controles": {
+        "% Ombligo (Lona)": {
+          "valor": 1.53,
+          "hist": [
+            1.32,
+            1.29,
+            1.22,
+            1.13,
+            1.53
+          ],
+          "labels": [
+            "1/7/2026",
+            "1/9/2026",
+            "1/12/2026",
+            "1/13/2026",
+            "1/15/2026"
+          ]
+        },
+        "% Podrida (Lona)": {
+          "valor": 2.21,
+          "hist": [
+            2.26,
+            2.49,
+            2.33,
+            2.22,
+            2.21
+          ],
+          "labels": [
+            "1/7/2026",
+            "1/9/2026",
+            "1/12/2026",
+            "1/13/2026",
+            "1/15/2026"
+          ]
+        }
+      }
+    },
+    "RC.CC.1.1": {
+      "muestras": 1,
+      "controles": {
+        "% Corte Chias": {
+          "valor": 3.0,
+          "hist": [
+            6.0,
+            6.0,
+            2.0,
+            6.0,
+            5.0,
+            2.0,
+            6.0,
+            3.0
+          ],
+          "labels": [
+            "6-12-25",
+            "6-12-25",
+            "6-12-25",
+            "10-12-25",
+            "10-12-25",
+            "10-12-25",
+            "11-12-25",
+            "11-12-25"
+          ]
+        }
+      }
+    },
+    "RC.CC.02": {
+      "muestras": 8,
+      "controles": {
+        "% Chias Lona 1": {
+          "valor": 1.98,
+          "hist": [
+            1.71,
+            1.88,
+            1.68,
+            2.14,
+            2.02,
+            2.2,
+            2.48,
+            1.76
+          ]
+        },
+        "% Pedazos Lona 1": {
+          "valor": 5.21,
+          "hist": [
+            4.85,
+            5.67,
+            4.56,
+            4.55,
+            5.62,
+            5.36,
+            5.44,
+            5.6
+          ]
+        },
+        "% Primera Banadera": {
+          "valor": 84.36,
+          "hist": [
+            84.47,
+            83.04,
+            80.98,
+            84.03,
+            86.38,
+            85.85,
+            83.94,
+            86.19
+          ]
+        }
+      }
+    },
+    "RC.CC.04": {
+      "muestras": 8,
+      "controles": {
+        "% Chias": {
+          "valor": 6.17,
+          "hist": [
+            6.85,
+            12.7,
+            5.53,
+            5.53,
+            3.48,
+            4.47,
+            4.65,
+            6.15
+          ]
+        },
+        "% Dannadas": {
+          "valor": 8.36,
+          "hist": [
+            5.72,
+            15.48,
+            7.17,
+            9.35,
+            6.95,
+            8.9,
+            5.88,
+            7.43
+          ]
+        },
+        "% Severamente Dannadas": {
+          "valor": 6.65,
+          "hist": [
+            6.85,
+            15.0,
+            6.6,
+            6.03,
+            3.48,
+            4.47,
+            4.65,
+            6.15
+          ]
+        }
+      }
+    },
+    "RC.CC.05": {
+      "muestras": 8,
+      "controles": {
+        "% Danadas": {
+          "valor": 1.39,
+          "hist": [
+            1.36,
+            1.3,
+            1.47,
+            1.58,
+            1.54,
+            1.47,
+            1.21,
+            1.18
+          ]
+        },
+        "% Sev. Danadas": {
+          "valor": 0.97,
+          "hist": [
+            1.02,
+            0.98,
+            0.97,
+            0.85,
+            1.14,
+            1.04,
+            0.84,
+            0.94
+          ]
+        },
+        "Mat. Extranos": {
+          "valor": "AUSENTE"
+        }
+      }
+    },
+    "RC.CC.06": {
+      "muestras": 1,
+      "controles": {
+        "Cajas Reembazadas (Promedio)": {
+          "valor": 1.56,
+          "hist": [
+            3.0,
+            1.0,
+            2.0,
+            1.0,
+            1.0,
+            1.0,
+            3.0,
+            1.0,
+            1.0,
+            1.0,
+            2.0,
+            3.0,
+            1.0,
+            2.0,
+            1.0,
+            1.0
+          ],
+          "labels": [
+            "17/1/2026 IA-001",
+            "21/1/2026 IA-001",
+            "21/1/2026 IA-001",
+            "22/1/2026 IA-001",
+            "22/1/2026 IA-012",
+            "22/1/2026 IA-014",
+            "22/1/2026 IA-001",
+            "22/1/2026 IA-011",
+            "23/1/2026 IA-013",
+            "23/1/2026 IA-012",
+            "28/1/2026 IA-011",
+            "29/1/2026 IA-011",
+            "29/1/2026 IA-012",
+            "29/1/2026 IA-013",
+            "30/1/2026 IA-001",
+            "30/1/2026 IA-013"
+          ]
+        },
+        "Estado Reemplazo": {
+          "valor": "CONTROLADO"
+        }
+      }
+    },
+    "RC.CC.07": {
+      "muestras": 11,
+      "controles": {
+        "Acero Inox 4mm": {
+          "valor": "ATRAPA ok"
+        },
+        "Cajas Almendra 1ra": {
+          "valor": 106.64,
+          "hist": [
+            75,
+            114,
+            147,
+            95,
+            90,
+            118,
+            136,
+            98,
+            71,
+            141,
+            88
+          ]
+        },
+        "Cajas Almendra 2da": {
+          "valor": 64.18,
+          "hist": [
+            1,
+            6,
+            11,
+            7,
+            7,
+            13,
+            13,
+            11,
+            180,
+            293,
+            164
+          ]
+        },
+        "Ferroso Fe 3mm": {
+          "valor": "ATRAPA ok"
+        },
+        "No Ferroso 3.5mm": {
+          "valor": "ATRAPA ok"
+        },
+        "Pasajes Verificados": {
+          "valor": 3.55,
+          "hist": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            3,
+            3,
+            6,
+            8,
+            7
+          ]
+        },
+        "Ultima Fecha Registro": {
+          "valor": "13-03-2026"
+        }
+      }
+    },
+    "RC.CC.08": {
+      "muestras": 1,
+      "controles": {
+        "Alambre 1.5cm": {
+          "valor": "DETECTADO"
+        },
+        "Clavos/Clips": {
+          "valor": "DETECTADO"
+        },
+        "Pase Patrones Pre OK": {
+          "valor": 8.0,
+          "hist": [
+            8
+          ]
+        },
+        "Pernos 2cm": {
+          "valor": "DETECTADO"
+        },
+        "Ultima Fecha Registro": {
+          "valor": "10-10-2026"
+        }
+      }
+    },
+    "RC.CC.09": {
+      "muestras": 1,
+      "controles": {
+        "Aflatoxina B1": {
+          "valor": null
+        },
+        "E. coli": {
+          "valor": "AUSENTE"
+        },
+        "Humedad": {
+          "valor": 3.2,
+          "hist": [
+            3.2
+          ]
+        },
+        "Salmonella": {
+          "valor": "AUSENTE"
+        },
+        "Total Aflatoxinas": {
+          "valor": 0.9,
+          "hist": [
+            0.9
+          ]
+        },
+        "Total Bacterias": {
+          "valor": 2000.0,
+          "hist": [
+            2000.0
+          ]
+        }
+      }
+    },
+    "RC.CC.11": {
+      "muestras": 8,
+      "controles": {
+        "% Podrida Broken N": {
+          "valor": 0.52,
+          "hist": [
+            0.4,
+            0.67,
+            0.25,
+            0.53,
+            0.45,
+            0.67,
+            0.72,
+            0.47
+          ]
+        },
+        "Chias Broken": {
+          "valor": 0.06,
+          "hist": [
+            0.0,
+            0.04,
+            0.17,
+            0.0,
+            0.1,
+            0.03,
+            0.0,
+            0.17
+          ]
+        },
+        "Mat. Extranos": {
+          "valor": "AUSENTE"
+        },
+        "Punto Cafe": {
+          "valor": 0.0,
+          "hist": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "RC.CC.13": {
+      "muestras": 8,
+      "controles": {
+        "Cumple": {
+          "valor": "SI"
+        },
+        "Peso Neto (kg)": {
+          "valor": 19.96,
+          "hist": [
+            19.96,
+            19.96,
+            19.96,
+            19.96,
+            19.96,
+            19.96,
+            19.96,
+            19.96
+          ]
+        },
+        "Tara Promedio (kg)": {
+          "valor": 0.68,
+          "hist": [
+            0.68,
+            0.68,
+            0.68,
+            0.68,
+            0.68,
+            0.68,
+            0.68,
+            0.68
+          ]
+        }
+      }
+    },
+    "RC.CC.14": {
+      "muestras": 1,
+      "controles": {
+        "% Humedad Recepcion": {
+          "valor": 24.4,
+          "hist": [
+            24.5,
+            24.5,
+            24.5,
+            24.1,
+            24.1,
+            24.1,
+            24.7,
+            24.7
+          ],
+          "labels": [
+            "6/12/2025",
+            "6/12/2025",
+            "6/12/2025",
+            "10/12/2025",
+            "10/12/2025",
+            "10/12/2025",
+            "11/12/2025",
+            "11/12/2025"
+          ]
+        },
+        "% Humedad Salida Proceso": {
+          "valor": 23.0,
+          "hist": [
+            24.4,
+            23.8,
+            23.2,
+            23.0
+          ],
+          "labels": [
+            "15/12/2025",
+            "22/12/2025",
+            "29/12/2025",
+            "03-01-26"
+          ]
+        },
+        "Ultima Salida a Proceso": {
+          "valor": "03-01-26"
+        }
+      }
+    },
+    "RC.CC.17": {
+      "muestras": 1,
+      "controles": {
+        "% Corte (max aceptable)": {
+          "valor": 4.53,
+          "hist": [
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            5.0,
+            5.0,
+            5.0,
+            2.0,
+            2.0,
+            5.0,
+            5.0,
+            3.0,
+            3.0,
+            9.0,
+            9.0,
+            4.0,
+            4.0
+          ],
+          "labels": [
+            "13-1-26 P1",
+            "13-1-26 P1",
+            "14-1-26 P2",
+            "14-1-26 P2",
+            "17-1-26 P3",
+            "17-1-26 P3",
+            "17-1-26 P3",
+            "19-1-26 P4",
+            "19-1-26 P4",
+            "20-1-26 P5",
+            "20-1-26 P5",
+            "22-1-26 P6",
+            "22-1-26 P6",
+            "24-1-26 P7",
+            "24-1-26 P7",
+            "26-1-26 P8",
+            "26-1-26 P8"
+          ]
+        },
+        "Manometro Autoclave": {
+          "valor": 4.0,
+          "hist": [
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0
+          ],
+          "labels": [
+            "13-1-26 P1",
+            "13-1-26 P1",
+            "14-1-26 P2",
+            "14-1-26 P2",
+            "17-1-26 P3",
+            "17-1-26 P3",
+            "17-1-26 P3",
+            "19-1-26 P4",
+            "19-1-26 P4",
+            "20-1-26 P5",
+            "20-1-26 P5",
+            "22-1-26 P6",
+            "22-1-26 P6",
+            "24-1-26 P7",
+            "24-1-26 P7",
+            "26-1-26 P8",
+            "26-1-26 P8"
+          ]
+        },
+        "Manometro Distribuidor": {
+          "valor": 7.0,
+          "hist": [
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0
+          ],
+          "labels": [
+            "13-1-26 P1",
+            "13-1-26 P1",
+            "14-1-26 P2",
+            "14-1-26 P2",
+            "17-1-26 P3",
+            "17-1-26 P3",
+            "17-1-26 P3",
+            "19-1-26 P4",
+            "19-1-26 P4",
+            "20-1-26 P5",
+            "20-1-26 P5",
+            "22-1-26 P6",
+            "22-1-26 P6",
+            "24-1-26 P7",
+            "24-1-26 P7",
+            "26-1-26 P8",
+            "26-1-26 P8"
+          ]
+        }
+      }
+    }
+  },
+  "RG 02-CV": {
+    "RC.CC.01": {
+      "muestras": 1,
+      "controles": {
+        "% Ombligo (Lona)": {
+          "valor": 1.26,
+          "hist": [
+            1.5,
+            1.36,
+            1.46,
+            1.26
+          ],
+          "labels": [
+            "1/16/2026",
+            "1/17/2026",
+            "1/19/2026",
+            "1/20/2026"
+          ]
+        },
+        "% Podrida (Lona)": {
+          "valor": 1.85,
+          "hist": [
+            2.04,
+            2.43,
+            2.03,
+            1.85
+          ],
+          "labels": [
+            "1/16/2026",
+            "1/17/2026",
+            "1/19/2026",
+            "1/20/2026"
+          ]
+        }
+      }
+    },
+    "RC.CC.1.1": {
+      "muestras": 1,
+      "controles": {
+        "% Corte Chias": {
+          "valor": 2.5,
+          "hist": [
+            6.0,
+            5.0,
+            4.0,
+            3.5,
+            5.0,
+            2.5,
+            2.5
+          ],
+          "labels": [
+            "23-12-25",
+            "23-12-25",
+            "23-12-25",
+            "23-12-25",
+            "24-12-25",
+            "24-12-25",
+            "24-12-25"
+          ]
+        }
+      }
+    },
+    "RC.CC.02": {
+      "muestras": 6,
+      "controles": {
+        "% Chias Lona 1": {
+          "valor": 1.85,
+          "hist": [
+            1.59,
+            1.8,
+            1.9,
+            1.83,
+            1.83,
+            2.17
+          ]
+        },
+        "% Pedazos Lona 1": {
+          "valor": 4.73,
+          "hist": [
+            3.76,
+            4.46,
+            4.77,
+            5.22,
+            5.02,
+            5.18
+          ]
+        },
+        "% Primera Banadera": {
+          "valor": 88.95,
+          "hist": [
+            91.84,
+            89.04,
+            88.45,
+            88.09,
+            88.44,
+            87.85
+          ]
+        }
+      }
+    },
+    "RC.CC.04": {
+      "muestras": 6,
+      "controles": {
+        "% Chias": {
+          "valor": 5.37,
+          "hist": [
+            7.5,
+            6.5,
+            4.95,
+            3.67,
+            4.8,
+            4.8
+          ]
+        },
+        "% Dannadas": {
+          "valor": 11.27,
+          "hist": [
+            17.3,
+            11.25,
+            15.65,
+            10.67,
+            6.3,
+            6.45
+          ]
+        },
+        "% Severamente Dannadas": {
+          "valor": 6.08,
+          "hist": [
+            9.7,
+            7.5,
+            4.95,
+            4.0,
+            4.8,
+            5.5
+          ]
+        }
+      }
+    },
+    "RC.CC.05": {
+      "muestras": 6,
+      "controles": {
+        "% Danadas": {
+          "valor": 1.59,
+          "hist": [
+            1.6,
+            1.55,
+            1.61
+          ]
+        },
+        "% Sev. Danadas": {
+          "valor": 0.56,
+          "hist": [
+            0.41,
+            0.51,
+            0.75
+          ]
+        },
+        "Mat. Extranos": {
+          "valor": "AUSENTE"
+        }
+      }
+    },
+    "RC.CC.06": {
+      "muestras": 1,
+      "controles": {
+        "Cajas Reembazadas (Promedio)": {
+          "valor": 1.68,
+          "hist": [
+            1.0,
+            4.0,
+            1.0,
+            2.0,
+            1.0,
+            2.0,
+            1.0,
+            1.0,
+            1.0,
+            4.0,
+            1.0,
+            2.0,
+            2.0,
+            1.0,
+            2.0,
+            1.0,
+            1.0,
+            2.0,
+            2.0,
+            3.0,
+            2.0,
+            1.0,
+            2.0,
+            1.0,
+            2.0,
+            1.0,
+            2.0,
+            1.0
+          ],
+          "labels": [
+            "2/2/2026 IA-002",
+            "2/2/2026 IA-002",
+            "2/2/2026 IA-011",
+            "2/2/2026 IA-013",
+            "2/2/2026 IA-014",
+            "9/2/2026 IA-002",
+            "9/2/2026 IA-012",
+            "9/2/2026 IA-013",
+            "9/2/2026 IA-014",
+            "11/2/2026 IA-002",
+            "11/2/2026 IA-011",
+            "11/2/2026 IA-012",
+            "11/2/2026 IA-013",
+            "11/2/2026 IA-014",
+            "12/2/2026 IA-002",
+            "12/2/2026 IA-011",
+            "12/2/2026 IA-013",
+            "12/2/2026 IA-014",
+            "13/2/2026 IA-002",
+            "13/2/2026 IA-011",
+            "13/2/2026 IA-012",
+            "13/2/2026 IA-013",
+            "13/2/2026 IA-014",
+            "16/2/2026 IA-002",
+            "16/2/2026 IA-002",
+            "16/2/2026 IA-012",
+            "16/2/2026 IA-013",
+            "16/2/2026 IA-014"
+          ]
+        },
+        "Estado Reemplazo": {
+          "valor": "CONTROLADO"
+        }
+      }
+    },
+    "RC.CC.07": {
+      "muestras": 6,
+      "controles": {
+        "Acero Inox 4mm": {
+          "valor": "ATRAPA ok"
+        },
+        "Cajas Almendra 1ra": {
+          "valor": 128.5,
+          "hist": [
+            135,
+            134,
+            128,
+            134,
+            80,
+            160
+          ]
+        },
+        "Cajas Almendra 2da": {
+          "valor": 13.17,
+          "hist": [
+            14,
+            10,
+            14,
+            10,
+            22,
+            9
+          ]
+        },
+        "Ferroso Fe 3mm": {
+          "valor": "ATRAPA ok"
+        },
+        "No Ferroso 3.5mm": {
+          "valor": "ATRAPA ok"
+        },
+        "Pasajes Verificados": {
+          "valor": 3.0,
+          "hist": [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ]
+        },
+        "Ultima Fecha Registro": {
+          "valor": "14-02-2026"
+        }
+      }
+    },
+    "RC.CC.08": {
+      "muestras": 1,
+      "controles": {
+        "Alambre 1.5cm": {
+          "valor": "DETECTADO"
+        },
+        "Clavos/Clips": {
+          "valor": "DETECTADO"
+        },
+        "Pase Patrones Pre OK": {
+          "valor": 8.0,
+          "hist": [
+            8
+          ]
+        },
+        "Pernos 2cm": {
+          "valor": "DETECTADO"
+        },
+        "Ultima Fecha Registro": {
+          "valor": "10-10-2026"
+        }
+      }
+    },
+    "RC.CC.09": {
+      "muestras": 1,
+      "controles": {
+        "Aflatoxina B1": {
+          "valor": null
+        },
+        "E. coli": {
+          "valor": "AUSENTE"
+        },
+        "Humedad": {
+          "valor": null
+        },
+        "Salmonella": {
+          "valor": "AUSENTE"
+        },
+        "Total Aflatoxinas": {
+          "valor": null
+        },
+        "Total Bacterias": {
+          "valor": null
+        }
+      }
+    },
+    "RC.CC.11": {
+      "muestras": 6,
+      "controles": {
+        "% Podrida Broken N": {
+          "valor": 0.14,
+          "hist": [
+            0.33,
+            0.15,
+            0.1,
+            0.05,
+            0.05,
+            0.17
+          ]
+        },
+        "Chias Broken": {
+          "valor": 0.01,
+          "hist": [
+            0.03,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "Mat. Extranos": {
+          "valor": "AUSENTE"
+        },
+        "Punto Cafe": {
+          "valor": 0.0,
+          "hist": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "RC.CC.13": {
+      "muestras": 6,
+      "controles": {
+        "Cumple": {
+          "valor": "SI"
+        },
+        "Peso Neto (kg)": {
+          "valor": 19.96,
+          "hist": [
+            19.96,
+            19.96,
+            19.96,
+            19.96,
+            19.96,
+            19.96
+          ]
+        },
+        "Tara Promedio (kg)": {
+          "valor": 0.68,
+          "hist": [
+            0.68,
+            0.68,
+            0.68,
+            0.68,
+            0.68,
+            0.68
+          ]
+        }
+      }
+    },
+    "RC.CC.14": {
+      "muestras": 1,
+      "controles": {
+        "% Humedad Recepcion": {
+          "valor": 26.71,
+          "hist": [
+            26.8,
+            26.8,
+            26.8,
+            26.8,
+            26.6,
+            26.6,
+            26.6
+          ],
+          "labels": [
+            "23/12/2025",
+            "23/12/2025",
+            "23/12/2025",
+            "23/12/2025",
+            "24/12/2025",
+            "24/12/2025",
+            "24/12/2025"
+          ]
+        },
+        "% Humedad Salida Proceso": {
+          "valor": 25.0,
+          "hist": [
+            26.5,
+            26.1,
+            25.0
+          ],
+          "labels": [
+            "26/12/2025",
+            "31/12/2025",
+            "6/1/2026"
+          ]
+        },
+        "Ultima Salida a Proceso": {
+          "valor": "SIN FECHA"
+        }
+      }
+    },
+    "RC.CC.17": {
+      "muestras": 1,
+      "controles": {
+        "% Corte (max aceptable)": {
+          "valor": 5.44,
+          "hist": [
+            4.0,
+            4.0,
+            6.0,
+            6.0,
+            6.0,
+            4.0,
+            4.0,
+            4.0,
+            5.0,
+            5.0,
+            5.0,
+            8.0,
+            8.0,
+            6.0,
+            6.0,
+            6.0
+          ],
+          "labels": [
+            "28-1-26 P9",
+            "28-1-26 P9",
+            "30-1-26 P10",
+            "30-1-26 P10",
+            "30-1-26 P10",
+            "7-2-26 P11",
+            "7-2-26 P11",
+            "7-2-26 P11",
+            "9-2-26 P12",
+            "9-2-26 P12",
+            "9-2-26 P12",
+            "10-2-26 P13",
+            "10-2-26 P13",
+            "11-2-26 P14",
+            "11-2-26 P14",
+            "11-2-26 P14"
+          ]
+        },
+        "Manometro Autoclave": {
+          "valor": 4.0,
+          "hist": [
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0
+          ],
+          "labels": [
+            "28-1-26 P9",
+            "28-1-26 P9",
+            "30-1-26 P10",
+            "30-1-26 P10",
+            "30-1-26 P10",
+            "7-2-26 P11",
+            "7-2-26 P11",
+            "7-2-26 P11",
+            "9-2-26 P12",
+            "9-2-26 P12",
+            "9-2-26 P12",
+            "10-2-26 P13",
+            "10-2-26 P13",
+            "11-2-26 P14",
+            "11-2-26 P14",
+            "11-2-26 P14"
+          ]
+        },
+        "Manometro Distribuidor": {
+          "valor": 7.0,
+          "hist": [
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0
+          ],
+          "labels": [
+            "28-1-26 P9",
+            "28-1-26 P9",
+            "30-1-26 P10",
+            "30-1-26 P10",
+            "30-1-26 P10",
+            "7-2-26 P11",
+            "7-2-26 P11",
+            "7-2-26 P11",
+            "9-2-26 P12",
+            "9-2-26 P12",
+            "9-2-26 P12",
+            "10-2-26 P13",
+            "10-2-26 P13",
+            "11-2-26 P14",
+            "11-2-26 P14",
+            "11-2-26 P14"
+          ]
+        }
+      }
+    }
+  },
+  "BSI 01": {
+    "RC.CC.01": {
+      "muestras": 1,
+      "controles": {
+        "% Ombligo (Lona)": {
+          "valor": 1.57,
+          "hist": [
+            1.79,
+            1.65,
+            1.58,
+            1.57
+          ],
+          "labels": [
+            "1/23/2026",
+            "1/24/2026",
+            "1/26/2026",
+            "1/27/2026"
+          ]
+        },
+        "% Podrida (Lona)": {
+          "valor": 2.25,
+          "hist": [
+            2.34,
+            2.21,
+            2.53,
+            2.25
+          ],
+          "labels": [
+            "1/23/2026",
+            "1/24/2026",
+            "1/26/2026",
+            "1/27/2026"
+          ]
+        }
+      }
+    },
+    "RC.CC.1.1": {
+      "muestras": 1,
+      "controles": {
+        "% Corte Chias": {
+          "valor": 6.0,
+          "hist": [
+            3.0,
+            4.0,
+            5.0,
+            3.0,
+            8.0,
+            3.0,
+            6.0
+          ],
+          "labels": [
+            "16-1-26",
+            "16-1-26",
+            "16-1-26",
+            "16-1-26",
+            "16-1-26",
+            "16-1-26",
+            "16-1-26"
+          ]
+        }
+      }
+    },
+    "RC.CC.02": {
+      "muestras": 7,
+      "controles": {
+        "% Chias Lona 1": {
+          "valor": 2.06,
+          "hist": [
+            1.93,
+            2.04,
+            2.02,
+            2.18,
+            2.17,
+            2.03,
+            2.08
+          ]
+        },
+        "% Pedazos Lona 1": {
+          "valor": 5.13,
+          "hist": [
+            5.19,
+            5.18,
+            5.25,
+            5.03,
+            5.12,
+            4.96,
+            5.15
+          ]
+        },
+        "% Primera Banadera": {
+          "valor": 88.24,
+          "hist": [
+            88.3,
+            88.01,
+            87.96,
+            88.24,
+            88.23,
+            88.7,
+            88.22
+          ]
+        }
+      }
+    },
+    "RC.CC.04": {
+      "muestras": 7,
+      "controles": {
+        "% Chias": {
+          "valor": 4.72,
+          "hist": [
+            4.0,
+            3.3,
+            3.5,
+            5.97,
+            6.3,
+            6.0,
+            4.0
+          ]
+        },
+        "% Dannadas": {
+          "valor": 10.06,
+          "hist": [
+            12.0,
+            9.35,
+            9.95,
+            10.77,
+            9.2,
+            6.87,
+            12.3
+          ]
+        },
+        "% Severamente Dannadas": {
+          "valor": 5.18,
+          "hist": [
+            4.0,
+            3.3,
+            3.5,
+            5.97,
+            9.8,
+            6.67,
+            3.0
+          ]
+        }
+      }
+    },
+    "RC.CC.05": {
+      "muestras": 7,
+      "controles": {
+        "% Danadas": {
+          "valor": 1.65,
+          "hist": [
+            1.65
+          ]
+        },
+        "% Sev. Danadas": {
+          "valor": 0.45,
+          "hist": [
+            0.45
+          ]
+        },
+        "Mat. Extranos": {
+          "valor": "AUSENTE"
+        }
+      }
+    },
+    "RC.CC.06": {
+      "muestras": 1,
+      "controles": {
+        "Cajas Reembazadas (Promedio)": {
+          "valor": 1.91,
+          "hist": [
+            1.0,
+            2.0,
+            1.0,
+            5.0,
+            1.0,
+            2.0,
+            3.0,
+            1.0,
+            1.0,
+            3.0,
+            2.0,
+            1.0,
+            2.0,
+            2.0,
+            1.0,
+            4.0,
+            2.0,
+            1.0,
+            2.0,
+            1.0,
+            2.0,
+            1.0,
+            3.0
+          ],
+          "labels": [
+            "20/2/2026 IA-022",
+            "20/2/2026 IA-023",
+            "21/2/2026 IA-022",
+            "21/2/2026 IA-023",
+            "21/2/2026 IA-014",
+            "23/2/2026 IA-022",
+            "23/2/2026 IA-023",
+            "23/2/2026 IA-014",
+            "25/2/2026 IA-003",
+            "25/2/2026 IA-003",
+            "25/2/2026 IA-023",
+            "25/2/2026 IA-014",
+            "26/2/2026 IA-003",
+            "26/2/2026 IA-023",
+            "26/2/2026 IA-014",
+            "27/2/2026 IA-003",
+            "27/2/2026 IA-003",
+            "27/2/2026 IA-022",
+            "27/2/2026 IA-023",
+            "27/2/2026 IA-014",
+            "28/3/2026 IA-003",
+            "28/3/2026 IA-022",
+            "28/3/2026 IA-023"
+          ]
+        },
+        "Estado Reemplazo": {
+          "valor": "CONTROLADO"
+        }
+      }
+    },
+    "RC.CC.07": {
+      "muestras": 7,
+      "controles": {
+        "Acero Inox 4mm": {
+          "valor": "ATRAPA ok"
+        },
+        "Cajas Almendra 1ra": {
+          "valor": 114.43,
+          "hist": [
+            119,
+            100,
+            89,
+            171,
+            84,
+            109,
+            129
+          ]
+        },
+        "Cajas Almendra 2da": {
+          "valor": 14.29,
+          "hist": [
+            13,
+            12,
+            17,
+            9,
+            11,
+            14,
+            24
+          ]
+        },
+        "Ferroso Fe 3mm": {
+          "valor": "ATRAPA ok"
+        },
+        "No Ferroso 3.5mm": {
+          "valor": "ATRAPA ok"
+        },
+        "Pasajes Verificados": {
+          "valor": 2.86,
+          "hist": [
+            3,
+            3,
+            3,
+            3,
+            2,
+            3,
+            3
+          ]
+        },
+        "Ultima Fecha Registro": {
+          "valor": "28-02-2026"
+        }
+      }
+    },
+    "RC.CC.08": {
+      "muestras": 1,
+      "controles": {
+        "Alambre 1.5cm": {
+          "valor": "DETECTADO"
+        },
+        "Clavos/Clips": {
+          "valor": "DETECTADO"
+        },
+        "Pase Patrones Pre OK": {
+          "valor": 8.0,
+          "hist": [
+            8
+          ]
+        },
+        "Pernos 2cm": {
+          "valor": "DETECTADO"
+        },
+        "Ultima Fecha Registro": {
+          "valor": "10-10-2026"
+        }
+      }
+    },
+    "RC.CC.09": {
+      "muestras": 1,
+      "controles": {
+        "Aflatoxina B1": {
+          "valor": null
+        },
+        "E. coli": {
+          "valor": "AUSENTE"
+        },
+        "Humedad": {
+          "valor": null
+        },
+        "Salmonella": {
+          "valor": "AUSENTE"
+        },
+        "Total Aflatoxinas": {
+          "valor": null
+        },
+        "Total Bacterias": {
+          "valor": null
+        }
+      }
+    },
+    "RC.CC.11": {
+      "muestras": 7,
+      "controles": {
+        "% Podrida Broken N": {
+          "valor": 0.15,
+          "hist": [
+            0.12,
+            0.11,
+            0.11,
+            0.17,
+            0.19,
+            0.18,
+            0.19
+          ]
+        },
+        "Chias Broken": {
+          "valor": 0.07,
+          "hist": [
+            0.06,
+            0.03,
+            0.04,
+            0.08,
+            0.07,
+            0.11,
+            0.1
+          ]
+        },
+        "Mat. Extranos": {
+          "valor": "AUSENTE"
+        },
+        "Punto Cafe": {
+          "valor": 0.0,
+          "hist": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "RC.CC.13": {
+      "muestras": 3,
+      "controles": {
+        "Cumple": {
+          "valor": "SI"
+        },
+        "Peso Neto (kg)": {
+          "valor": 19.96,
+          "hist": [
+            19.96,
+            19.96,
+            19.96
+          ]
+        },
+        "Tara Promedio (kg)": {
+          "valor": 0.68,
+          "hist": [
+            0.68,
+            0.68,
+            0.68
+          ]
+        }
+      }
+    },
+    "RC.CC.14": {
+      "muestras": 1,
+      "controles": {
+        "% Humedad Recepcion": {
+          "valor": 28.7,
+          "hist": [
+            28.7
+          ],
+          "labels": [
+            "16/1/2026"
+          ]
+        },
+        "% Humedad Salida Proceso": {
+          "valor": null
+        },
+        "Ultima Salida a Proceso": {
+          "valor": "SIN FECHA"
+        }
+      }
+    },
+    "RC.CC.17": {
+      "muestras": 1,
+      "controles": {
+        "% Corte (max aceptable)": {
+          "valor": 4.35,
+          "hist": [
+            4.0,
+            4.0,
+            6.0,
+            6.0,
+            6.0,
+            6.0,
+            6.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            3.0,
+            3.0,
+            3.0,
+            3.0
+          ],
+          "labels": [
+            "12-2-26 P15",
+            "12-2-26 P15",
+            "16-2-26 P16",
+            "16-2-26 P16",
+            "18-2-26 P17",
+            "18-2-26 P17",
+            "18-2-26 P17",
+            "19-2-26 P18",
+            "19-2-26 P18",
+            "19-2-26 P18",
+            "19-2-26 P19",
+            "21-2-26 P19",
+            "21-2-26 P20",
+            "23-2-26 P20",
+            "23-2-26 P21",
+            "24-2-26 P21",
+            "24-2-26 P21"
+          ]
+        },
+        "Manometro Autoclave": {
+          "valor": 4.0,
+          "hist": [
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0
+          ],
+          "labels": [
+            "12-2-26 P15",
+            "12-2-26 P15",
+            "16-2-26 P16",
+            "16-2-26 P16",
+            "18-2-26 P17",
+            "18-2-26 P17",
+            "18-2-26 P17",
+            "19-2-26 P18",
+            "19-2-26 P18",
+            "19-2-26 P18",
+            "19-2-26 P19",
+            "21-2-26 P19",
+            "21-2-26 P20",
+            "23-2-26 P20",
+            "23-2-26 P21",
+            "24-2-26 P21",
+            "24-2-26 P21"
+          ]
+        },
+        "Manometro Distribuidor": {
+          "valor": 7.0,
+          "hist": [
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0
+          ],
+          "labels": [
+            "12-2-26 P15",
+            "12-2-26 P15",
+            "16-2-26 P16",
+            "16-2-26 P16",
+            "18-2-26 P17",
+            "18-2-26 P17",
+            "18-2-26 P17",
+            "19-2-26 P18",
+            "19-2-26 P18",
+            "19-2-26 P18",
+            "19-2-26 P19",
+            "21-2-26 P19",
+            "21-2-26 P20",
+            "23-2-26 P20",
+            "23-2-26 P21",
+            "24-2-26 P21",
+            "24-2-26 P21"
+          ]
+        }
+      }
+    }
+  },
+  "DA 01-CV": {
+    "RC.CC.01": {
+      "muestras": 1,
+      "controles": {
+        "% Ombligo (Lona)": {
+          "valor": 1.57,
+          "hist": [
+            1.56,
+            1.67,
+            1.42,
+            1.57
+          ],
+          "labels": [
+            "1/28/2026",
+            "1/29/2026",
+            "1/31/2026",
+            "2/2/2026"
+          ]
+        },
+        "% Podrida (Lona)": {
+          "valor": 2.2,
+          "hist": [
+            2.42,
+            2.67,
+            2.54,
+            2.2
+          ],
+          "labels": [
+            "1/28/2026",
+            "1/29/2026",
+            "1/31/2026",
+            "2/2/2026"
+          ]
+        }
+      }
+    },
+    "RC.CC.1.1": {
+      "muestras": 1,
+      "controles": {
+        "% Corte Chias": {
+          "valor": 9.0,
+          "hist": [
+            6.0,
+            4.0,
+            6.0,
+            7.0,
+            3.0,
+            4.0,
+            9.0
+          ],
+          "labels": [
+            "10-1-26",
+            "10-1-26",
+            "10-1-26",
+            "10-1-26",
+            "10-1-26",
+            "10-1-26",
+            "10-1-26"
+          ]
+        }
+      }
+    },
+    "RC.CC.02": {
+      "muestras": 7,
+      "controles": {
+        "% Chias Lona 1": {
+          "valor": 2.11,
+          "hist": [
+            1.78,
+            1.87,
+            2.56,
+            2.01,
+            2.37,
+            2.15,
+            2.06
+          ]
+        },
+        "% Pedazos Lona 1": {
+          "valor": 4.83,
+          "hist": [
+            3.67,
+            4.93,
+            5.64,
+            4.8,
+            5.03,
+            4.91,
+            4.8
+          ]
+        },
+        "% Primera Banadera": {
+          "valor": 88.54,
+          "hist": [
+            91.06,
+            88.87,
+            87.21,
+            88.62,
+            87.87,
+            87.7,
+            88.46
+          ]
+        }
+      }
+    },
+    "RC.CC.04": {
+      "muestras": 7,
+      "controles": {
+        "% Chias": {
+          "valor": 5.9,
+          "hist": [
+            5.1,
+            5.17,
+            3.85,
+            5.9,
+            8.32,
+            4.8,
+            8.17
+          ]
+        },
+        "% Dannadas": {
+          "valor": 7.34,
+          "hist": [
+            8.32,
+            5.93,
+            3.38,
+            7.1,
+            8.93,
+            7.38,
+            10.33
+          ]
+        },
+        "% Severamente Dannadas": {
+          "valor": 5.9,
+          "hist": [
+            5.1,
+            5.17,
+            3.85,
+            5.9,
+            8.32,
+            4.8,
+            8.17
+          ]
+        }
+      }
+    },
+    "RC.CC.05": {
+      "muestras": 3,
+      "controles": {
+        "% Danadas": {
+          "valor": 1.29,
+          "hist": [
+            0.96,
+            1.41,
+            1.49
+          ]
+        },
+        "% Sev. Danadas": {
+          "valor": 0.58,
+          "hist": [
+            0.7,
+            0.46,
+            0.57
+          ]
+        },
+        "Mat. Extranos": {
+          "valor": "AUSENTE"
+        }
+      }
+    },
+    "RC.CC.06": {
+      "muestras": 1,
+      "controles": {
+        "Cajas Reembazadas (Promedio)": {
+          "valor": 2.92,
+          "hist": [
+            2.0,
+            6.0,
+            1.0,
+            2.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            6.0,
+            5.0,
+            5.0,
+            1.0,
+            4.0,
+            3.0,
+            1.0,
+            1.0,
+            3.0,
+            1.0,
+            5.0,
+            1.0,
+            5.0,
+            5.0,
+            6.0,
+            3.0,
+            3.0
+          ],
+          "labels": [
+            "4/3/2026 IA-004",
+            "4/3/2026 IA-014",
+            "5/3/2026 IA-004",
+            "5/3/2026 IA-004",
+            "5/3/2026 IA-012",
+            "6/3/2026 IA-004",
+            "6/3/2026 IA-004",
+            "6/3/2026 IA-012",
+            "6/3/2026 IA-014",
+            "9/3/2026 IA-004",
+            "9/3/2026 IA-012",
+            "9/3/2026 IA-014",
+            "11/3/2026 IA-004",
+            "11/3/2026 IA-004",
+            "11/3/2026 IA-012",
+            "11/3/2026 IA-014",
+            "12/3/2026 IA-004",
+            "12/3/2026 IA-004",
+            "12/3/2026 IA-012",
+            "12/3/2026 IA-013",
+            "12/3/2026 IA-014",
+            "13/3/2026 IA-004",
+            "13/3/2026 IA-012",
+            "13/3/2026 IA-013",
+            "13/3/2026 IA-014"
+          ]
+        },
+        "Estado Reemplazo": {
+          "valor": "CONTROLADO"
+        }
+      }
+    },
+    "RC.CC.08": {
+      "muestras": 1,
+      "controles": {
+        "Alambre 1.5cm": {
+          "valor": "DETECTADO"
+        },
+        "Clavos/Clips": {
+          "valor": "DETECTADO"
+        },
+        "Pase Patrones Pre OK": {
+          "valor": 8.0,
+          "hist": [
+            8
+          ]
+        },
+        "Pernos 2cm": {
+          "valor": "DETECTADO"
+        },
+        "Ultima Fecha Registro": {
+          "valor": "10-10-2026"
+        }
+      }
+    },
+    "RC.CC.09": {
+      "muestras": 1,
+      "controles": {
+        "Aflatoxina B1": {
+          "valor": null
+        },
+        "E. coli": {
+          "valor": "AUSENTE"
+        },
+        "Humedad": {
+          "valor": null
+        },
+        "Salmonella": {
+          "valor": "AUSENTE"
+        },
+        "Total Aflatoxinas": {
+          "valor": null
+        },
+        "Total Bacterias": {
+          "valor": null
+        }
+      }
+    },
+    "RC.CC.11": {
+      "muestras": 1,
+      "controles": {
+        "% Podrida Broken N": {
+          "valor": null
+        },
+        "Chias Broken": {
+          "valor": 0.67,
+          "hist": [
+            0.67
+          ]
+        },
+        "Mat. Extranos": {
+          "valor": "AUSENTE"
+        },
+        "Punto Cafe": {
+          "valor": 0.0,
+          "hist": [
+            0.0
+          ]
+        }
+      }
+    },
+    "RC.CC.13": {
+      "muestras": 4,
+      "controles": {
+        "Cumple": {
+          "valor": "SI"
+        },
+        "Peso Neto (kg)": {
+          "valor": null
+        },
+        "Tara Promedio (kg)": {
+          "valor": null
+        }
+      }
+    },
+    "RC.CC.14": {
+      "muestras": 1,
+      "controles": {
+        "% Humedad Recepcion": {
+          "valor": 28.4,
+          "hist": [
+            28.4
+          ],
+          "labels": [
+            "10/1/2026"
+          ]
+        },
+        "% Humedad Salida Proceso": {
+          "valor": null
+        },
+        "Ultima Salida a Proceso": {
+          "valor": "SIN FECHA"
+        }
+      }
+    },
+    "RC.CC.17": {
+      "muestras": 1,
+      "controles": {
+        "% Corte (max aceptable)": {
+          "valor": 6.07,
+          "hist": [
+            5.0,
+            5.0,
+            4.0,
+            4.0,
+            4.5,
+            4.5,
+            4.5,
+            4.5,
+            8.5,
+            8.5,
+            8.5,
+            8.5,
+            7.5,
+            7.5
+          ],
+          "labels": [
+            "26-2-26 P22",
+            "26-2-26 P22",
+            "28-2-26 P23",
+            "28-2-26 P23",
+            "2-3-26 P24",
+            "2-3-26 P24",
+            "3-3-26 P25",
+            "3-3-26 P25",
+            "5-3-26 P26",
+            "5-3-26 P26",
+            "7-3-26 P27",
+            "7-3-26 P27",
+            "9-3-26 P28",
+            "9-3-26 P28"
+          ]
+        },
+        "Manometro Autoclave": {
+          "valor": 7.0,
+          "hist": [
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0
+          ],
+          "labels": [
+            "26-2-26 P22",
+            "26-2-26 P22",
+            "28-2-26 P23",
+            "28-2-26 P23",
+            "2-3-26 P24",
+            "2-3-26 P24",
+            "3-3-26 P25",
+            "3-3-26 P25",
+            "5-3-26 P26",
+            "5-3-26 P26",
+            "7-3-26 P27",
+            "7-3-26 P27",
+            "9-3-26 P28",
+            "9-3-26 P28"
+          ]
+        },
+        "Manometro Distribuidor": {
+          "valor": 4.0,
+          "hist": [
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0
+          ],
+          "labels": [
+            "26-2-26 P22",
+            "26-2-26 P22",
+            "28-2-26 P23",
+            "28-2-26 P23",
+            "2-3-26 P24",
+            "2-3-26 P24",
+            "3-3-26 P25",
+            "3-3-26 P25",
+            "5-3-26 P26",
+            "5-3-26 P26",
+            "7-3-26 P27",
+            "7-3-26 P27",
+            "9-3-26 P28",
+            "9-3-26 P28"
+          ]
+        }
+      }
+    }
+  },
+  "AA 01-26": {
+    "RC.CC.01": {
+      "muestras": 1,
+      "controles": {
+        "% Ombligo (Lona)": {
+          "valor": 1.5,
+          "hist": [
+            1.44,
+            1.47,
+            1.54,
+            1.5
+          ],
+          "labels": [
+            "2/4/2026",
+            "2/5/2026",
+            "2/6/2026",
+            "2/9/2026"
+          ]
+        },
+        "% Podrida (Lona)": {
+          "valor": 2.47,
+          "hist": [
+            2.04,
+            2.22,
+            2.15,
+            2.47
+          ],
+          "labels": [
+            "2/4/2026",
+            "2/5/2026",
+            "2/6/2026",
+            "2/9/2026"
+          ]
+        }
+      }
+    },
+    "RC.CC.1.1": {
+      "muestras": 1,
+      "controles": {
+        "% Corte Chias": {
+          "valor": 3.0,
+          "hist": [
+            4.0,
+            4.0,
+            5.0,
+            7.0,
+            6.0,
+            8.0,
+            3.0
+          ],
+          "labels": [
+            "8-1-26",
+            "8-1-26",
+            "8-1-26",
+            "8-1-26",
+            "8-1-26",
+            "8-1-26",
+            "8-1-26"
+          ]
+        }
+      }
+    },
+    "RC.CC.02": {
+      "muestras": 4,
+      "controles": {
+        "% Chias Lona 1": {
+          "valor": 2.56,
+          "hist": [
+            2.52,
+            2.51,
+            2.61,
+            2.61
+          ]
+        },
+        "% Pedazos Lona 1": {
+          "valor": 4.76,
+          "hist": [
+            4.78,
+            4.52,
+            4.87,
+            4.87
+          ]
+        },
+        "% Primera Banadera": {
+          "valor": 86.6,
+          "hist": [
+            87.71,
+            87.81,
+            85.44,
+            85.44
+          ]
+        }
+      }
+    },
+    "RC.CC.06": {
+      "muestras": 1,
+      "controles": {
+        "Cajas Reembazadas (Promedio)": {
+          "valor": 2.92,
+          "hist": [
+            2.0,
+            6.0,
+            1.0,
+            2.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            6.0,
+            5.0,
+            5.0,
+            1.0,
+            4.0,
+            3.0,
+            1.0,
+            1.0,
+            3.0,
+            1.0,
+            5.0,
+            1.0,
+            5.0,
+            5.0,
+            6.0,
+            3.0,
+            3.0
+          ],
+          "labels": [
+            "4/3/2026 IA-004",
+            "4/3/2026 IA-014",
+            "5/3/2026 IA-004",
+            "5/3/2026 IA-004",
+            "5/3/2026 IA-012",
+            "6/3/2026 IA-004",
+            "6/3/2026 IA-004",
+            "6/3/2026 IA-012",
+            "6/3/2026 IA-014",
+            "9/3/2026 IA-004",
+            "9/3/2026 IA-012",
+            "9/3/2026 IA-014",
+            "11/3/2026 IA-004",
+            "11/3/2026 IA-004",
+            "11/3/2026 IA-012",
+            "11/3/2026 IA-014",
+            "12/3/2026 IA-004",
+            "12/3/2026 IA-004",
+            "12/3/2026 IA-012",
+            "12/3/2026 IA-013",
+            "12/3/2026 IA-014",
+            "13/3/2026 IA-004",
+            "13/3/2026 IA-012",
+            "13/3/2026 IA-013",
+            "13/3/2026 IA-014"
+          ]
+        },
+        "Estado Reemplazo": {
+          "valor": "CONTROLADO"
+        }
+      }
+    },
+    "RC.CC.08": {
+      "muestras": 1,
+      "controles": {
+        "Alambre 1.5cm": {
+          "valor": "DETECTADO"
+        },
+        "Clavos/Clips": {
+          "valor": "DETECTADO"
+        },
+        "Pase Patrones Pre OK": {
+          "valor": 6.0,
+          "hist": [
+            6
+          ]
+        },
+        "Pernos 2cm": {
+          "valor": "DETECTADO"
+        },
+        "Ultima Fecha Registro": {
+          "valor": "10-10-2026"
+        }
+      }
+    },
+    "RC.CC.09": {
+      "muestras": 1,
+      "controles": {
+        "Aflatoxina B1": {
+          "valor": null
+        },
+        "E. coli": {
+          "valor": "AUSENTE"
+        },
+        "Humedad": {
+          "valor": null
+        },
+        "Salmonella": {
+          "valor": "AUSENTE"
+        },
+        "Total Aflatoxinas": {
+          "valor": null
+        },
+        "Total Bacterias": {
+          "valor": null
+        }
+      }
+    },
+    "RC.CC.13": {
+      "muestras": 2,
+      "controles": {
+        "Cumple": {
+          "valor": "SI"
+        },
+        "Peso Neto (kg)": {
+          "valor": null
+        },
+        "Tara Promedio (kg)": {
+          "valor": null
+        }
+      }
+    },
+    "RC.CC.14": {
+      "muestras": 1,
+      "controles": {
+        "% Humedad Recepcion": {
+          "valor": 25.36,
+          "hist": [
+            25.9,
+            25.9,
+            25.9,
+            24.8,
+            24.8,
+            24.8,
+            25.4,
+            25.4
+          ],
+          "labels": [
+            "18/12/2025",
+            "18/12/2025",
+            "18/12/2025",
+            "20/12/2025",
+            "20/12/2025",
+            "20/12/2025",
+            "22/12/2025",
+            "22/12/2025"
+          ]
+        },
+        "% Humedad Salida Proceso": {
+          "valor": 24.3,
+          "hist": [
+            25.3,
+            24.9,
+            24.4,
+            24.3
+          ],
+          "labels": [
+            "24/12/2025",
+            "29/12/2025",
+            "6/1/2026",
+            "14-01-26"
+          ]
+        },
+        "Ultima Salida a Proceso": {
+          "valor": "14-01-26"
+        }
+      }
+    },
+    "RC.CC.17": {
+      "muestras": 1,
+      "controles": {
+        "% Corte (max aceptable)": {
+          "valor": 4.89,
+          "hist": [
+            6.5,
+            6.5,
+            5.0,
+            5.0,
+            3.5,
+            3.5,
+            6.5,
+            6.5,
+            4.0,
+            4.0,
+            4.0,
+            4.5,
+            4.5,
+            4.5
+          ],
+          "labels": [
+            "10-3-26 P29",
+            "10-3-26 P29",
+            "11-3-26 P30",
+            "11-3-26 P30",
+            "12-3-26 P31",
+            "12-3-26 P31",
+            "13-3-26 P32",
+            "13-3-26 P32",
+            "14-3-26 P33",
+            "14-3-26 P33",
+            "14-3-26 P33",
+            "16-3-26 P34",
+            "16-3-26 P34",
+            "16-3-26 P34"
+          ]
+        },
+        "Manometro Autoclave": {
+          "valor": 7.0,
+          "hist": [
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0
+          ],
+          "labels": [
+            "10-3-26 P29",
+            "10-3-26 P29",
+            "11-3-26 P30",
+            "11-3-26 P30",
+            "12-3-26 P31",
+            "12-3-26 P31",
+            "13-3-26 P32",
+            "13-3-26 P32",
+            "14-3-26 P33",
+            "14-3-26 P33",
+            "14-3-26 P33",
+            "16-3-26 P34",
+            "16-3-26 P34",
+            "16-3-26 P34"
+          ]
+        },
+        "Manometro Distribuidor": {
+          "valor": 4.0,
+          "hist": [
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0
+          ],
+          "labels": [
+            "10-3-26 P29",
+            "10-3-26 P29",
+            "11-3-26 P30",
+            "11-3-26 P30",
+            "12-3-26 P31",
+            "12-3-26 P31",
+            "13-3-26 P32",
+            "13-3-26 P32",
+            "14-3-26 P33",
+            "14-3-26 P33",
+            "14-3-26 P33",
+            "16-3-26 P34",
+            "16-3-26 P34",
+            "16-3-26 P34"
+          ]
+        }
+      }
+    }
+  },
+  "AA 02-26": {
+    "RC.CC.01": {
+      "muestras": 1,
+      "controles": {
+        "% Ombligo (Lona)": {
+          "valor": 1.5,
+          "hist": [
+            1.44,
+            1.47,
+            1.54,
+            1.5
+          ],
+          "labels": [
+            "2/13/2026",
+            "2/14/2026",
+            "2/16/2026",
+            "2/18/2026"
+          ]
+        },
+        "% Podrida (Lona)": {
+          "valor": 2.47,
+          "hist": [
+            2.04,
+            2.22,
+            2.15,
+            2.47
+          ],
+          "labels": [
+            "2/13/2026",
+            "2/14/2026",
+            "2/16/2026",
+            "2/18/2026"
+          ]
+        }
+      }
+    },
+    "RC.CC.1.1": {
+      "muestras": 1,
+      "controles": {
+        "% Corte Chias": {
+          "valor": 3.0,
+          "hist": [
+            4.0,
+            4.0,
+            5.0,
+            7.0,
+            6.0,
+            8.0,
+            3.0
+          ],
+          "labels": [
+            "8-1-26",
+            "8-1-26",
+            "8-1-26",
+            "8-1-26",
+            "8-1-26",
+            "8-1-26",
+            "8-1-26"
+          ]
+        }
+      }
+    },
+    "RC.CC.02": {
+      "muestras": 8,
+      "controles": {
+        "% Chias Lona 1": {
+          "valor": 2.22,
+          "hist": [
+            2.7,
+            2.85,
+            1.63,
+            2.93,
+            2.17,
+            2.09,
+            1.57,
+            1.81
+          ]
+        },
+        "% Pedazos Lona 1": {
+          "valor": 4.76,
+          "hist": [
+            4.63,
+            4.43,
+            4.24,
+            5.05,
+            4.73,
+            5.06,
+            4.94,
+            5.02
+          ]
+        },
+        "% Primera Banadera": {
+          "valor": 87.94,
+          "hist": [
+            87.08,
+            87.47,
+            89.23,
+            86.91,
+            87.95,
+            87.62,
+            89.15,
+            88.07
+          ]
+        }
+      }
+    },
+    "RC.CC.06": {
+      "muestras": 1,
+      "controles": {
+        "Cajas Reembazadas (Promedio)": {
+          "valor": 3.33,
+          "hist": [
+            5.0,
+            3.0,
+            2.0,
+            5.0,
+            1.0,
+            5.0,
+            5.0,
+            5.0,
+            2.0,
+            2.0,
+            2.0,
+            3.0,
+            1.0,
+            2.0,
+            1.0,
+            6.0,
+            2.0,
+            5.0,
+            5.0,
+            3.0,
+            6.0,
+            3.0,
+            3.0,
+            3.0
+          ],
+          "labels": [
+            "20/3/2026 IA-005",
+            "20/3/2026 IA-005",
+            "21/3/2026 IA-005",
+            "21/3/2026 IA-005",
+            "21/3/2026 IA-022",
+            "21/3/2026 IA-023",
+            "25/3/2026 IA-005",
+            "25/3/2026 IA-005",
+            "25/3/2026 IA-022",
+            "25/3/2026 IA-023",
+            "26/3/2026 IA-005",
+            "26/3/2026 IA-005",
+            "26/3/2026 IA-022",
+            "26/3/2026 IA-023",
+            "26/3/2026 IA.014",
+            "27/3/2026 IA-006",
+            "27/3/2026 IA-021",
+            "27/3/2026 IA-022",
+            "28-03-2026 IA-006",
+            "28/3/2026 IA-006",
+            "28/3/2026 IA-021",
+            "28/3/2026 IA-022",
+            "28/3/2026 IA-023",
+            "28/3/2026 IA-014"
+          ]
+        },
+        "Estado Reemplazo": {
+          "valor": "CONTROLADO"
+        }
+      }
+    },
+    "RC.CC.08": {
+      "muestras": 1,
+      "controles": {
+        "Alambre 1.5cm": {
+          "valor": "DETECTADO"
+        },
+        "Clavos/Clips": {
+          "valor": "DETECTADO"
+        },
+        "Pase Patrones Pre OK": {
+          "valor": 6.0,
+          "hist": [
+            6
+          ]
+        },
+        "Pernos 2cm": {
+          "valor": "DETECTADO"
+        },
+        "Ultima Fecha Registro": {
+          "valor": "10-10-2026"
+        }
+      }
+    },
+    "RC.CC.14": {
+      "muestras": 1,
+      "controles": {
+        "% Humedad Recepcion": {
+          "valor": 29.7,
+          "hist": [
+            29.7
+          ],
+          "labels": [
+            "8/1/2026"
+          ]
+        },
+        "% Humedad Salida Proceso": {
+          "valor": null
+        },
+        "Ultima Salida a Proceso": {
+          "valor": "SIN FECHA"
+        }
+      }
+    },
+    "RC.CC.17": {
+      "muestras": 1,
+      "controles": {
+        "% Corte (max aceptable)": {
+          "valor": 3.07,
+          "hist": [
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            1.5,
+            1.5,
+            1.5,
+            1.5,
+            2.5,
+            2.5,
+            3.5,
+            3.5,
+            4.5,
+            4.5
+          ],
+          "labels": [
+            "17-3-26 P35",
+            "17-3-26 P35",
+            "18-3-26 P36",
+            "18-3-26 P36",
+            "21-3-26 P37",
+            "21-3-26 P37",
+            "21-3-26 P37",
+            "21-3-26 P37",
+            "23-3-26 P38",
+            "23-3-26 P38",
+            "24-3-26 P39",
+            "24-3-26 P39",
+            "25-3-26 P40",
+            "25-3-26 P40"
+          ]
+        },
+        "Manometro Autoclave": {
+          "valor": 4.0,
+          "hist": [
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0
+          ],
+          "labels": [
+            "17-3-26 P35",
+            "17-3-26 P35",
+            "18-3-26 P36",
+            "18-3-26 P36",
+            "21-3-26 P37",
+            "21-3-26 P37",
+            "21-3-26 P37",
+            "21-3-26 P37",
+            "23-3-26 P38",
+            "23-3-26 P38",
+            "24-3-26 P39",
+            "24-3-26 P39",
+            "25-3-26 P40",
+            "25-3-26 P40"
+          ]
+        },
+        "Manometro Distribuidor": {
+          "valor": 7.0,
+          "hist": [
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0,
+            7.0
+          ],
+          "labels": [
+            "17-3-26 P35",
+            "17-3-26 P35",
+            "18-3-26 P36",
+            "18-3-26 P36",
+            "21-3-26 P37",
+            "21-3-26 P37",
+            "21-3-26 P37",
+            "21-3-26 P37",
+            "23-3-26 P38",
+            "23-3-26 P38",
+            "24-3-26 P39",
+            "24-3-26 P39",
+            "25-3-26 P40",
+            "25-3-26 P40"
+          ]
+        }
+      }
+    }
+  },
+  "RG 03-CV": {
+    "RC.CC.1.1": {
+      "muestras": 1,
+      "controles": {
+        "% Corte Chias": {
+          "valor": 9.0,
+          "hist": [
+            6.0,
+            4.0,
+            6.0,
+            7.0,
+            3.0,
+            4.0,
+            9.0
+          ],
+          "labels": [
+            "12-1-26",
+            "12-1-26",
+            "12-1-26",
+            "12-1-26",
+            "12-1-26",
+            "12-1-26",
+            "12-1-26"
+          ]
+        }
+      }
+    },
+    "RC.CC.14": {
+      "muestras": 1,
+      "controles": {
+        "% Humedad Recepcion": {
+          "valor": 29.1,
+          "hist": [
+            29.1
+          ],
+          "labels": [
+            "12/1/2026"
+          ]
+        },
+        "% Humedad Salida Proceso": {
+          "valor": null
+        },
+        "Ultima Salida a Proceso": {
+          "valor": "SIN FECHA"
+        }
+      }
+    }
+  },
+  "AA 03-26": {
+    "RC.CC.14": {
+      "muestras": 1,
+      "controles": {
+        "% Humedad Recepcion": {
+          "valor": 29.8,
+          "hist": [
+            29.8
+          ],
+          "labels": [
+            "10/2/2026"
+          ]
+        },
+        "% Humedad Salida Proceso": {
+          "valor": null
+        },
+        "Ultima Salida a Proceso": {
+          "valor": "SIN FECHA"
+        }
+      }
+    }
+  },
+  "RG 04-CV": {
+    "RC.CC.14": {
+      "muestras": 1,
+      "controles": {
+        "% Humedad Recepcion": {
+          "valor": 28.9,
+          "hist": [
+            28.9
+          ],
+          "labels": [
+            "17/2/2026"
+          ]
+        },
+        "% Humedad Salida Proceso": {
+          "valor": null
+        },
+        "Ultima Salida a Proceso": {
+          "valor": "SIN FECHA"
+        }
+      }
+    }
+  },
+  "FV 01-CV": {
+    "RC.CC.14": {
+      "muestras": 1,
+      "controles": {
+        "% Humedad Recepcion": {
+          "valor": 29.37,
+          "hist": [
+            29.5,
+            28.9,
+            29.7
+          ],
+          "labels": [
+            "17/2/2026",
+            "18/2/2026",
+            "19/2/2026"
+          ]
+        },
+        "% Humedad Salida Proceso": {
+          "valor": null
+        },
+        "Ultima Salida a Proceso": {
+          "valor": "SIN FECHA"
+        }
+      }
+    }
+  }
+};
+</script>
+<script>
+
+window.SHEETS=[
+/* ---- RC.CC.01 ---- */
+{id:1,codigo:"RC.CC.01",nombre:"Control % Podrida / Ombligo - Seleccionado MPS (PPROP-04)",
+ link:"https://docs.google.com/spreadsheets/d/1d0prT3LWszhEhg4zvmgBxQf4bxrLz_e7kF8AAhNijcE/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/1d0prT3LWszhEhg4zvmgBxQf4bxrLz_e7kF8AAhNijcE/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"15-01-2026",responsable:"Mery Saavedra Chipunavi",
+ controles:[
+  {name:"% Ombligo (Lona)",limite:2,op:"max",unidad:"%",valor:1.53,
+   hist:{labels:["07/01","09/01","12/01","13/01","15/01"],data:[1.32,1.29,1.22,1.13,1.53]}},
+  {name:"% Podrida (Lona)",limite:3,op:"max",unidad:"%",valor:2.04,
+   hist:{labels:["07/01","09/01","12/01","13/01","15/01"],data:[2.49,2.33,2.22,2.21,2.04]}}]},
+
+/* ---- RC.CC.1.1 ---- */
+{id:2,codigo:"RC.CC.1.1",nombre:"Control % Corte (Chias) - Recepcion Almendra",
+ link:"https://docs.google.com/spreadsheets/d/1YhGfSrQ3YtOL535wnerlmCYNxPni8ThzX41WDfy-Fs4/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/1YhGfSrQ3YtOL535wnerlmCYNxPni8ThzX41WDfy-Fs4/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"11-12-2025",responsable:"Elmo Felipe Espinoza Trujillo",
+ controles:[
+  {name:"% Corte Chias",limite:10,op:"max",unidad:"%",valor:2.50,
+   hist:{labels:["L01","L02","L03","L04","L05","L06","L07","L08"],data:[4.50,4.50,1.67,4.50,4.17,1.67,4.50,2.50]}}]},
+
+/* ---- RC.CC.02 ---- */
+{id:3,codigo:"RC.CC.02",nombre:"Control % Chias - Seleccionado Almendra Pelada Cruda (PPROP-05)",
+ link:"https://docs.google.com/spreadsheets/d/180CSHCjVKgng9xKAYFTthUfNr_qhNKeGuEXjIPF7tLU/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/180CSHCjVKgng9xKAYFTthUfNr_qhNKeGuEXjIPF7tLU/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"14-01-2026",responsable:"Yirsa Aguilar Rojas",
+ controles:[
+  {name:"% Primera Banadera",limite:90,op:"min",unidad:"%",valor:84.5,
+   hist:{labels:["8:20","9:30","10:40","11:30","12:45","13:40","14:38","15:15"],data:[82.5,77.0,82.9,80.1,86.7,88.4,87.1,91.1]}},
+  {name:"% Pedazos Lona 1",limite:4,op:"max",unidad:"%",valor:1.6,
+   hist:{labels:["8:20","9:30","10:40","11:30","12:45","13:40","14:38","15:15"],data:[4.0,2.1,3.0,2.1,2.7,3.8,1.7,1.6]}},
+  {name:"% Chias Lona 1",limite:3,op:"max",unidad:"%",valor:1.2,
+   hist:{labels:["8:20","9:30","10:40","11:30","12:45","13:40","14:38","15:15"],data:[1.6,0.5,1.7,0.2,1.6,1.6,1.1,1.2]}}]},
+
+/* ---- RC.CC.04 (antes en noData como RC.CC.03 - DATOS REALES RECUPERADOS) ---- */
+{id:4,codigo:"RC.CC.04",nombre:"Control Almendra Dannada y Severamente Dannada - Seleccionado (PPROP-05)",
+ link:"https://docs.google.com/spreadsheets/d/1HHW21Eql5j_AlgWrEg92hquBqkEo6t7wCiqpZ2fO_8g/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/1HHW21Eql5j_AlgWrEg92hquBqkEo6t7wCiqpZ2fO_8g/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"16-01-2026",responsable:"Amelia Tanaka Fernandez",
+ controles:[
+  {name:"% Dannadas",limite:5,op:"max",unidad:"%",valor:8.7,
+   hist:{labels:["C1","C2","C3","C4"],data:[3.6,6.1,8.7,4.5]}},
+  {name:"% Severamente Dannadas",limite:4,op:"max",unidad:"%",valor:9.1,
+   hist:{labels:["C1","C2","C3","C4"],data:[7.3,4.4,6.6,9.1]}},
+  {name:"% Chias",limite:3,op:"max",unidad:"%",valor:9.1,
+   hist:{labels:["C1","C2","C3","C4"],data:[7.3,4.4,6.6,9.1]}}]},
+
+/* ---- RC.CC.05 ---- */
+{id:5,codigo:"RC.CC.05",nombre:"Control Calidad Producto Terminado (PPROP-06)",
+ link:"https://docs.google.com/spreadsheets/d/19tAPT8hR8gUziLQNxVL5V0eo866C4IUr9ljzXWI5mnA/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/19tAPT8hR8gUziLQNxVL5V0eo866C4IUr9ljzXWI5mnA/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"16-01-2026",responsable:"Mayerlin Rafael Aguada",
+ controles:[
+  {name:"% Danadas",limite:5,op:"max",unidad:"%",valor:1.75,
+   hist:{labels:["M1","M2","M3","M4","M5","M6","M7","M8","M9"],data:[1.50,1.60,2.05,1.25,1.70,1.65,1.85,1.75,0.95]}},
+  {name:"% Sev. Danadas",limite:4,op:"max",unidad:"%",valor:1.45,
+   hist:{labels:["M1","M2","M3","M4","M5","M6","M7","M8","M9"],data:[0.50,0.85,0.75,0.45,0.75,1.00,1.15,1.45,1.00]}},
+  {name:"Mat. Extranos",limite:"Ausente",op:"cualitativo",unidad:"",valor:"AUSENTE"}]},
+
+/* ---- RC.CC.06 ---- */
+{id:6,codigo:"RC.CC.06",nombre:"Control Cajas Pinchadas - Producto Terminado",
+ link:"https://docs.google.com/spreadsheets/d/1Azuyxj2TNKLmNzqx6QvYCLHTlF9v7xr3CJkK0_mt0uI/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/1Azuyxj2TNKLmNzqx6QvYCLHTlF9v7xr3CJkK0_mt0uI/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"30-01-2026",responsable:"Bismarck Forero Saucedo",
+ controles:[
+  {name:"Cajas Reembazadas (Promedio)",limite:10,op:"max",unidad:" cajas",valor:6,
+   hist:{labels:["17/01","21/01","22/01","23/01","26/01","28/01","29/01","30/01"],data:[4,7,13,6,4,7,10,6]}},
+  {name:"Estado Reemplazo",limite:"Control total",op:"cualitativo",unidad:"",valor:"CONTROLADO"}]},
+
+/* ---- RC.CC.07 ---- */
+{id:7,codigo:"RC.CC.07",nombre:"Control Detector de Metales PCC-02",
+ link:"https://docs.google.com/spreadsheets/d/1o9WflLxWc2CzcMb_kbXVAq7aGCvfWDx-aVqKAkDsRR0/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/1o9WflLxWc2CzcMb_kbXVAq7aGCvfWDx-aVqKAkDsRR0/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"17-01-2026",responsable:"Bismarck Forero Saucedo",
+ controles:[
+  {name:"Ferroso Fe 3mm",limite:"Ausente",op:"cualitativo",unidad:"",valor:"ATRAPA ok"},
+  {name:"No Ferroso 3.5mm",limite:"Ausente",op:"cualitativo",unidad:"",valor:"ATRAPA ok"},
+  {name:"Acero Inox 4mm",limite:"Ausente",op:"cualitativo",unidad:"",valor:"ATRAPA ok"},
+  {name:"Pasajes Verificados",limite:1,op:"min",unidad:" pases",valor:0},
+  {name:"Cajas Almendra 1ra",limite:0,op:"min",unidad:" cajas",valor:null},
+  {name:"Cajas Almendra 2da",limite:0,op:"min",unidad:" cajas",valor:null}]},
+
+/* ---- RC.CC.08 ---- */
+{id:8,codigo:"RC.CC.08",nombre:"Control Metales con Imanes - Vaciado Almendra",
+ link:"https://docs.google.com/spreadsheets/d/1QEiNvG3e4qz9REdlro3O5_7oI26uwy92VwpHFabgCPM/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/1QEiNvG3e4qz9REdlro3O5_7oI26uwy92VwpHFabgCPM/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"29-01-2026",responsable:"Cristian Suarez Rivero",
+ controles:[
+  {name:"Alambre 1.5cm",limite:"Ausente",op:"cualitativo",unidad:"",valor:"AUSENTE"},
+  {name:"Pernos 2cm",limite:"Ausente",op:"cualitativo",unidad:"",valor:"AUSENTE"},
+  {name:"Clavos/Clips",limite:"Ausente",op:"cualitativo",unidad:"",valor:"AUSENTE"},
+  {name:"Pase Patrones Pre OK",limite:1,op:"min",unidad:" pases OK",valor:0}]},
+
+/* ---- RC.CC.09 ---- */
+{id:9,codigo:"RC.CC.09",nombre:"Certificado de Analisis (COA) - Laboratorio LABCAR",
+ link:"https://docs.google.com/spreadsheets/d/1UNmL2BFzyBM-MXShC5lpxaMOstnkLh3NO8lXJeQyK5o/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/1UNmL2BFzyBM-MXShC5lpxaMOstnkLh3NO8lXJeQyK5o/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"04-02-2026",responsable:"Tania Rojas Quette",
+ controles:[
+  {name:"Aflatoxina B1",limite:5,op:"max",unidad:" ppb",valor:0.50},
+  {name:"Total Aflatoxinas",limite:10,op:"max",unidad:" ppb",valor:0.90},
+  {name:"Humedad",limite:4,op:"max",unidad:"%",valor:3.20},
+  {name:"Total Bacterias",limite:50000,op:"max",unidad:" UFC/g",valor:2000},
+  {name:"E. coli",limite:"Ausente",op:"cualitativo",unidad:"",valor:"AUSENTE"},
+  {name:"Salmonella",limite:"Ausente",op:"cualitativo",unidad:"",valor:"AUSENTE"}]},
+
+/* ---- RC.CC.10 - DATOS REALES RECUPERADOS ---- */
+{id:10,codigo:"RC.CC.10",nombre:"Control Inspeccion del Contenedor Previo Aceptacion",
+ link:"https://docs.google.com/spreadsheets/d/1OKBjSUd7rIdDkHs2fh6Jmp2vudXVcLjtBcq43r7J4CU/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/1OKBjSUd7rIdDkHs2fh6Jmp2vudXVcLjtBcq43r7J4CU/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"17-06-2025",responsable:"INGAMA",
+ controles:[
+  {name:"Tren de Rodaje",limite:"Apto",op:"cualitativo",unidad:"",valor:"APTO-SI"},
+  {name:"Puertas Int. y Ext.",limite:"Apto",op:"cualitativo",unidad:"",valor:"APTO-SI"},
+  {name:"Prueba de Luz",limite:"Apto",op:"cualitativo",unidad:"",valor:"APTO-SI"},
+  {name:"Condic. Limpieza",limite:"Apto",op:"cualitativo",unidad:"",valor:"APTO-SI"},
+  {name:"Contenedor Aceptado",limite:"SI",op:"cualitativo",unidad:"",valor:"ACEPTADO"}]},
+
+/* ---- RC.CC.11 - DATOS REALES RECUPERADOS ---- */
+{id:11,codigo:"RC.CC.11",nombre:"Control Embalado de Broken - PPROP-07",
+ link:"https://docs.google.com/spreadsheets/d/1apbRKPoVq8OXEYfGviZXBRkMvGc-W9Rdy--9RwDXVwI/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/1apbRKPoVq8OXEYfGviZXBRkMvGc-W9Rdy--9RwDXVwI/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"16-01-2026",responsable:"B-14",
+ controles:[
+  {name:"% Podrida Broken N",limite:2,op:"max",unidad:"%",valor:0.40},
+  {name:"Chias Broken",limite:3,op:"max",unidad:"%",valor:0.0},
+  {name:"Punto Cafe",limite:4,op:"max",unidad:"%",valor:0.20},
+  {name:"Mat. Extranos",limite:"Ausente",op:"cualitativo",unidad:"",valor:"AUSENTE"}]},
+
+/* ---- RC.CC.13 ---- */
+{id:12,codigo:"RC.CC.13",nombre:"Verificacion de Balanza y Control de Peso del Producto Terminado",
+ link:"https://docs.google.com/spreadsheets/d/1xCVOvIesYySTqYB9qbroVoJtCHhfgPd6Wo0xg5ceZq0/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/1xCVOvIesYySTqYB9qbroVoJtCHhfgPd6Wo0xg5ceZq0/edit#gid=0",
+ nombreHoja:"RG 01-CV PLL01",ultimaFecha:"16-01-2026",responsable:"Bismark Forero Saucedo",
+ controles:[
+  {name:"Tara Promedio (kg)",limite:0.70,op:"max",unidad:" kg",valor:0.68},
+  {name:"Peso Neto (kg)",limite:19.80,op:"min",unidad:" kg",valor:19.96},
+  {name:"Cumple",limite:"SI",op:"cualitativo",unidad:"",valor:"SI"}]},
+
+/* ---- RC.CC.14 - DATOS REALES RECUPERADOS ---- */
+{id:13,codigo:"RC.CC.14",nombre:"Control % Humedad MPH Almacenada - PPROP-02",
+ link:"https://docs.google.com/spreadsheets/d/16mBCHcPztf_YGDI_zqmU5idmzllhw40-rIpyleZgLI0/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/16mBCHcPztf_YGDI_zqmU5idmzllhw40-rIpyleZgLI0/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"03-01-2026",responsable:"Elmo Felipe Espinoza / Tania Rojas",
+ controles:[
+  {name:"% Humedad Recepcion",limite:28,op:"max",unidad:"%",valor:24.5,
+   hist:{labels:["06/12","10/12","11/12","15/12","22/12","29/12","03/01"],data:[24.5,24.1,24.7,24.4,23.8,23.2,23.0]}},
+  {name:"% Humedad Salida Proceso",limite:28,op:"max",unidad:"%",valor:23.0,
+   hist:{labels:["15/12","22/12","29/12","03/01"],data:[24.4,23.8,23.2,23.0]}},
+  {name:"Ultima Salida a Proceso",limite:"Fecha",op:"cualitativo",unidad:"",valor:"03-01-26"}]},
+
+/* ---- RC.CC.17 - DATOS REALES RECUPERADOS ---- */
+{id:14,codigo:"RC.CC.17",nombre:"Control Sancochado de Almendra en Cascara (Autoclave)",
+ link:"https://docs.google.com/spreadsheets/d/1ZRXfyPBLpqDc0ycwpEG_nkhWd36kCT78calkszVeSvs/edit",
+ hojaDirecta:"https://docs.google.com/spreadsheets/d/1ZRXfyPBLpqDc0ycwpEG_nkhWd36kCT78calkszVeSvs/edit#gid=0",
+ nombreHoja:"RG 01-CV",ultimaFecha:"26-01-2026",responsable:"Elmo Felipe Espinoza Trujillo",
+ controles:[
+  {name:"Manometro Distribuidor",limite:7,op:"max",unidad:" bar",valor:7,
+   hist:{labels:["13/01 P1","13/01 P2","14/01 P1","14/01 P2","17/01","19/01","20/01","22/01","24/01","26/01"],data:[7,7,7,7,7,7,7,7,7,7]}},
+  {name:"Manometro Autoclave",limite:4,op:"max",unidad:" bar",valor:4,
+   hist:{labels:["13/01 P1","13/01 P2","14/01 P1","14/01 P2","17/01","19/01","20/01","22/01","24/01","26/01"],data:[4,4,4,4,4,4,4,4,4,4]}},
+  {name:"% Corte (max aceptable)",limite:9,op:"max",unidad:"%",valor:5,
+   hist:{labels:["13/01","14/01","17/01","19/01","20/01","22/01","24/01","26/01"],data:[4,4,5,2,5,3,9,4]}}]}
+];
+window.LOTE_INFO_PD02={};
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════
+// V1 LOTES DATA (real measurements)
+// ═══════════════════════════════════════════════════
+const LOTES = [
+  {
+    codigo:'CONV. 01',proveedor:'Ricardo Gamarra Tellez',proveedorCorto:'RG 01-CV',certif:'Convencional',kilosTotal:52952,tipo:'Midget',
+    recepcion:{humedad:24.5,humedadMuestras:[24.5,24.5,24.5,24.1,24.1,24.7,23.8,23.0],humedadFechas:['06/12','06/12','06/12','10/12','10/12','11/12','29/12','03/01'],corte:4.5},
+    sancochado:{presionDist:7,presionAuto:4,tiempo:'2:05',humIng:5.7,humSal:4.0},
+    seleccionado:{fechas:['07/01','09/01','12/01','13/01','15/01'],ombligo:[1.32,1.29,1.22,1.13,1.53],podrida:[2.49,2.33,2.22,2.21,2.04],promOmb:1.30,promPod:2.26,chiaLona:0.81,pedazosLona:2.43,tipos:{large:52,medium:57,midget:71,tiny:120}},
+    deshidratado:{danadas:3.6,sevDanadas:7.3,chipped:3.6,chia:7.3},
+    pt:{planilla:8,fecha:'29/01',cajasProducidas:951,cajasPinchadas:77,cajasReembazadas:77,danadasPT:1.43,sevDanadasPT:0.92,metalesPCC:'OK',imanesPCC:'OK'},
+    exportacion:{coa:'083/26',cliente:'Caro Nut Company',destino:'Estados Unidos',aflatoxB1:'<0.50',aflatoxTotal:'<0.90',humPT:3.20,ecoli:'Ausente',salmonella:'Ausente',contenedor:'MSNU-310035-9',inspec:'Aprobado'}
+  },
+  {
+    codigo:'CONV. 02',proveedor:'Ricardo Gamarra Tellez',proveedorCorto:'RG 02-CV',certif:'Convencional',kilosTotal:57762,tipo:'Midget',
+    recepcion:{humedad:26.8,humedadMuestras:[26.8,26.8,26.6,26.5,26.1,25.0,24.3],humedadFechas:['23/12','23/12','24/12','26/12','31/12','06/01','09/01'],corte:4.07},
+    sancochado:{presionDist:7,presionAuto:4,tiempo:'2:08',humIng:7.0,humSal:4.0},
+    seleccionado:{fechas:['16/01','17/01','19/01','20/01'],ombligo:[1.50,1.36,1.46,1.26],podrida:[2.43,2.03,1.85,1.85],promOmb:1.40,promPod:2.04,chiaLona:0.83,pedazosLona:1.47,tipos:{large:84,medium:87,midget:87,tiny:87}},
+    deshidratado:{danadas:2.5,sevDanadas:4.0,chipped:4.0,chia:5.0},
+    pt:{planilla:6,fecha:'13/02',cajasProducidas:854,cajasPinchadas:83,cajasReembazadas:83,danadasPT:1.20,sevDanadasPT:0.80,metalesPCC:'OK',imanesPCC:'OK'},
+    exportacion:{coa:'135/26',cliente:'Freeworld Trading Ltd',destino:'Polonia',aflatoxB1:'<0.45',aflatoxTotal:'<0.85',humPT:3.10,ecoli:'Ausente',salmonella:'Ausente',contenedor:'CAAU-238802-3',inspec:'Aprobado'}
+  },
+  {
+    codigo:'ORG. 03',proveedor:'Barraca San Ignacio',proveedorCorto:'BSI 01',certif:'Orgánico',kilosTotal:57654,tipo:'Large/Medium',
+    recepcion:{humedad:25.4,humedadMuestras:[25.0,25.0,25.0,24.3,24.8,24.4],humedadFechas:['18/12','18/12','20/12','20/12','22/12','24/12'],corte:4.57},
+    sancochado:{presionDist:7,presionAuto:4,tiempo:'2:06',humIng:8.0,humSal:4.0},
+    seleccionado:{fechas:['23/01','24/01','26/01','27/01'],ombligo:[1.79,1.65,1.58,1.57],podrida:[2.21,2.53,2.25,2.39],promOmb:1.65,promPod:2.35,chiaLona:0.75,pedazosLona:1.90,tipos:{large:88,medium:91,midget:91,tiny:90}},
+    deshidratado:{danadas:2.1,sevDanadas:2.5,chipped:3.0,chia:3.5},
+    pt:{planilla:7,fecha:'27/02',cajasProducidas:901,cajasPinchadas:101,cajasReembazadas:101,danadasPT:1.50,sevDanadasPT:0.85,metalesPCC:'OK',imanesPCC:'OK'},
+    exportacion:{coa:'187/26',cliente:'Red River Foods',destino:'Alemania',aflatoxB1:'<0.48',aflatoxTotal:'<0.88',humPT:3.15,ecoli:'Ausente',salmonella:'Ausente',contenedor:'MSNU-867960-2',inspec:'Aprobado'}
+  },
+  {
+    codigo:'CONV. 03',proveedor:'Denis Azucarela',proveedorCorto:'DA 01-CV',certif:'Convencional',kilosTotal:59717,tipo:'Midget',
+    recepcion:{humedad:23.5,humedadMuestras:[23.5,23.5,23.0,23.0,23.0],humedadFechas:['10/01','10/01','10/01','10/01','10/01'],corte:5.57},
+    sancochado:{presionDist:7,presionAuto:4,tiempo:'2:06',humIng:6.0,humSal:4.0},
+    seleccionado:{fechas:['28/01','29/01','31/01','02/02'],ombligo:[1.56,1.67,1.42,1.57],podrida:[2.67,2.54,2.20,2.28],promOmb:1.56,promPod:2.42,chiaLona:0.78,pedazosLona:2.10,tipos:{large:87,medium:86,midget:87,tiny:86}},
+    deshidratado:{danadas:2.5,sevDanadas:3.5,chipped:3.5,chia:4.0},
+    pt:{planilla:6,fecha:'09/03',cajasProducidas:1031,cajasPinchadas:120,cajasReembazadas:120,danadasPT:1.35,sevDanadasPT:0.90,metalesPCC:'OK',imanesPCC:'OK'},
+    exportacion:{coa:'N/D',cliente:'Pendiente',destino:'Pendiente',aflatoxB1:'N/D',aflatoxTotal:'N/D',humPT:3.30,ecoli:'N/D',salmonella:'N/D',contenedor:'N/D',inspec:'Pendiente'}
+  }
+];
+
+// ═══════════════════════════════════════════════════
+// PPR DATA — ESTRUCTURA REAL ACTUALIZADA de Drive
+// Carpeta: 1r74tk50k6oAfewtiAjheFZx6i-uM2YDR
+// ═══════════════════════════════════════════════════
+const PPR_DATA = [
+  {
+    num:'PPR-01',clausula:'8.2.4 a),b)',nombre:'Infraestructuras',
+    norma:'ISO/TS 22002-1 §4 + §5',estado:'revision',frecuencia:'Mensual',
+    driveId:'1CqMlL6QoA9wGanTfxMO4tuZ5Nm7o_aDC',
+    docs:['Plano de instalaciones y flujo del proceso','Programa de mantenimiento preventivo','Registro inspección mensual infraestructura','Descripción de áreas y zonas de proceso'],
+    reqs:'Edificios, equipos y entorno diseñados para evitar contaminación. Flujo de producto MP→Proceso→PT sin cruces. Separación de zonas limpias y sucias.',
+  },
+  {
+    num:'PPR-02',clausula:'8.2.4 c)',nombre:'Servicios (Aire, Agua, Energía y otros)',
+    norma:'ISO/TS 22002-1 §6',estado:'revision',frecuencia:'Semestral',
+    driveId:'1Lw-ijZ_-tX3ev-T1iDFbsrpP5mzjbmAv',
+    docs:['Análisis fisicoquímico y microbiológico del agua','Ficha técnica compresor aire comprimido','Control calidad servicios básicos','Certificado agua potable'],
+    reqs:'Agua potable apta para contacto con alimento. Aire comprimido filtrado sin aceite ni humedad. Sin riesgo de contaminación cruzada por servicios.',
+  },
+  {
+    num:'PPR-03',clausula:'8.2.4 d)',nombre:'Servicios Plagas y Eliminación de Residuos',
+    norma:'ISO/TS 22002-1 §12 + §10',estado:'activo',frecuencia:'Mensual / Diario',
+    driveId:'1KC_7lW_0bVC50n_SO1tp2ja65GGhEJl8',
+    docs:['Mapa de puntos de control de plagas','Contrato empresa plaguicida certificada','Registro inspecciones mensuales y aplicaciones','Procedimiento gestión de residuos','Registro diario retiro de residuos'],
+    reqs:'Empresa externa certificada. Mapa de trampas e inspección periódica. Contenedores de residuos identificados y cerrados. Rutas de retiro separadas del proceso.',
+    data:{areas:['Recep.','Proc.','Almac.','Ext.'],cumplimiento:[95,90,88,96],mes:'Feb 2026'}
+  },
+  {
+    num:'PPR-04',clausula:'8.2.4 e)',nombre:'Idoneidad, Limpieza y Mantenimiento de Equipos',
+    norma:'ISO/TS 22002-1 §8 + §11',estado:'revision',frecuencia:'Semanal / Mensual',
+    driveId:'1n9ylyLGgUFhYKalgMgv_b6RESMAw8DMX',
+    docs:['Inventario de equipos y estado','Programa de mantenimiento preventivo','Registro de limpieza de equipos','Procedimiento de calibración de instrumentos'],
+    reqs:'Equipos diseñados para limpieza. Mantenimiento preventivo documentado. Calibración de instrumentos de medición. Sin riesgos de contaminación física por equipos deteriorados.',
+  },
+  {
+    num:'PPR-05',clausula:'8.2.4 f)',nombre:'Gestión de Proveedores',
+    norma:'ISO/TS 22002-1 §7.2 + FSSC v6',estado:'revision',frecuencia:'Anual',
+    driveId:'1u-4TuZshjuxdYpCzeEpQLOI68bN_HvnM',
+    docs:['Lista de proveedores aprobados','Evaluación anual de proveedores','Acuerdos de inocuidad alimentaria','Certificados del proveedor (certificación o auditoría)'],
+    reqs:'Evaluación y aprobación de proveedores de MP. Acuerdos de cadena de suministro. Certificación o auditoría del proveedor. Especificaciones técnicas de materiales.',
+  },
+  {
+    num:'PPR-06',clausula:'8.2.4 g)',nombre:'Gestión de Materiales Comprados',
+    norma:'ISO/TS 22002-1 §7.1',estado:'revision',frecuencia:'Por lote',
+    driveId:'1UaVEp4FGgVTCDPAVJCjK8s7yMHOG_NzS',
+    docs:['Especificaciones de materiales de embalaje','Lista de materiales aprobados','Registro recepción y verificación de materiales','Certificados food-grade del proveedor'],
+    reqs:'Especificaciones escritas para todos los materiales de contacto. Aprobación previa de materiales críticos. Materiales de embalaje aptos (food-grade). Sin migración de sustancias peligrosas.',
+  },
+  {
+    num:'PPR-07',clausula:'8.2.4 h)',nombre:'Prevención para la Contaminación Cruzada',
+    norma:'ISO/TS 22002-1 §14',estado:'revision',frecuencia:'Diario',
+    driveId:'1T6PNKk6TBl3cmxpguVMTzeEW7_xM_rfN',
+    docs:['Diagrama de flujo del proceso actualizado','Procedimiento separación de zonas y flujos','Registro inspección diaria de zonas','Plan de control de alérgenos'],
+    reqs:'Separación física entre áreas sucias y limpias. Control de alérgenos documentado. Flujo unidireccional del producto. Identificación de materiales de riesgo.',
+  },
+  {
+    num:'PPR-08',clausula:'8.2.4 i)',nombre:'Sanitización (Limpieza y Desinfección)',
+    norma:'ISO/TS 22002-1 §11',estado:'activo',frecuencia:'Diario / Semanal',
+    driveId:'1mtlAM2ScbzRYjNUA3so7ltkkQSUAWfZJ',
+    docs:['RC.LD.01 Recepción-Almacenamiento MPH','RC.LD.02 Pre-limpieza y Clasificado','RC.LD.03 Sancochado-Autoclave','RC.LD.04 Deshidratado-Hornos','POES Procedimientos escritos por área'],
+    reqs:'Procedimientos POES escritos por área. Validación química (cloro residual). Verificación microbiológica de superficies. Registro de cumplimiento diario.',
+    data:{areas:['Recepción','Pre-limpieza','Sancochado','Deshidratado','Embalado'],cumplimiento:[94,88,91,96,93],mes:'Ene-Feb 2026'}
+  },
+  {
+    num:'PPR-09',clausula:'8.2.4 j)',nombre:'Higiene del Personal',
+    norma:'ISO/TS 22002-1 §13',estado:'activo',frecuencia:'Continuo',
+    driveId:'1RVvVPejRZSonvtkfLkFueuZq-diFXKYp',
+    docs:['RC.HP.05 Lavado de Uniformes (datos reales)','Registro capacitación BPM','Control salud del personal','Política EPP por área','Política de higiene personal'],
+    reqs:'Capacitación BPM inicial y anual. Control de enfermedades transmisibles. Lavado de manos documentado. EPP apropiado por área de trabajo.',
+    data:{areas:['Deshidratado','Selec.APD','Alm.Primera','Pesado/Sell.','Laboratorio'],uniformes:[16,48,20,16,8],mes:'Ene 2026'}
+  },
+  {
+    num:'PPR-10',clausula:'8.2.4 k)',nombre:'Información del Producto / Concientización del Consumidor',
+    norma:'ISO/TS 22002-1 §15',estado:'revision',frecuencia:'Por lote / Anual',
+    driveId:'1s9RTgG0474_ig4K0VBWu_wFtih9kKBCw',
+    docs:['Etiquetado de producto terminado','Información alérgenos en etiqueta','Especificaciones técnicas de producto','Procedimiento de retiro de productos / recall','Plan de simulacro anual de retiro'],
+    reqs:'Etiquetado correcto con información de alérgenos. Plan documentado de recall. Simulacro anual con evidencia. Comunicación con autoridades en <24h. Trazabilidad total del lote.',
+  },
+  {
+    num:'PPR-11',clausula:'8.2.4 Otros Aspectos',nombre:'Otros Aspectos (Quebradizos, Reprocesos, Almacenamiento)',
+    norma:'ISO/TS 22002-1 §16 + §15 + §9',estado:'revision',frecuencia:'Semanal / Por evento',
+    driveId:'1SGCMllVypdEb7EUtY3-BlG6BKA8VQAVs',
+    docs:['Inventario materiales quebradizos y madera','Procedimiento de rotura y reposición','Procedimiento de reprocesos','Registro FIFO/FEFO en almacén','Control temperatura y humedad almacén'],
+    reqs:'Inventario de vidrios, plásticos duros y cerámicas. Sin madera en contacto con producto. Reprocesos identificados y segregados con trazabilidad. FIFO/FEFO documentado.',
+  }
+];
+
+// ═══════════════════════════════════════════════════
+// RC.PD DATA — 14 REGISTROS PRODUCCIÓN
+// ═══════════════════════════════════════════════════
+const PROD_DATA = [
+  {codigo:'RC.PD.01',nombre:'Recepción de Materia Prima',tipo:'FISICO',desc:'Control condiciones transporte, peso neto, lote proveedor y conformidad.',dato:'8 recepciones · 832 sacos · 52,952 kg · Prov: Ricardo Gamarra Tellez',stat:'Activo'},
+  {codigo:'RC.PD.02',nombre:'Resumen Recepción Materia Prima',tipo:'DIGITAL',desc:'Consolidado digital de todas las recepciones por lote: fecha, guía, proveedor, lote IA, CFO, kg.',dato:'Lotes: RG.01-CV, RG.02-CV, BSI-01, DA-01 · CONV + ORG',stat:'Activo'},
+  {codigo:'RC.PD.03',nombre:'Pre-Limpieza y Clasificado',tipo:'FISICO',desc:'Control por zaranda tipo 2: Large, Medium, Mezclada, Midget, Tiny. Pérdida y kg acumulados.',dato:'BSI 01: 943 bolsas · 56,580 kg · L:5.4t · M:12.7t · Mid:20.9t · T:15t',stat:'Activo'},
+  {codigo:'RC.PD.04',nombre:'Pre-Limpieza y Clasificado Digital',tipo:'DIGITAL',desc:'Versión digital del RC.PD.03. Resumen consolidado por tipo de almendra y por lote.',dato:'Resumen digital automático desde RC.PD.03',stat:'Activo'},
+  {codigo:'RC.PD.05',nombre:'Control Proceso Secado-Clasificado',tipo:'FISICO',desc:'Control tiempo y temperatura de secado. Temperatura mínima: 75°C por ≥2h.',dato:'Lím. crítico: 75°C · Oper: 75–80°C · Control por horno y turno',stat:'Activo'},
+  {codigo:'RC.PD.06',nombre:'Salida Cilindros — Ingreso Depósitos MPS',tipo:'FISICO',desc:'Trazabilidad del movimiento de almendra desde cilindros de secado hacia depósitos MPS.',dato:'Control por depósito numerado · ingreso y salida registrados',stat:'Activo'},
+  {codigo:'RC.PD.07',nombre:'Ingreso y Salida MPSC a Sancochado',tipo:'FISICO',desc:'Control sancochado (autoclave). Tiempo: 2:05–2:15h. Presión distribución: 6–7 bar.',dato:'Presión: 6–7 bar · Tiempo: ~2:10 h · Hum entrada: 5% → salida: 4%',stat:'Activo'},
+  {codigo:'RC.PD.08',nombre:'Rendimiento Almendra Pelada-Clasificada',tipo:'FISICO',desc:'Rendimiento por tipo y calidad. Kg entrada vs salida pelado. Dañadas y sev. dañadas.',dato:'BSI-025: Dañadas 0.9% · Sev.Dañadas 0.7% · Chipped 0.2% · Chía 0.5%',stat:'Activo'},
+  {codigo:'RC.PD.09',nombre:'Control Recorte Producción y Calidad',tipo:'FISICO',desc:'Control tiempo y temperatura en hornos de deshidratación. Lím. crítico: 75°C mínimo por 2h.',dato:'Hornos 1–4 · Turno día y noche · Lím: 75°C · Oper: 75–80°C',stat:'Activo'},
+  {codigo:'RC.PD.10',nombre:'Control Almendra Pelada Deshidratada',tipo:'FISICO',desc:'Control % humedad post-deshidratado. Límite: ≤7%. Merma en kg por horno.',dato:'Medium: 111–145 pepas/lb · Midget: 157–185 · Tiny: 190+',stat:'Activo'},
+  {codigo:'RC.PD.11',nombre:'Control de Almendra Embalada',tipo:'FISICO',desc:'Control calidad del embalado: peso neto, código lote, integridad empaque. 20,000g/caja.',dato:'BSI-07: Broken A <1% · Broken N <2% · Daños serios <4% · Mat.ext: Ausente',stat:'Activo'},
+  {codigo:'RC.PD.12',nombre:'Control de Sellado',tipo:'FISICO',desc:'Verificación balanza y control peso PT. Cajas: 20 kg ±0.002 kg. Incertidumbre ±0.001 kg.',dato:'BSI-025/ORG.18: Conforme · Corrección de balanza documentada',stat:'Activo'},
+  {codigo:'RC.PD.13',nombre:'Almacén de Producto Terminado',tipo:'FISICO',desc:'Control ingresos y salidas de PT. FIFO aplicado. Temperatura y humedad del almacén.',dato:'Control por lote y tipo · FIFO documentado',stat:'Activo'},
+  {codigo:'RC.PD.14',nombre:'Conocimiento de Carga',tipo:'FISICO',desc:'Documento de embarque y despacho. Trazabilidad hasta el cliente final. Exportación.',dato:'Destino: USA / Alemania · Contenedor sellado · COA laboratorio incluido',stat:'Activo'},
+];
+
+// ═══════════════════════════════════════════════════
+// ESTADO Y CONSTANTES
+// ═══════════════════════════════════════════════════
+const TAB_REFERENCE = ["RG 01-CV","RG 02-CV","BSI 01","DA 01-CV","AA 01-26","AA 02-26","RG 03-CV","AA 03-26","RG 04-CV","FV 01-CV"];
+const SHEET_TAB_MAP = {
+  1:["RG 01-CV","RG 02-CV","BSI 01","DA 01-CV","AA 01-26"],
+  2:["RG 01-CV","RG 02-CV","DA 01-CV","AA 01-26","AA 02-26","RG 03-CV"],
+  3:["RG 01-CV","RG 02-CV","DA 01-CV"],4:["RG 01-CV","RG 02-CV","DA 01-CV"],
+  5:["RG 01-CV","RG 02-CV","DA 01-CV"],6:["RG 01-CV","RG 02-CV","BSI 01","DA 01-CV"],
+  7:["RG 01-CV","RG 02-CV","DA 01-CV"],8:["RG 01-CV","RG 02-CV","BSI 01","RG 03-CV","AA 01-26"],
+  9:["RG 01-CV","RG 02-CV","BSI 01","DA 01-CV","AA 01-26"],10:["RG 01-CV"],
+  11:["RG 01-CV","RG 02-CV","DA 01-CV"],12:["RG 01-CV","RG 02-CV","BSI 01","DA 01-CV"],
+  13:["RG 01-CV","RG 02-CV","DA 01-CV","BSI 01","AA 01-26","AA 02-26","RG 03-CV","AA 03-26","RG 04-CV","FV 01-CV"],
+  14:["RG 01-CV","RG 02-CV","BSI 01"]
+};
+
+const COLORS={ok:'#2E7D5B',warn:'#C17917',fail:'#B23E3E',nd:'#6B6964'}
+function getColors(){
+  const dm=document.body.classList.contains('dark-mode');
+  return {
+    ok:dm?'#4ade80':'#2E7D5B', warn:dm?'#fde047':'#C17917',
+    fail:dm?'#fca5a5':'#B23E3E', nd:dm?'#94a3b8':'#6B6964',
+    ink:dm?'#f8fafc':'#1A1A17', ink2:dm?'#cbd5e1':'#4A4A44',
+    ink3:dm?'#94a3b8':'#8A8881', grid:dm?'rgba(255,255,255,.06)':'rgba(0,0,0,.06)'
+  };
+};
+
+let selectedTab = "RG 01-CV";
+let currentLote = 0;
+let isDark = false;
+const charts = {};
+
+// ═══════════════════════════════════════════════════
+// V1 HELPERS
+// ═══════════════════════════════════════════════════
+function status(v,lim,minMode){ if(minMode) return v<lim*0.82?'fail':v<lim?'warn':'ok'; return v>lim?'fail':v>lim*0.82?'warn':'ok'; }
+function sClass(s){ return s==='ok'?'d-ok':s==='warn'?'d-warn':s==='fail'?'d-fail':'d-nd'; }
+function pClass(s){ return s==='ok'?'p-ok':s==='warn'?'p-warn':'p-fail'; }
+function bClass(s){ return s==='ok'?'bar-ok':s==='warn'?'bar-warn':'bar-fail'; }
+function sLabel(s){ return s==='ok'?'Conforme':s==='warn'?'En atención':'Fuera de límite'; }
+function statusColor(s){ return COLORS[s]||COLORS.nd; }
+
+// RC.CC helpers
+function fuera(c){ return c.op==="max"?typeof c.valor==="number"&&c.valor>c.limite:c.op==="min"?typeof c.valor==="number"&&c.valor<c.limite:false; }
+function cerca(c){ if(fuera(c)) return false; return c.op==="max"?typeof c.valor==="number"&&c.valor>c.limite*0.78:c.op==="min"?typeof c.valor==="number"&&c.valor<c.limite*1.18:false; }
+function sheetStatus(s){ if(s.noData||s.listadoMaestro) return "nd"; if(s.controles.some(fuera)) return "alert"; if(s.controles.some(cerca)) return "warn"; return "ok"; }
+function pct(c){ return typeof c.valor==="number"?Math.min((c.valor/c.limite)*100,100):100; }
+function ptColor(v,l,op){ if((op==="max"&&v>l)||(op==="min"&&v<l)) return COLORS.fail; if((op==="max"&&v>l*0.78)||(op==="min"&&v<l*1.18)) return COLORS.warn; return COLORS.ok; }
+function sameTab(a,b){ return String(a||"").replace(/\s+/g,"").toUpperCase()===String(b||"").replace(/\s+/g,"").toUpperCase(); }
+function matchTab(s,tab){ if(tab==="TODAS") return true; return (SHEET_TAB_MAP[s.id]||[]).some(t=>sameTab(t,tab)); }
+function destroyChart(id){
+  if(charts[id]){try{charts[id].destroy();}catch(e){} delete charts[id];}
+  const cv=document.getElementById(id);
+  if(cv&&window.Chart){const ec=Chart.getChart(cv);if(ec)try{ec.destroy();}catch(e){}}
+}
+function computeSheets(){
+  const aggs=(window.AGGREGATES_BY_TAB_GENERATED||{})[selectedTab]||{};
+  return (window.SHEETS||[]).map(s=>{
+    const s2=JSON.parse(JSON.stringify(s));
+    s2.matchTab=matchTab(s,selectedTab);
+    const agg=aggs[s.codigo];
+    if(agg&&agg.controles){
+      s2.controles=s2.controles.map(c=>{
+        const ov=agg.controles[c.name];
+        if(!ov) return c;
+        const c2=Object.assign({},c);
+        if(typeof ov.valor==="number"||typeof ov.valor==="string") c2.valor=ov.valor;
+        if(Array.isArray(ov.hist)&&ov.hist.length) c2.hist={labels:(Array.isArray(ov.labels)&&ov.labels.length===ov.hist.length)?ov.labels:ov.hist.map((_,i)=>"M"+(i+1)),data:ov.hist};
+        return c2;
+      });
+    }
+    return s2;
+  });
+}
+function getLote(){ const idx=LOTES.findIndex(l=>sameTab(l.proveedorCorto,selectedTab)); return idx>=0?idx:0; }
+
+// ═══════════════════════════════════════════════════
+// THEME
+// ═══════════════════════════════════════════════════
+function toggleTheme(){
+  isDark=!isDark;
+  document.body.classList.toggle('dark-mode',isDark);
+  setTimeout(function(){if(typeof renderV1Charts==='function')renderV1Charts();if(typeof renderProdCharts==='function')renderProdCharts();},50);
+}
+
+// ═══════════════════════════════════════════════════
+// VIEW SWITCHING
+// ═══════════════════════════════════════════════════
+function setView(v){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  ['calidad','produccion','ppr'].forEach(n=>{
+    const btn=document.getElementById('sb-'+n);
+    if(btn) btn.className='sb-btn'+(n===v?' a'+(n==='calidad'?'c':n==='produccion'?'g':'p'):'');
+  });
+  document.getElementById('sbLotesSection').style.display=v==='calidad'?'block':'none';
+  const T={'calidad':'Control Room — Calidad','produccion':'Control Room — Producción','ppr':'Control Room — PPR / FSSC 22000'};
+  const S={'calidad':'14 Registros RC.CC · INGAMA Beneficiadora · Riberalta','produccion':'14 Registros RC.PD · Flujo de producción','ppr':'11 Cláusulas PPR · Cláusula 8.2.4 ISO/TS 22002-1'};
+  document.getElementById('tbTitle').textContent=T[v];
+  document.getElementById('tbSub').textContent=S[v];
+  if(v==='calidad') renderCalidad();
+  if(v==='produccion') renderProduccion();
+  if(v==='ppr') renderPPR();
+  var ps=document.getElementById('sbPPRSection');if(ps)ps.style.display=(v==='ppr'?'block':'none');if(v==='ppr')renderSBPPR();
+}
+function setTab(t){
+  selectedTab=t;
+  currentLote=getLote();
+  renderSBLotes();
+  renderCalidad();
+}
+
+// ═══════════════════════════════════════════════════
+// SIDEBAR LOTES
+// ═══════════════════════════════════════════════════
+function renderSBLotes(){
+  const el=document.getElementById('sbLotes');
+  el.innerHTML='';
+  ['TODAS',...TAB_REFERENCE].forEach(function(t){
+    const btn=document.createElement('button');
+    btn.className='sb-lote'+(t===selectedTab?' al':'');
+    btn.textContent=t;
+    btn.onclick=function(){setTab(t);};
+    el.appendChild(btn);
+  });
+}
+
+// ═══════════════════════════════════════════════════
+// V1 LOTE GRID & HERO
+// ═══════════════════════════════════════════════════
+function renderLoteGrid(){}
+
+function renderHero(){
+  const L=LOTES[getLote()];
+  const r=L.recepcion,s=L.seleccionado,d=L.deshidratado,p=L.pt;
+  const checks=[status(r.humedad,25),status(r.corte,10),status(s.promOmb,2),status(s.promPod,3),status(s.chiaLona,3),status(d.danadas,5),status(d.sevDanadas,4),status(p.danadasPT,5),status(p.sevDanadasPT,4)];
+  const nOk=checks.filter(c=>c==='ok').length;
+  const nWarn=checks.filter(c=>c==='warn').length;
+  const nFail=checks.filter(c=>c==='fail').length;
+  const overall=nFail>0?'fail':nWarn>0?'warn':'ok';
+  document.getElementById('heroSection').innerHTML=`
+    <div class="hero">
+      <div class="hero-cell primary">
+        <div class="hl">Lote seleccionado</div>
+        <div class="hv"><em>${L.codigo}</em></div>
+        <div class="hs">${L.proveedor} · ${L.kilosTotal.toLocaleString('es')} kg · ${L.tipo}</div>
+      </div>
+      <div class="hero-cell">
+        <div class="hl">Conformes</div>
+        <div class="hv" style="color:${COLORS.ok}">${nOk}</div>
+        <div class="hs"><span class="pill p-ok">dentro de límite</span></div>
+      </div>
+      <div class="hero-cell">
+        <div class="hl">En atención</div>
+        <div class="hv" style="color:${COLORS.warn}">${nWarn}</div>
+        <div class="hs"><span class="pill p-warn">cerca del límite</span></div>
+      </div>
+      <div class="hero-cell">
+        <div class="hl">Fuera de límite</div>
+        <div class="hv" style="color:${COLORS.fail}">${nFail}</div>
+        <div class="hs"><span class="pill ${pClass(overall)}">${sLabel(overall)}</span></div>
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// V1 STAGES / INFORME
+// ═══════════════════════════════════════════════════
+function indCard({label,val,unit,limit,rc,pcc,status:st,extra,limitText}){
+  const s=st||'ok';
+  return `<div class="ind">
+    <div class="ind-dot-wrap">
+      <div class="ind-dot ${sClass(s)}"></div>
+      <span class="ind-tag ${pcc?'pcc':''}">${pcc?'PCC · ':''}${rc}</span>
+    </div>
+    <div class="ind-lbl">${label}</div>
+    <div class="ind-val">${val}${unit?`<em>${unit}</em>`:''}</div>
+    <div class="ind-lim">${limitText||(limit?`Límite: ${limit}${unit||''}`:'—')}</div>
+    ${typeof val==='number'&&typeof limit==='number'?`<div class="bar"><div class="bar-f ${bClass(s)}" style="width:${Math.min(100,(val/limit*100)).toFixed(0)}%"></div></div>`:''}
+    ${extra||''}
+  </div>`;
+}
+
+function renderStages(){
+  const L=LOTES[getLote()];
+  const r=L.recepcion,sc=L.sancochado,se=L.seleccionado,d=L.deshidratado,p=L.pt,e=L.exportacion;
+  const stages=[
+    {
+      key:'recepcion',num:'01',name:'Recepción de materia prima',rc:'RC.CC.14 · RC.CC.1.1',
+      indicators:[
+        {label:'% Humedad MPH almacenada',val:r.humedad,unit:'%',limit:25,rc:'RC.CC.14',status:status(r.humedad,25)},
+        {label:'% Corte chías',val:r.corte,unit:'%',limit:10,rc:'RC.CC.1.1',status:status(r.corte,10)},
+        {label:'Lote de proveedor',val:L.proveedorCorto,rc:'RC.PD.01',limitText:L.proveedor,status:'ok'},
+        {label:'Kilos recibidos',val:L.kilosTotal.toLocaleString('es'),unit:' kg',rc:'RC.PD.01',limitText:`Tipo: ${L.tipo}`,status:'ok'}
+      ]
+    },
+    {
+      key:'sancochado',num:'02',name:'Sancochado en autoclave',rc:'RC.CC.17',
+      indicators:[
+        {label:'Presión del distribuidor',val:sc.presionDist,unit:' bar',limit:7,rc:'RC.CC.17',status:sc.presionDist===7?'ok':'warn',limitText:'Valor exacto: 7 bar'},
+        {label:'Presión del autoclave',val:sc.presionAuto,unit:' bar',limit:4,rc:'RC.CC.17',status:sc.presionAuto===4?'ok':'warn',limitText:'Valor exacto: 4 bar'},
+        {label:'Tiempo de ciclo',val:sc.tiempo,unit:' min',rc:'RC.CC.17',limitText:'Rango: 2:05 – 2:15',status:'ok'},
+        {label:'% Humedad entrada → salida',val:`${sc.humIng}→${sc.humSal}`,unit:'%',rc:'RC.PD.05',limitText:'Reducción esperada',status:'ok'}
+      ]
+    },
+    {
+      key:'seleccionado',num:'03',name:'Seleccionado (caída de lona)',rc:'RC.CC.01 · RC.CC.02',
+      indicators:[
+        {label:'% Ombligo promedio del lote',val:se.promOmb,unit:'%',limit:2,rc:'RC.CC.01',status:status(se.promOmb,2)},
+        {label:'% Podrida promedio del lote',val:se.promPod,unit:'%',limit:3,rc:'RC.CC.01',status:status(se.promPod,3)},
+        {label:'% Chías en caída de lona',val:se.chiaLona,unit:'%',limit:3,rc:'RC.CC.02',status:status(se.chiaLona,3)},
+        {label:'% Pedazos en caída de lona',val:se.pedazosLona,unit:'%',limit:4,rc:'RC.CC.02',status:status(se.pedazosLona,4)},
+        {label:'Tipo predominante',val:se.tipos.midget>se.tipos.medium?'Midget':'Medium',rc:'RC.PD.03',limitText:'Clasificación por zaranda',status:'ok'},
+      ]
+    },
+    {
+      key:'deshidratado',num:'04',name:'Deshidratado y recorte',rc:'RC.CC.04 · RC.CC.05',
+      indicators:[
+        {label:'% Dañadas (deshidratado)',val:d.danadas,unit:'%',limit:5,rc:'RC.CC.04',status:status(d.danadas,5)},
+        {label:'% Sev. Dañadas',val:d.sevDanadas,unit:'%',limit:4,rc:'RC.CC.04',status:status(d.sevDanadas,4)},
+        {label:'% Dañadas (prod. terminado)',val:p.danadasPT,unit:'%',limit:5,rc:'RC.CC.05',status:status(p.danadasPT,5)},
+        {label:'% Sev. Dañadas (PT)',val:p.sevDanadasPT,unit:'%',limit:4,rc:'RC.CC.05',status:status(p.sevDanadasPT,4)},
+      ]
+    },
+    {
+      key:'detector',num:'05',name:'Control de metales (PCC)',rc:'RC.CC.07 · RC.CC.08',pcc:true,
+      indicators:[
+        {label:'Detector metales — Ferroso Fe',val:'ATRAPA ok',rc:'RC.CC.07',pcc:true,limitText:'Fe 3mm · No Fe 3.5mm · SS 4mm',status:'ok'},
+        {label:'Detector metales — No Ferroso',val:'ATRAPA ok',rc:'RC.CC.07',pcc:true,limitText:'PCC-02 verificado',status:'ok'},
+        {label:'Imanes vaciado APD',val:p.imanesPCC,rc:'RC.CC.08',pcc:true,limitText:'Sin fragmentos metálicos',status:p.imanesPCC==='OK'?'ok':'fail'},
+        {label:'Pasajes verificados (detective)',val:'≥1 pase/turno',rc:'RC.CC.07',limitText:'Verificación al inicio, c/100 cajas, final',status:'ok'},
+      ]
+    },
+    {
+      key:'exportacion',num:'06',name:'Embalado, PT y exportación',rc:'RC.CC.09 · RC.CC.10',
+      indicators:[
+        {label:'Aflatoxina B1 (COA)',val:e.aflatoxB1,unit:' ppb',rc:'RC.CC.09',limitText:'Límite: ≤ 5 ppb (UE: 2 ppb)',status:'ok'},
+        {label:'Aflatoxinas totales (COA)',val:e.aflatoxTotal,unit:' ppb',rc:'RC.CC.09',limitText:'Límite: ≤ 10 ppb',status:'ok'},
+        {label:'% Humedad producto terminado',val:e.humPT,unit:'%',limit:7,rc:'RC.CC.09',status:status(e.humPT,7)},
+        {label:'E. coli',val:e.ecoli,rc:'RC.CC.09',limitText:'Límite: Ausente',status:e.ecoli==='Ausente'?'ok':'fail'},
+        {label:'Salmonella',val:e.salmonella,rc:'RC.CC.09',limitText:'Límite: Ausente',status:e.salmonella==='Ausente'?'ok':'fail'},
+        {label:'Inspección contenedor',val:e.inspec,rc:'RC.CC.10',limitText:`Contenedor: ${e.contenedor}`,status:e.inspec==='Aprobado'?'ok':'warn'},
+      ]
+    }
+  ];
+
+  const stCounts=stages.map(stg=>({key:stg.key,fails:stg.indicators.filter(i=>i.status==='fail').length,warns:stg.indicators.filter(i=>i.status==='warn').length}));
+  
+  document.getElementById('stagesContainer').innerHTML=stages.map((stg,idx)=>{
+    const sc=stCounts[idx];
+    const overall=sc.fails>0?'fail':sc.warns>0?'warn':'ok';
+    return `<div class="stage" id="stage_${stg.key}">
+      <div class="stage-head" onclick="toggleStage('${stg.key}')">
+        <div class="stage-num">${stg.num}</div>
+        <div class="stage-info">
+          <div class="stage-nm">${stg.name}</div>
+          <div class="stage-rc">${stg.rc}${stg.pcc?' · <strong style="color:var(--accent2)">PCC</strong>':''}</div>
+        </div>
+        <div class="stage-right">
+          ${sc.fails?`<span class="pill p-fail">${sc.fails} fuera</span>`:''}
+          ${sc.warns?`<span class="pill p-warn">${sc.warns} atención</span>`:''}
+          ${!sc.fails&&!sc.warns?`<span class="pill p-ok">Conforme</span>`:''}
+          <span class="chev" id="chev_${stg.key}">›</span>
+        </div>
+      </div>
+      <div class="stage-body" id="body_${stg.key}">
+        <div class="ind-grid">${stg.indicators.map(i=>indCard(i)).join('')}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Auto-open stages with issues
+  stages.forEach(stg=>{
+    const sc2=stCounts.find(s=>s.key===stg.key);
+    if(sc2&&(sc2.fails>0||sc2.warns>0)) toggleStage(stg.key);
+  });
+}
+
+function toggleStage(key){
+  const body=document.getElementById('body_'+key);
+  const chev=document.getElementById('chev_'+key);
+  if(!body) return;
+  body.classList.toggle('open');
+  if(chev) chev.classList.toggle('open');
+}
+
+// ═══════════════════════════════════════════════════
+// V1 CHARTS
+// ═══════════════════════════════════════════════════
+function renderV1Charts(){
+  const L=LOTES[getLote()];
+  if(!L||!window.Chart) return;
+
+  destroyChart('chartTrend');
+  const cvT=document.getElementById('chartTrend');
+  if(cvT) charts.chartTrend=new Chart(cvT,{type:'line',data:{labels:L.seleccionado.fechas,datasets:[
+    {label:'% Podrida',data:L.seleccionado.podrida,borderColor:COLORS.fail,backgroundColor:`${COLORS.fail}18`,tension:.35,borderWidth:2,pointRadius:4,pointBackgroundColor:L.seleccionado.podrida.map(v=>v>3?COLORS.fail:v>2.34?COLORS.warn:COLORS.ok),fill:true},
+    {label:'% Ombligo',data:L.seleccionado.ombligo,borderColor:COLORS.warn,backgroundColor:`${COLORS.warn}10`,tension:.35,borderWidth:2,pointRadius:4,pointBackgroundColor:L.seleccionado.ombligo.map(v=>v>2?COLORS.fail:v>1.56?COLORS.warn:COLORS.ok),fill:true},
+    {label:'Lím Podrida (3%)',data:Array(L.seleccionado.fechas.length).fill(3),borderColor:`${COLORS.fail}66`,borderDash:[5,3],borderWidth:1.5,pointRadius:0,fill:false},
+    {label:'Lím Ombligo (2%)',data:Array(L.seleccionado.fechas.length).fill(2),borderColor:`${COLORS.warn}66`,borderDash:[5,3],borderWidth:1.5,pointRadius:0,fill:false}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:getColors().ink3,font:{family:'JetBrains Mono',size:9},boxWidth:10}}},scales:{y:{min:0,max:4,grid:{color:getColors().grid},ticks:{color:getColors().ink3,font:{size:9}}},x:{grid:{color:getColors().grid},ticks:{color:getColors().ink3,font:{size:9}}}}}});
+
+  destroyChart('chartTypes');
+  const t=L.seleccionado.tipos;
+  const tot=t.large+t.medium+t.midget+t.tiny;
+  const cvTy=document.getElementById('chartTypes');
+  if(cvTy) charts.chartTypes=new Chart(cvTy,{type:'doughnut',data:{labels:['Large','Medium','Midget','Tiny'],datasets:[{data:[t.large,t.medium,t.midget,t.tiny],backgroundColor:document.body.classList.contains('dark-mode')?['#5eead4','#34d399','#f87171','#fbbf24']:['#2C4A3E','#4A7C6F','#8B3A2E','#B08A3E'],borderColor:'var(--panel)',borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{color:getColors().ink2,font:{family:'JetBrains Mono',size:10},padding:10,generateLabels:function(chart){const d=chart.data;return d.labels.map((l,i)=>({text:`${l}: ${d.datasets[0].data[i]} (${Math.round(d.datasets[0].data[i]/tot*100)}%)`,fillStyle:d.datasets[0].backgroundColor[i],strokeStyle:'var(--panel)',lineWidth:2,index:i}));}}}}}});
+
+  destroyChart('chartRadar');
+  const radarData=[L.seleccionado.promPod/3*100,L.seleccionado.promOmb/2*100,L.seleccionado.chiaLona/3*100,L.deshidratado.danadas/5*100,L.deshidratado.chia/8*100,L.pt.cajasPinchadas/10*100,L.recepcion.humedad/25*100];
+  const cvR=document.getElementById('chartRadar');
+  if(cvR) charts.chartRadar=new Chart(cvR,{type:'radar',data:{labels:['% Podrida','% Ombligo','% Chía Lona','% Dañadas','% Chía PT','Cajas Pinch.','% Humedad'],datasets:[
+    {label:L.proveedorCorto,data:radarData,borderColor:COLORS.accent||'#2C4A3E',backgroundColor:'rgba(44,74,62,.1)',pointBackgroundColor:radarData.map(v=>v>100?COLORS.fail:v>78?COLORS.warn:COLORS.ok),pointRadius:3,borderWidth:2},
+    {label:'Límite (100%)',data:[100,100,100,100,100,100,100],borderColor:`${COLORS.fail}55`,backgroundColor:`${COLORS.fail}06`,borderDash:[5,3],pointRadius:0,borderWidth:1.5}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:getColors().ink3,font:{size:9}}}},scales:{r:{min:0,max:140,ticks:{color:getColors().ink3,backdropColor:'transparent',stepSize:35},grid:{color:getColors().grid},pointLabels:{color:getColors().ink2,font:{size:9}},angleLines:{color:'var(--line2)'}}}}});
+
+  destroyChart('chartCajas');
+  const cvC=document.getElementById('chartCajas');
+  if(cvC) charts.chartCajas=new Chart(cvC,{type:'bar',data:{labels:LOTES.map(l=>l.proveedorCorto),datasets:[
+    {label:'Cajas Producidas',data:LOTES.map(l=>l.pt.cajasProducidas),backgroundColor:'rgba(46,125,91,.7)',borderColor:COLORS.ok,borderWidth:1.5},
+    {label:'Cajas Pinchadas',data:LOTES.map(l=>l.pt.cajasPinchadas),backgroundColor:'rgba(178,62,62,.7)',borderColor:COLORS.fail,borderWidth:1.5},
+    {label:'Reembaladas',data:LOTES.map(l=>l.pt.cajasReembazadas),backgroundColor:'rgba(193,121,23,.7)',borderColor:COLORS.warn,borderWidth:1.5}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:getColors().ink3,font:{size:9},boxWidth:10}}},scales:{y:{grid:{color:getColors().grid},ticks:{color:getColors().ink3,font:{size:9}}},x:{grid:{display:false},ticks:{color:getColors().ink3,font:{size:9}}}}}});
+}
+
+function renderCompCharts(){
+  if(!window.Chart) return;
+
+  destroyChart('chartHumAll');
+  const cvH=document.getElementById('chartHumAll');
+  if(cvH) charts.chartHumAll=new Chart(cvH,{type:'bar',data:{labels:LOTES.map(l=>l.proveedorCorto),datasets:[
+    {label:'% Humedad Recepción',data:LOTES.map(l=>l.recepcion.humedad),backgroundColor:LOTES.map(l=>l.recepcion.humedad>25?`${COLORS.fail}bb`:l.recepcion.humedad>19.5?`${COLORS.warn}bb`:`${COLORS.ok}bb`),borderWidth:1.5},
+    {label:'Límite (25%)',data:LOTES.map(()=>25),type:'line',borderColor:`${COLORS.fail}77`,borderDash:[5,3],borderWidth:1.5,pointRadius:0,fill:false}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:getColors().ink3,font:{size:9},boxWidth:10}}},scales:{y:{min:18,max:28,grid:{color:getColors().grid},ticks:{color:getColors().ink3,font:{size:9},callback:v=>v+'%'}},x:{grid:{display:false},ticks:{color:getColors().ink3,font:{size:9}}}}}});
+
+  destroyChart('chartPodAll');
+  const cvP=document.getElementById('chartPodAll');
+  if(cvP) charts.chartPodAll=new Chart(cvP,{type:'bar',data:{labels:LOTES.map(l=>l.proveedorCorto),datasets:[
+    {label:'% Podrida Promedio',data:LOTES.map(l=>l.seleccionado.promPod),backgroundColor:LOTES.map(l=>l.seleccionado.promPod>3?`${COLORS.fail}bb`:l.seleccionado.promPod>2.34?`${COLORS.warn}bb`:`${COLORS.ok}bb`),borderWidth:1.5},
+    {label:'% Ombligo Prom.',data:LOTES.map(l=>l.seleccionado.promOmb),backgroundColor:'rgba(44,74,62,.4)',borderWidth:1.5},
+    {label:'Lím Podrida (3%)',data:LOTES.map(()=>3),type:'line',borderColor:`${COLORS.fail}66`,borderDash:[5,3],borderWidth:1.5,pointRadius:0,fill:false},
+    {label:'Lím Ombligo (2%)',data:LOTES.map(()=>2),type:'line',borderColor:`${COLORS.warn}66`,borderDash:[5,3],borderWidth:1.5,pointRadius:0,fill:false}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:getColors().ink3,font:{size:9},boxWidth:10}}},scales:{y:{min:0,max:4,grid:{color:getColors().grid},ticks:{color:getColors().ink3,font:{size:9},callback:v=>v+'%'}},x:{grid:{display:false},ticks:{color:getColors().ink3,font:{size:9}}}}}});
+
+  // Comparison table
+  const tbl=document.getElementById('compTable');
+  const headers=['Indicador','Límite',...LOTES.map(l=>l.proveedorCorto)];
+  const rows=[
+    ['% Humedad Recep.','≤25%',...LOTES.map(l=>({v:l.recepcion.humedad+'%',ok:l.recepcion.humedad<=25,s:status(l.recepcion.humedad,25)}))],
+    ['% Corte MP','≤10%',...LOTES.map(l=>({v:l.recepcion.corte+'%',ok:l.recepcion.corte<=10,s:status(l.recepcion.corte,10)}))],
+    ['% Podrida prom.','<3%',...LOTES.map(l=>({v:l.seleccionado.promPod+'%',ok:l.seleccionado.promPod<3,s:status(l.seleccionado.promPod,3)}))],
+    ['% Ombligo prom.','<2%',...LOTES.map(l=>({v:l.seleccionado.promOmb+'%',ok:l.seleccionado.promOmb<2,s:status(l.seleccionado.promOmb,2)}))],
+    ['Cajas Pinchadas','<5',...LOTES.map(l=>({v:l.pt.cajasPinchadas,ok:l.pt.cajasPinchadas<5,s:status(l.pt.cajasPinchadas,5)}))],
+    ['% Hum. PT','≤7%',...LOTES.map(l=>({v:l.exportacion.humPT+'%',ok:l.exportacion.humPT<=7,s:status(l.exportacion.humPT,7)}))],
+    ['E.coli','Ausente',...LOTES.map(l=>({v:l.exportacion.ecoli,ok:l.exportacion.ecoli==='Ausente',s:l.exportacion.ecoli==='Ausente'?'ok':'fail'}))],
+    ['Salmonella','Ausente',...LOTES.map(l=>({v:l.exportacion.salmonella,ok:l.exportacion.salmonella==='Ausente',s:l.exportacion.salmonella==='Ausente'?'ok':'fail'}))],
+  ];
+  tbl.innerHTML=`<thead><tr>${headers.map((h,i)=>`<th style="text-align:${i>1?'center':'left'}">${h}</th>`).join('')}</tr></thead>
+  <tbody>${rows.map((row,ri)=>`<tr>${row.map((cell,ci)=>{
+    if(ci<=1) return `<td style="color:${ci===0?'var(--ink2)':'var(--ink3)'};font-family:var(--mono);font-size:11px">${cell}</td>`;
+    const s2=cell.s;
+    return `<td style="text-align:center"><span class="t-pill p-${s2}" style="font-size:10px">${cell.v}</span></td>`;
+  }).join('')}</tr>`).join('')}</tbody>`;
+}
+
+// ═══════════════════════════════════════════════════
+// RC.CC GRID
+// ═══════════════════════════════════════════════════
+function renderTabRow(){
+  const el=document.getElementById('tabRowCalidad');
+  el.innerHTML='';
+  ['TODAS',...TAB_REFERENCE].forEach(function(t){
+    const btn=document.createElement('button');
+    btn.className='tab-btn'+(t===selectedTab?' active':'');
+    btn.textContent=t;
+    btn.onclick=function(){setTab(t);};
+    el.appendChild(btn);
+  });
+  const lbl=document.getElementById('currentTabLabel');
+  if(lbl) lbl.textContent=selectedTab;
+}
+
+function renderRegistros(sheets){
+  const el=document.getElementById('registrosGrid');
+  el.innerHTML=sheets.map(s=>{
+    const st=sheetStatus(s);const m=s.matchTab;
+    const cc=!m?'nd-bg':(st==='alert'?'fail-bg':st==='warn'?'warn-bg':'ok-bg');
+    const codeClass=!m?'nd':(st==='alert'?'fail':st==='warn'?'warn':'ok');
+    const stTxt=!m?'N/A':st==='alert'?'ALERTA':st==='warn'?'ADVERT.':st==='nd'?'S/DATOS':'OK';
+    return `<div class="rc ${cc}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">
+        <div style="flex:1;min-width:0">
+          <span class="rc-code ${codeClass}">${s.codigo}</span>
+          <div class="rc-name">${s.nombre}</div>
+          <div class="rc-meta">${s.ultimaFecha} · ${selectedTab==='TODAS'?s.nombreHoja:selectedTab}</div>
+        </div>
+        <span style="font-family:var(--mono);font-size:9px;font-weight:600;color:${st==='alert'?COLORS.fail:st==='warn'?COLORS.warn:st==='nd'?COLORS.nd:COLORS.ok}">${stTxt}</span>
+      </div>
+      ${m&&!s.noData&&!s.listadoMaestro?s.controles.map(c=>{
+        const cs=fuera(c)?'fail':cerca(c)?'warn':'ok';
+        const isN=typeof c.valor==='number';
+        return `<div class="ctrl${cs==='ok'?'':' '+cs}">
+          <div class="ctrl-row">
+            <span class="ctrl-name" title="${c.name}">${c.name}</span>
+            <span class="ctrl-val ${cs}">${isN?c.valor+c.unidad:c.valor}</span>
+          </div>
+          <div class="ctrl-lim">
+            <span>Lím: ${c.op==='min'?'≥':c.op==='max'?'<':''}${c.limite}${typeof c.limite==='number'?c.unidad:''}</span>
+            ${fuera(c)?`<span class="ctrl-tag fail">FUERA</span>`:cerca(c)?`<span class="ctrl-tag warn">CERCA</span>`:''}
+          </div>
+          ${isN?`<div class="ind-bar"><div class="ind-bar-f ${cs}" style="width:${pct(c)}%"></div></div>`:''}
+        </div>`;
+      }).join(''):s.listadoMaestro?'<div style="font-size:11px;color:var(--ink3);font-style:italic;font-family:var(--sans)">Listado maestro</div>':s.noData?'<div style="font-size:11px;color:var(--ink3);font-style:italic">Sin datos disponibles</div>':''}
+      <div class="card-foot">
+        <span style="font-family:var(--mono);font-size:10px;color:var(--ink3)">${s.ultimaFecha}</span>
+        <a class="go-link" href="${s.hojaDirecta||s.link}" target="_blank">↗ Ver hoja</a>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderAlertBanner(sheets){
+  const alertas=sheets.filter(s=>s.matchTab&&!s.noData&&!s.listadoMaestro&&s.controles.some(fuera));
+  const el=document.getElementById('alertCalidad');
+  if(!alertas.length){el.innerHTML='';return;}
+  el.innerHTML=`<div class="alert-banner">
+    <div class="alert-title">⚠ ALERTAS CRÍTICAS ACTIVAS (${alertas.length})</div>
+    <div class="alert-grid">
+    ${alertas.map(s=>`<div class="alert-card">
+      <div class="alert-card-code">${s.codigo}</div>
+      <div style="font-family:var(--serif);font-size:13px;font-weight:500;color:var(--ink);margin-bottom:6px">${s.nombre}</div>
+      ${s.controles.filter(fuera).map(c=>`<div style="font-family:var(--mono);font-size:10px;padding:4px 0;border-bottom:1px solid var(--fail-bg);color:var(--fail)">
+        ${c.name}: <strong>${c.valor}${c.unidad}</strong> (lím ${c.op==='max'?'<':'≥'}${c.limite}${typeof c.limite==='number'?c.unidad:''})
+      </div>`).join('')}
+    </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderDonut(sheets){
+  destroyChart('chartDonut');
+  const active=sheets.filter(s=>s.matchTab&&!s.noData&&!s.listadoMaestro);
+  const alertas=active.filter(s=>s.controles.some(fuera)).length;
+  const warns=active.filter(s=>!s.controles.some(fuera)&&s.controles.some(cerca)).length;
+  const nd=sheets.filter(s=>s.matchTab&&(s.noData||s.listadoMaestro)).length;
+  const ok=Math.max(active.length-alertas-warns,0);
+  const cv=document.getElementById('chartDonut');
+  if(!cv||!window.Chart) return;
+  charts.chartDonut=new Chart(cv,{type:'doughnut',data:{labels:['Conforme','Advertencia','No Conforme','Sin Datos'],datasets:[{data:[ok,warns,alertas,nd],backgroundColor:[`${COLORS.ok}cc`,`${COLORS.warn}cc`,`${COLORS.fail}cc`,'rgba(107,105,100,.4)'],borderColor:'var(--panel)',borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom',labels:{color:getColors().ink3,font:{family:'JetBrains Mono',size:10},padding:10}}}}});
+}
+
+function renderCoverage(){
+  const el=document.getElementById('coveragePanel');
+  const all=window.SHEETS||[];
+  const aggs=window.AGGREGATES_BY_TAB_GENERATED||{};
+  el.innerHTML=TAB_REFERENCE.map(tab=>{
+    const present=all.filter(s=>(SHEET_TAB_MAP[s.id]||[]).some(t=>sameTab(t,tab))||!!(aggs[tab]?.[s.codigo])).map(s=>s.codigo);
+    const missing=all.map(s=>s.codigo).filter(c=>!present.includes(c));
+    const ok2=missing.length===0;
+    return `<div class="coverage-item ${ok2?'ok':'partial'}">
+      <div style="display:flex;justify-content:space-between;margin-bottom:2px">
+        <strong style="color:${ok2?COLORS.ok:COLORS.warn}">${tab}</strong>
+        <span style="color:var(--ink3)">${present.length}/${all.length}${ok2?' ✓':''}</span>
+      </div>
+      ${!ok2?`<div style="color:var(--ink3)">Faltan: ${missing.slice(0,4).join(', ')}${missing.length>4?'…':''}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════
+// RENDER CALIDAD (full)
+// ═══════════════════════════════════════════════════
+function renderCalidad(){
+  const sheets=computeSheets();
+  renderLoteGrid();
+  renderHero();
+  renderStages();
+  renderV1Charts();
+  renderCompCharts();
+  renderTabRow();
+  renderRegistros(sheets);
+  renderAlertBanner(sheets);
+  renderDonut(sheets);
+  renderCoverage();
+}
+
+// ═══════════════════════════════════════════════════
+// PRODUCCIÓN
+// ═══════════════════════════════════════════════════
+function renderProduccion(){
+  renderProdCharts();
+  document.getElementById('prodGrid').innerHTML=PROD_DATA.map(p=>`
+    <div class="prod-card">
+      <div class="prod-code">${p.codigo}</div>
+      <div class="prod-name">${p.nombre}</div>
+      <div><span class="prod-badge ${p.tipo==='DIGITAL'?'d':'f'}">${p.tipo}</span></div>
+      <div class="prod-desc" style="margin-top:6px">${p.desc}</div>
+      <div class="prod-dato">${p.dato}</div>
+      <div class="prod-stat">
+        <span style="color:var(--ink3)">Estado</span>
+        <span style="color:var(--ok);font-weight:600">● ${p.stat}</span>
+      </div>
+    </div>`).join('');
+}
+
+function renderProdCharts(){
+  if(!window.Chart) return;
+  destroyChart('chartProdKilos');
+  const cvK=document.getElementById('chartProdKilos');
+  const convoyLabels=['Conv 1','Conv 2','Conv 3','Conv 4','Conv 5','Conv 6','Conv 7','Conv 8'];
+  const convoyKg=[8736,8369,4627,8143,8209,4294,8245,6329];
+  const convoyBags=[120,120,60,120,120,60,120,92];
+  if(cvK) charts.chartProdKilos=new Chart(cvK,{type:'bar',data:{labels:convoyLabels,datasets:[
+    {label:'Peso Neto (kg)',data:convoyKg,backgroundColor:`${COLORS.ok}aa`,borderColor:COLORS.ok,borderWidth:1.5,yAxisID:'y'},
+    {label:'N° Sacos',data:convoyBags,type:'line',borderColor:'#2C4A3E',backgroundColor:'rgba(44,74,62,.12)',borderWidth:2,pointRadius:4,fill:false,yAxisID:'y2'}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:getColors().ink3,font:{size:9},boxWidth:10}}},scales:{y:{grid:{color:getColors().grid},ticks:{color:getColors().ink3,font:{size:9}}},y2:{position:'right',grid:{drawOnChartArea:false},ticks:{color:getColors().ink3,font:{size:9}}},x:{grid:{display:false},ticks:{color:getColors().ink3,font:{size:9}}}}}});
+
+  destroyChart('chartProdTipos');
+  const cvT=document.getElementById('chartProdTipos');
+  if(cvT) charts.chartProdTipos=new Chart(cvT,{type:'bar',data:{
+    labels:['Large','Medium','Mezclada','Midget','Tiny'],
+    datasets:[
+      {label:'BSI 01 (ORG)',data:[5460,12720,20880,15000,2520],backgroundColor:'rgba(44,74,62,.7)',borderColor:'#2C4A3E',borderWidth:1.5},
+      {label:'RG 01-CV (CONV)',data:[2496,2604,3249,3249,1380],backgroundColor:'rgba(139,58,46,.55)',borderColor:'#8B3A2E',borderWidth:1.5}
+    ]
+  },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:getColors().ink3,font:{size:9},boxWidth:10}}},scales:{y:{grid:{color:getColors().grid},ticks:{color:getColors().ink3,font:{size:9},callback:v=>v>=1000?(v/1000)+'t':v}},x:{grid:{display:false},ticks:{color:getColors().ink3,font:{size:9}}}}}});
+}
+
+// ═══════════════════════════════════════════════════
+// PPR
+// ═══════════════════════════════════════════════════
+// PPR DATA (real from Drive)
+const PPR_ANALYTICS = [
+  {id:'limp',n:'Limpieza (Sanitización)',cl:'8.2.4 i)',m:[88,91,93,94],ncs:12,color:'#2C4A3E',reg:'RC.LD.01',resp:'Mery Saavedra Chipunavi'},
+  {id:'plag',n:'Control de Plagas',cl:'8.2.4 d)',m:[72,75,78,80],ncs:11,color:'#B23E3E',reg:'RC.PL.02/03',resp:'Tania Rojas Quette'},
+  {id:'hig', n:'Higiene Personal',cl:'8.2.4 j)',m:[90,92,93,95],ncs:4, color:'#7c3aed',reg:'RC.HP.05',resp:'Mery Saavedra Chipunavi'},
+  {id:'res', n:'Eliminación Residuos',cl:'8.2.4 d)',m:[85,87,88,90],ncs:5, color:'#166534',reg:'Elim.Residuos 26',resp:'Jefe Calidad'},
+  {id:'ins', n:'Infraestructuras',cl:'8.2.4 a)b)',m:[88,88,90,91],ncs:7, color:'#92400e',reg:'RC.INF.01',resp:'Jefe Mantenimiento'},
+  {id:'equ', n:'Mantenimiento Equipos',cl:'8.2.4 e)',m:[82,84,86,88],ncs:8, color:'#9a3412',reg:'RC.MAN.01',resp:'Jefe Mantenimiento'},
+  {id:'agu', n:'Agua, Aire, Energía',cl:'8.2.4 c)',m:[91,92,93,94],ncs:3, color:'#065f46',reg:'RC.SRV.01',resp:'Jefe Planta'},
+  {id:'pro', n:'Gestión Proveedores',cl:'8.2.4 f)',m:[78,80,82,84],ncs:9, color:'#86198f',reg:'RC.PRV.01',resp:'Jefe Calidad'},
+  {id:'ale', n:'Alérgenos',cl:'8.2.4 h)',m:[70,74,76,79],ncs:6, color:'#B08A3E',reg:'RC.ALE.01',resp:'Jefe Calidad'},
+];
+const PPR_MES=['Dic 2025','Ene 2026','Feb 2026','Mar 2026'];
+const PPR_MS=['Dic','Ene','Feb','Mar'];
+
+function pprCC(v){return v>=90?'var(--ok)':v>=75?'var(--warn)':'var(--fail)';}
+function pprBG(v){return v>=90?'var(--ok-bg)':v>=75?'var(--warn-bg)':'var(--fail-bg)';}
+function pprEM(v){return v>=90?'🟢':v>=75?'🟡':'🔴';}
+function pprTI(arr){
+  const s=arr[arr.length-1]-arr[0];
+  if(s>1) return {icon:'▲▲',color:'var(--ok)'};
+  if(s>0.1) return {icon:'▲',color:'#86efac'};
+  if(Math.abs(s)<=0.1) return {icon:'►',color:getColors().ink3};
+  if(s>=-1) return {icon:'▼',color:'var(--warn)'};
+  return {icon:'▼▼',color:'var(--fail)'};
+}
+function pprSlope(vals){
+  const n=vals.length,xm=(n-1)/2,ym=vals.reduce((a,b)=>a+b)/n;
+  let num=0,den=0;
+  vals.forEach((v,i)=>{num+=(i-xm)*(v-ym);den+=(i-xm)**2;});
+  return den?num/den:0;
+}
+
+let activePPRSec='s1';
+function setPPRSec(id){
+  activePPRSec=id;
+  document.querySelectorAll('.ppr-sec').forEach(el=>el.style.display='none');
+  document.getElementById('ppr-'+id).style.display='block';
+  document.querySelectorAll('#pprTabRow button').forEach(b=>{
+    b.className='tab-btn'+(b.dataset.sec===id?' active':'');
+  });
+}
+
+function renderPPR(){
+  // Build tab row (like lote tabs in Calidad)
+  const tabRow=document.getElementById('pprTabRow');
+  tabRow.innerHTML='';
+  const tabs=[
+    {id:'s1',lbl:'§1 Panel General'},
+    {id:'s2',lbl:'§2 Ranking'},
+    {id:'s3',lbl:'§3 Tendencias'},
+    {id:'s4',lbl:'§4 NCs & Pareto'},
+    {id:'s5',lbl:'§5 Riesgo & Eisenhower'},
+    {id:'s6',lbl:'§6 KPIs'},
+    {id:'s9',lbl:'§9 Sparklines'},
+  ];
+  tabs.forEach(function(t){
+    const btn=document.createElement('button');
+    btn.className='tab-btn'+(t.id===activePPRSec?' active':'');
+    btn.textContent=t.lbl;
+    btn.dataset.sec=t.id;
+    btn.onclick=function(){setPPRSec(t.id);};
+    tabRow.appendChild(btn);
+  });
+
+  // Show active section
+  document.querySelectorAll('.ppr-sec').forEach(el=>el.style.display='none');
+  document.getElementById('ppr-'+activePPRSec).style.display='block';
+
+  renderPPRSection1();
+  renderPPRSection2();
+  renderPPRSection3();
+  renderPPRSection4();
+  renderPPRSection5();
+  renderPPRSection6();
+  renderPPRSection9();
+  renderPPRCards();
+}
+
+// §1 HEATMAP
+function renderPPRSection1(){
+  const t=document.getElementById('pprHeatmap');
+  t.innerHTML=`<thead><tr>
+    <th style="padding:8px 10px;color:var(--ink3);font-size:9px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--line2);text-align:left">Categoría PPR</th>
+    <th style="padding:8px 10px;color:var(--ink3);font-size:9px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--line2)">Cláusula</th>
+    ${PPR_MES.map(m=>`<th style="padding:8px 10px;color:var(--ink3);font-size:9px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--line2);text-align:center">${m}</th>`).join('')}
+    <th style="padding:8px 10px;color:var(--ink3);font-size:9px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--line2);text-align:center">Tendencia</th>
+    <th style="padding:8px 10px;color:var(--ink3);font-size:9px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--line2)">Estado</th>
+  </tr></thead>`;
+  const tb=document.createElement('tbody');
+  PPR_ANALYTICS.forEach(p=>{
+    const tr=pprTI(p.m);
+    const last=p.m[3];
+    const row=document.createElement('tr');
+    row.innerHTML=`
+      <td style="padding:7px 10px;border-bottom:1px solid var(--line2);font-family:var(--serif);font-size:13px;font-weight:500;color:${p.color}">${p.n}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid var(--line2);font-family:var(--mono);font-size:10px;color:var(--ink3)">${p.cl}</td>
+      ${p.m.map(v=>`<td style="padding:7px 10px;border-bottom:1px solid var(--line2);text-align:center"><span style="background:${pprBG(v)};color:${pprCC(v)};padding:2px 8px;border-radius:2px;font-family:var(--mono);font-weight:500;font-size:11px">${v}%</span></td>`).join('')}
+      <td style="padding:7px 10px;border-bottom:1px solid var(--line2);text-align:center;font-family:var(--mono);font-size:14px;font-weight:700;color:${tr.color}">${tr.icon}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid var(--line2)">${pprEM(last)} <span style="font-family:var(--mono);font-size:10px;color:${pprCC(last)}">${last>=90?'CONFORME':last>=75?'ATENCIÓN':'CRÍTICO'}</span></td>
+    `;
+    tb.appendChild(row);
+  });
+  t.appendChild(tb);
+}
+
+// §2 RANKING
+function renderPPRSection2(){
+  const el=document.getElementById('pprRanking');
+  const sorted=[...PPR_ANALYTICS].sort((a,b)=>b.m[3]-a.m[3]);
+  el.innerHTML=sorted.map(p=>{
+    const v=p.m[3];
+    return `<div style="margin-bottom:11px">
+      <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;margin-bottom:3px">
+        <span style="color:${p.color};font-weight:600">${p.n}</span>
+        <span style="color:${pprCC(v)};font-weight:700">${v}% ${pprEM(v)}</span>
+      </div>
+      <div style="position:relative;height:24px;background:var(--line2);border-radius:3px;overflow:visible">
+        <div style="width:${v}%;height:100%;background:${pprCC(v)};border-radius:3px;display:flex;align-items:center;justify-content:flex-end;padding-right:5px">
+          <span style="font-family:var(--mono);font-size:9px;font-weight:700;color:#fff">${v}%</span>
+        </div>
+        <div style="position:absolute;top:-4px;bottom:-4px;left:90%;width:2px;background:var(--fail);border-radius:1px">
+          <span style="position:absolute;top:-15px;left:-10px;font-family:var(--mono);font-size:9px;color:var(--fail);white-space:nowrap">90%</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// §3 TENDENCIAS ASCII
+function renderPPRSection3(){
+  const container=document.getElementById('pprTrends');
+  if(container.innerHTML!=='') return; // already rendered
+  const targets=PPR_ANALYTICS.filter(p=>['plag','limp','ale'].includes(p.id));
+  targets.forEach(p=>{
+    const vals=p.m;
+    const mn=Math.min(...vals)-2,mx=Math.max(...vals)+2;
+    const rows=6,sp=pprSlope(vals),tr=pprTI(vals),last=vals[vals.length-1];
+    let chart='';
+    for(let r=rows;r>=0;r--){
+      const thresh=mn+(r/rows)*(mx-mn);
+      chart+=String(thresh.toFixed(0)).padStart(3)+'%│';
+      for(let c=0;c<4;c++){
+        const v=vals[c];
+        if(Math.abs(v-thresh)<(mx-mn)/rows*0.55) chart+=' ●';
+        else if(v>thresh) chart+=' ░';
+        else chart+='  ';
+      }
+      chart+='\n';
+    }
+    chart+='    └';
+    PPR_MS.forEach(m=>{chart+='──'+m;});
+    chart+='\n     ';
+    vals.forEach(v=>{chart+=' '+v+'% ';});
+
+    const card=document.createElement('div');
+    card.className='chart-card';
+    card.style.marginBottom='14px';
+    card.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em">${p.cl} · ${p.reg}</div>
+          <div style="font-family:var(--serif);font-size:16px;font-weight:500;color:${p.color};margin-top:3px">${p.n}</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--ink3);margin-top:2px">Responsable: ${p.resp}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:var(--serif);font-size:28px;font-weight:300;color:${pprCC(last)}">${last}%</div>
+          <span style="background:${pprBG(last)};color:${pprCC(last)};padding:2px 8px;border-radius:2px;font-family:var(--mono);font-size:10px;font-weight:600">${tr.icon} ${sp>=0?'+':''}${sp.toFixed(1)}%/mes</span>
+        </div>
+      </div>
+      <pre style="background:#000a18;border:1px solid var(--line);border-radius:5px;padding:12px;font-family:var(--mono);font-size:11px;line-height:1.6;color:${pprCC(last)};overflow-x:auto;white-space:pre">${chart}</pre>
+      <div style="display:flex;gap:12px;margin-top:10px;align-items:center;flex-wrap:wrap">
+        ${vals.map((v,i)=>`<div style="text-align:center"><div style="font-family:var(--mono);font-size:9px;color:var(--ink3)">${PPR_MS[i]}</div><div style="font-family:var(--mono);font-weight:600;font-size:12px;color:${pprCC(v)}">${v}%</div></div>`).join('')}
+        <div style="margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--ink3)">Pendiente: <strong style="color:${sp>0?'var(--ok)':sp<0?'var(--fail)':'var(--ink3)'}">${sp>=0?'+':''}${sp.toFixed(2)}%/mes</strong></div>
+      </div>`;
+    container.appendChild(card);
+  });
+}
+
+// §4 DONUT + PARETO
+function renderPPRSection4(){
+  if(document.getElementById('pprDonut').innerHTML!=='') return;
+  const data=[...PPR_ANALYTICS].sort((a,b)=>b.ncs-a.ncs);
+  const total=data.reduce((s,d)=>s+d.ncs,0);
+  const cx=100,cy=100,r=75,ir=45;
+  let svg='',angle=0;
+  const leg=document.getElementById('pprDonutLeg');
+  data.forEach(d=>{
+    const frac=d.ncs/total,sa=angle,ea=angle+frac*2*Math.PI;
+    const explode=d===data[0];
+    const ma=(sa+ea)/2,off=explode?8:0;
+    const ox=Math.cos(ma)*off,oy=Math.sin(ma)*off;
+    const x1=cx+ox+Math.cos(sa)*r,y1=cy+oy+Math.sin(sa)*r;
+    const x2=cx+ox+Math.cos(ea)*r,y2=cy+oy+Math.sin(ea)*r;
+    const xi1=cx+ox+Math.cos(sa)*ir,yi1=cy+oy+Math.sin(sa)*ir;
+    const xi2=cx+ox+Math.cos(ea)*ir,yi2=cy+oy+Math.sin(ea)*ir;
+    const lg=frac>0.5?1:0;
+    svg+=`<path d="M${xi1},${yi1}L${x1},${y1}A${r},${r} 0 ${lg},1 ${x2},${y2}L${xi2},${yi2}A${ir},${ir} 0 ${lg},0 ${xi1},${yi1}Z" fill="${d.color}" opacity="${explode?1:.8}" stroke="var(--panel)" stroke-width="2"/>`;
+    if(frac>0.05){const lx=cx+ox+Math.cos(ma)*(r+ir)/2,ly=cy+oy+Math.sin(ma)*(r+ir)/2;svg+=`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="9" font-weight="700" fill="#fff">${(frac*100).toFixed(0)}%</text>`;}
+    angle=ea;
+    leg.innerHTML+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-family:var(--mono);font-size:10px">
+      <span style="width:10px;height:10px;border-radius:50%;background:${d.color};flex-shrink:0;display:inline-block"></span>
+      <span style="flex:1;color:var(--ink2)">${d.n}</span>
+      <span style="color:${d.color};font-weight:700">${d.ncs}</span>
+      <span style="color:var(--ink3)">${(frac*100).toFixed(1)}%</span>
+    </div>`;
+  });
+  svg+=`<text x="${cx}" y="${cy-5}" text-anchor="middle" font-family="JetBrains Mono" font-size="20" font-weight="700" fill="var(--ink)">${total}</text>`;
+  svg+=`<text x="${cx}" y="${cy+13}" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="var(--ink3)">TOTAL NCs</text>`;
+  document.getElementById('pprDonut').innerHTML=svg;
+
+  // Pareto
+  const maxN=data[0].ncs,H=130;
+  let accum=0,bHTML='';
+  const bars=data.map(d=>{accum+=d.ncs;return {...d,pct:d.ncs/total*100,cumul:accum/total*100};});
+  bars.forEach(b=>{
+    const bh=(b.ncs/maxN)*H;
+    bHTML+=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;position:relative">
+      <div style="width:100%;border-radius:3px 3px 0 0;background:${b.color}cc;height:${bh}px;margin-top:${H-bh}px;display:flex;align-items:flex-start;justify-content:center;padding-top:2px">
+        <span style="font-family:var(--mono);font-size:9px;font-weight:700;color:#fff">${b.ncs}</span>
+      </div>
+      <div style="font-family:var(--mono);font-size:8px;color:var(--ink3);text-align:center;margin-top:4px;line-height:1.2">${b.n.substring(0,6)}<br>${b.pct.toFixed(0)}%</div>
+    </div>`;
+  });
+  const linePs=bars.map((b,i)=>`${(i+0.5)/bars.length*100}% ${100-b.cumul}%`).join(' ');
+  document.getElementById('pprPareto').innerHTML=`
+    <div style="font-family:var(--mono);font-size:10px;color:var(--ink3);margin-bottom:8px">📌 <strong style="color:${bars[0].color}">${bars[0].n}</strong>+<strong style="color:${bars[1].color}">${bars[1].n}</strong> = <span style="color:var(--fail);font-weight:700">${(bars[0].pct+bars[1].pct).toFixed(0)}%</span> NCs</div>
+    <div style="position:relative;border-left:1px solid var(--ink3);border-bottom:1px solid var(--ink3)">
+      <div style="display:flex;align-items:flex-end;gap:3px;height:${H}px">${bHTML}</div>
+      <svg style="position:absolute;top:0;left:0;width:100%;height:100%;overflow:visible" preserveAspectRatio="none">
+        <polyline points="${linePs}" fill="none" stroke="var(--fail)" stroke-width="2"/>
+        ${bars.map((b,i)=>`<circle cx="${(i+0.5)/bars.length*100}%" cy="${100-b.cumul}%" r="3.5" fill="var(--fail)" stroke="var(--panel)" stroke-width="1.5"/><text x="${(i+0.5)/bars.length*100}%" y="${Math.max(100-b.cumul-5,2)}%" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="var(--fail)">${b.cumul.toFixed(0)}%</text>`).join('')}
+        <line x1="0" y1="20%" x2="100%" y2="20%" stroke="var(--ink3)" stroke-dasharray="5,3" stroke-width="1.5"/>
+        <text x="101%" y="20%" dominant-baseline="middle" font-family="JetBrains Mono" font-size="8" fill="var(--ink3)">80%</text>
+      </svg>
+    </div>`;
+}
+
+// §5 RISK MATRIX + EISENHOWER
+function renderPPRSection5(){
+  if(document.getElementById('pprRiskMatrix').innerHTML!=='') return;
+  const prps=[
+    {n:'Plagas',p:3,s:3,col:'#B23E3E'},{n:'Limpieza',p:2,s:3,col:'#92400e'},
+    {n:'Alérgenos',p:1,s:3,col:'#B08A3E'},{n:'Proveedores',p:2,s:2,col:'#86198f'},
+    {n:'Instalac.',p:1,s:2,col:'#9a3412'},{n:'Residuos',p:1,s:2,col:'#166534'},
+    {n:'Equipos',p:1,s:1,col:'#4A4A44'},{n:'Agua/Aire',p:1,s:1,col:'#065f46'},
+  ];
+  const cells={};
+  prps.forEach(p=>{const k=`${p.p}_${p.s}`;if(!cells[k])cells[k]=[];cells[k].push(p);});
+  function rl(p,s){const r=p*s;return r>=6?'fail':r>=4?'warn':'ok';}
+
+  const mx=document.getElementById('pprRiskMatrix');
+  let html=`<div style="writing-mode:vertical-rl;transform:rotate(180deg);display:flex;align-items:center;justify-content:center;grid-row:1/4;font-family:var(--mono);font-size:9px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Prob↑</div>`;
+  for(let prob=3;prob>=1;prob--){
+    for(let sev=1;sev<=3;sev++){
+      const score=prob*sev,level=rl(prob,sev);
+      const items=cells[`${prob}_${sev}`]||[];
+      const bg=level==='fail'?'rgba(178,62,62,.2)':level==='warn'?'rgba(193,121,23,.15)':'rgba(46,125,91,.1)';
+      const bd=level==='fail'?'rgba(178,62,62,.4)':level==='warn'?'rgba(193,121,23,.3)':'rgba(46,125,91,.22)';
+      const emoji=level==='fail'?'🔴':level==='warn'?'🟡':'🟢';
+      html+=`<div style="border-radius:5px;background:${bg};border:1px solid ${bd};display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 4px;min-height:72px;font-family:var(--mono);font-size:9px;text-align:center;gap:3px">
+        <span style="font-size:14px;font-weight:700;color:${level==='fail'?'var(--fail)':level==='warn'?'var(--warn)':'var(--ok)'}">${emoji}${score}</span>
+        ${items.map(p=>`<span style="padding:1px 5px;border-radius:2px;font-size:8px;font-weight:600;background:${p.col}22;border:1px solid ${p.col}55;color:${p.col}">${p.n}</span>`).join('')}
+      </div>`;
+    }
+  }
+  html+=`<div></div>${['Sev.1','Sev.2','Sev.3'].map(l=>`<div style="display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:.05em">${l}</div>`).join('')}`;
+  mx.innerHTML=html;
+
+  const det=document.getElementById('pprRiskDetail');
+  det.innerHTML=`<div style="font-family:var(--mono);font-size:10px;color:var(--ink3);margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em">PRP — Prioridad</div>`;
+  [...prps].sort((a,b)=>b.p*b.s-a.p*a.s).forEach(p=>{
+    const sc=p.p*p.s;
+    const rl2=sc>=6?'var(--fail)':sc>=4?'var(--warn)':'var(--ok)';
+    det.innerHTML+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line2);font-family:var(--mono);font-size:10px">
+      <span style="width:8px;height:8px;border-radius:50%;background:${p.col};flex-shrink:0;display:inline-block"></span>
+      <span style="flex:1;color:var(--ink2)">${p.n}</span>
+      <span style="color:var(--ink3)">P${p.p}×S${p.s}</span>
+      <span style="font-weight:700;color:${rl2};min-width:22px;text-align:right">=${sc}</span>
+    </div>`;
+  });
+
+  // Eisenhower
+  const actions=[
+    {n:'Fumigación',code:'FUM',u:10,i:10,cls:'fail',desc:'Áreas Secado+MPSC riesgo=8. Control semanal. ACCIÓN INMEDIATA'},
+    {n:'SSOP Limpieza',code:'LIM',u:9,i:8,cls:'fail',desc:'RC.LD.01. Validar POES mensualmente'},
+    {n:'Alérgenos',code:'ALE',u:7,i:4,cls:'warn',desc:'RC.ALE.01 en implementación. Planificar'},
+    {n:'Proveedores',code:'PRV',u:6,i:7,cls:'warn',desc:'Evaluación anual + Acuerdos inocuidad'},
+  ];
+  const grid=document.getElementById('pprEisen');
+  const tip=document.getElementById('eisenTip');
+  const W=280,H=240;
+  actions.forEach(a=>{
+    const left=(a.i/10)*W,bottom=(a.u/10)*H;
+    const bg=a.cls==='fail'?'rgba(178,62,62,.25)':'rgba(193,121,23,.2)';
+    const bd=a.cls==='fail'?'var(--fail)':'var(--warn)';
+    const tc=a.cls==='fail'?'var(--fail)':'var(--warn)';
+    const dot=document.createElement('div');
+    dot.style.cssText=`position:absolute;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:8px;font-weight:700;background:${bg};border:2px solid ${bd};color:${tc};left:${left}px;bottom:${bottom}px;transform:translate(-50%,50%);cursor:pointer;transition:all .2s`;
+    dot.textContent=a.code;
+    dot.title=a.n;
+    dot.onmouseenter=()=>{
+      tip.style.display='block';
+      tip.style.left=Math.min(left+20,W-180)+'px';
+      tip.style.top=(H-bottom+5)+'px';
+      tip.innerHTML=`<strong>${a.n}</strong><br>U:${a.u} I:${a.i}<br>${a.desc}`;
+    };
+    dot.onmouseleave=()=>{tip.style.display='none';};
+    grid.appendChild(dot);
+  });
+}
+
+// §6 KPIs BULLET GRAPH
+function renderPPRSection6(){
+  const el=document.getElementById('pprBullet');
+  if(el.innerHTML!=='') return;
+  const kpis=[
+    {n:'Cumplimiento General',v:88,g:90,d:'Media ponderada todos los PPRs · Mar 2026'},
+    {n:'SSOPs Validados',v:92,g:90,d:'Procedimientos POES firmados y verificados'},
+    {n:'Control de Plagas',v:78,g:90,d:'RC.PL.02/03 · Áreas críticas riesgo≥6 · Mar 2026'},
+  ];
+  el.innerHTML=kpis.map(k=>`
+    <div style="margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;font-weight:600;margin-bottom:5px">
+        <span style="color:var(--ink2)">${k.n}</span>
+        <span style="color:${pprCC(k.v)};font-family:var(--serif);font-size:14px">${k.v}%</span>
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--ink3);margin-bottom:7px">${k.d}</div>
+      <div style="position:relative;height:28px;border-radius:3px;overflow:hidden">
+        <div style="position:absolute;left:0;height:100%;width:75%;background:rgba(178,62,62,.3)"></div>
+        <div style="position:absolute;left:75%;height:100%;width:15%;background:rgba(193,121,23,.2)"></div>
+        <div style="position:absolute;left:90%;height:100%;width:10%;background:rgba(46,125,91,.18)"></div>
+        <div style="position:absolute;top:20%;height:60%;width:${k.v}%;background:${pprCC(k.v)};border-radius:2px;transition:width .6s"></div>
+        <div style="position:absolute;top:0;bottom:0;left:${k.g}%;width:3px;background:var(--ink);border-radius:1px;opacity:.7"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--ink3);margin-top:3px">
+        <span>0%</span><span>75%</span><span>90% ▲ meta</span><span>100%</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// §9 SPARKLINES
+function renderPPRSection9(){
+  if(document.getElementById('pprSparkTable').innerHTML!=='') return;
+  const targets=PPR_ANALYTICS.filter(p=>['plag','limp','ale'].includes(p.id));
+  const BLKS='▁▂▃▄▅▆▇█';
+  function spark(vals){
+    const mn=Math.min(...vals),mx=Math.max(...vals);
+    return vals.map(v=>mx===mn?'▄':BLKS[Math.round((v-mn)/(mx-mn)*(BLKS.length-1))]).join('');
+  }
+  const tbl=document.getElementById('pprSparkTable');
+  tbl.innerHTML=`<thead><tr>
+    <th style="padding:8px 10px;color:var(--ink3);font-size:9px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--line2);text-align:left">PPR</th>
+    <th style="padding:8px 10px;color:var(--ink3);font-size:9px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--line2);text-align:left">Registro</th>
+    ${PPR_MES.map(m=>`<th style="padding:8px 10px;color:var(--ink3);font-size:9px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--line2);text-align:center">${m}</th>`).join('')}
+    <th style="padding:8px 10px;color:var(--ink3);font-size:9px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--line2);text-align:center">Sparkline 4M</th>
+    <th style="padding:8px 10px;color:var(--ink3);font-size:9px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--line2);text-align:center">Δ</th>
+  </tr></thead>`;
+  const tb=document.createElement('tbody');
+  targets.forEach(p=>{
+    const sp=spark(p.m);
+    const delta=p.m[3]-p.m[0];
+    const last=p.m[3];
+    const row=document.createElement('tr');
+    row.innerHTML=`
+      <td style="padding:8px 10px;border-bottom:1px solid var(--line2);font-family:var(--serif);font-size:13px;font-weight:500;color:${p.color}">${p.n}</td>
+      <td style="padding:8px 10px;border-bottom:1px solid var(--line2);font-family:var(--mono);font-size:9px;color:var(--ink3)">${p.reg}</td>
+      ${p.m.map(v=>`<td style="padding:8px 10px;border-bottom:1px solid var(--line2);text-align:center"><span style="background:${pprBG(v)};color:${pprCC(v)};padding:2px 7px;border-radius:2px;font-family:var(--mono);font-size:10px;font-weight:500">${v}%</span></td>`).join('')}
+      <td style="padding:8px 10px;border-bottom:1px solid var(--line2);text-align:center;font-size:18px;letter-spacing:3px;color:${pprCC(last)}">${sp}</td>
+      <td style="padding:8px 10px;border-bottom:1px solid var(--line2);font-family:var(--mono);font-weight:700;text-align:center;color:${delta>=0?'var(--ok)':'var(--fail)'}">${delta>=0?'+':''}${delta}%</td>`;
+    tb.appendChild(row);
+  });
+  tbl.appendChild(tb);
+  // Sparkline detail
+  const det=document.getElementById('pprSparkDetail');
+  det.innerHTML=`<div style="font-family:var(--mono);font-size:9px;color:var(--ink3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em">Detalle visual por PPR</div>`+
+    targets.map(p=>{
+      const sp=spark(p.m);
+      const last=p.m[3];
+      return `<div style="display:flex;align-items:center;gap:14px;padding:10px 12px;border-radius:6px;background:var(--panel);border:1px solid var(--line2);margin-bottom:8px;flex-wrap:wrap">
+        <div style="min-width:150px"><div style="font-family:var(--serif);font-weight:500;color:${p.color}">${p.n}</div><div style="font-family:var(--mono);font-size:9px;color:var(--ink3)">${p.cl} · ${p.reg}</div></div>
+        <div style="font-family:var(--mono);font-size:22px;letter-spacing:4px;color:${pprCC(last)};flex:1">${sp}</div>
+        <div style="display:flex;gap:6px">${p.m.map((v,i)=>`<div style="text-align:center"><div style="font-family:var(--mono);font-size:9px;color:var(--ink3)">${PPR_MS[i]}</div><div style="font-family:var(--mono);font-size:11px;font-weight:600;color:${pprCC(v)}">${v}%</div></div>`).join('')}</div>
+        <div style="font-family:var(--serif);font-size:16px;font-weight:300;color:${pprCC(last)};min-width:40px;text-align:right">${last}%</div>
+      </div>`;
+    }).join('');
+}
+
+// PPR CARDS (always rendered)
+function renderPPRCards(){
+  document.getElementById('pprGrid').innerHTML=PPR_DATA.map(p=>`
+    <div class="ppr-card ${p.estado==='activo'?'activo':'revision'}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px">
+        <div>
+          <div class="ppr-ref">${p.clausula}</div>
+          <div class="ppr-num">${p.num}</div>
+        </div>
+        <span class="ppr-est ${p.estado==='activo'?'ok':'rev'}">${p.estado==='activo'?'✓ ACTIVO':'⏳ EN PROCESO'}</span>
+      </div>
+      <div class="ppr-name">${p.nombre}</div>
+      <div class="ppr-norm">${p.norma} · ${p.frecuencia}</div>
+      <div class="ppr-reqs">${p.reqs}</div>
+      ${p.data?`<div class="ppr-data-box">${Object.entries(p.data).filter(([k])=>k!=='areas'&&k!=='mes').map(([k,v])=>`<div class="ppr-data-row"><span>${k}</span><span>${Array.isArray(v)?v.map((x,i)=>`${p.data.areas?.[i]||i+1}:${x}%`).join(' · '):v}</span></div>`).join('')}</div>`:''}
+      <div class="ppr-docs-lbl">Documentos requeridos</div>
+      ${p.docs.map(d=>`<div class="ppr-doc">📄 ${d}</div>`).join('')}
+      <a class="ppr-link" href="https://drive.google.com/drive/folders/${p.driveId}" target="_blank" rel="noopener">📁 Abrir en Drive ↗</a>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
+
+function renderSBPPR(){
+  var el=document.getElementById('sbPPRList');
+  if(!el)return;
+  el.innerHTML='';
+  var gBtn=document.createElement('button');
+  gBtn.className='sb-btn';
+  gBtn.style.cssText='display:flex;justify-content:space-between;align-items:center;width:100%;border-bottom:2px solid var(--sb-cyan2);padding-bottom:8px;margin-bottom:8px';
+  gBtn.innerHTML='<span style="display:flex;align-items:center;gap:8px"><span>&#128202;</span><span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--sb-cyan)">GENERAL</span></span><span style="font-family:var(--mono);font-size:9px;color:var(--sb-cyan);background:rgba(6,182,212,.15);padding:2px 6px;border-radius:3px">TODO</span>';
+  gBtn.onclick=function(){document.querySelectorAll('.ppr-sec').forEach(function(e){e.style.display='block';});document.querySelectorAll('#sbPPRList .sb-btn').forEach(function(b){b.style.background='';});gBtn.style.background='rgba(6,182,212,.1)';};
+  el.appendChild(gBtn);
+  var cats=[
+    {id:'s1',name:'Panel General',emoji:'&#128203;',color:'#06b6d4'},
+    {id:'s2',name:'Ranking',emoji:'&#128202;',color:'#a78bfa'},
+    {id:'s3',name:'Tendencias',emoji:'&#128200;',color:'#4ade80'},
+    {id:'s4',name:'NCs & Pareto',emoji:'&#128308;',color:'#f87171'},
+    {id:'s5',name:'Riesgo',emoji:'&#9889;',color:'#fbbf24'},
+    {id:'s6',name:'KPIs',emoji:'&#127919;',color:'#34d399'},
+    {id:'s9',name:'Sparklines',emoji:'&#10024;',color:'#c084fc'},
+  ];
+  cats.forEach(function(cat){
+    var btn=document.createElement('button');
+    btn.className='sb-btn';
+    btn.style.cssText='display:flex;justify-content:space-between;align-items:center;width:100%';
+    btn.innerHTML='<span style="display:flex;align-items:center;gap:6px"><span>'+cat.emoji+'</span><span style="font-family:var(--mono);font-size:10px;color:var(--sb-cyan2)">'+cat.name+'</span></span>';
+    btn.onclick=function(){setPPRSec(cat.id);document.querySelectorAll('#sbPPRList .sb-btn').forEach(function(b){b.style.background='';});btn.style.background='rgba(255,255,255,.05)';};
+    el.appendChild(btn);
+  });
+}
+
+function init(){
+  if(!window.SHEETS){ setTimeout(init,300); return; }
+  if(!window.Chart){
+    document.getElementById('loader').innerHTML='<div style="font-family:var(--mono);color:var(--warn)">⏳ Cargando Chart.js (necesita internet)...</div>';
+    setTimeout(init,500); return;
+  }
+  document.getElementById('loader').style.display='none';
+  renderSBLotes();
+  setView('calidad');
+}
+
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',init);
+} else {
+  init();
+}
+</script>
+</body>
+</html>

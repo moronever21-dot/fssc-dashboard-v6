@@ -629,8 +629,14 @@ def _lot_from_rows(rows):
             if 'RG.02-CV' in s or 'RG 02-CV' in s: return 'RG 02-CV'
             if 'RG.01-CV' in s or 'RG 01-CV' in s: return 'RG 01-CV'
             if 'DA 01-CV' in s or 'DA.01-CV' in s: return 'DA 01-CV'
+            if 'DA 02-CV' in s or 'DA.02-CV' in s: return 'DA 02-CV'
+            if 'RE 01-CV' in s or 'RE.01-CV' in s: return 'RE 01-CV'
             if 'AA 01-26' in s:            return 'AA 01-26'
             if 'AA 02-26' in s:            return 'AA 02-26'
+            if 'AA 03-26' in s:            return 'AA 03-26'
+            if 'FV 01-CV' in s or 'FV.01-CV' in s: return 'FV 01-CV'
+            if 'RG 03-CV' in s or 'RG.03-CV' in s: return 'RG 03-CV'
+            if 'RG 04-CV' in s or 'RG.04-CV' in s: return 'RG 04-CV'
     return None
 
 
@@ -647,6 +653,10 @@ def canonical_tab_name(tab_name):
         return 'RG 04-CV'
     if re.search(r'\bDA\s*01\s*CV\b', name) or 'DA01CV' in compact:
         return 'DA 01-CV'
+    if re.search(r'\bDA\s*02\s*CV\b', name) or 'DA02CV' in compact:
+        return 'DA 02-CV'
+    if re.search(r'\bRE\s*01\s*CV\b', name) or 'RE01CV' in compact:
+        return 'RE 01-CV'
     if re.search(r'\bBSI\s*01\b', name) or 'BSI01' in compact:
         return 'BSI 01'
     if re.search(r'\bAA\s*01\s*26\b', name) or 'AA0126' in compact:
@@ -657,6 +667,8 @@ def canonical_tab_name(tab_name):
         return 'AA 03-26'
     if re.search(r'\bFV\s*01\s*CV\b', name) or 'FV01CV' in compact:
         return 'FV 01-CV'
+    if re.search(r'\bFV\s*02\s*CV\b', name) or 'FV02CV' in compact:
+        return 'FV 02-CV'
     return None
 
 
@@ -671,6 +683,9 @@ REFERENCE_TAB_ORDER = [
     'AA 03-26',
     'RG 04-CV',
     'FV 01-CV',
+    'DA 02-CV',
+    'RE 01-CV',
+    'FV 02-CV',
 ]
 
 
@@ -704,7 +719,10 @@ def group_name(code, tab_name, tab_index=0, rows=None):
     if number <= 14:        return 'RG 02-CV'
     if number <= 21:        return 'BSI 01'    # Corrección: 15-21 = BSI 01 (no DA 01-CV)
     if number <= 28:        return 'DA 01-CV'  # PLLs 22-28 sin identificador = DA 01-CV
-    return None  # Rangos desconocidos sin identificador: omitir para evitar clasificación errónea
+    if number <= 34:        return 'BSI 01'     # PLLs 29-34 = BSI 01
+    if number <= 40:        return 'RG 03-CV'   # PLLs 35-40 = RG 03-CV
+    if number <= 47:        return 'RG 04-CV'   # PLLs 41-47 = RG 04-CV
+    return None  # Rangos desconocidos sin identificador: omitir
 
 
 def summarize_code(code):

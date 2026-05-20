@@ -149,3 +149,15 @@ git add .
 git commit -m "trabajo del dia: <descripcion breve>"
 git push
 ```
+
+## guia del Agente 
+Solicita al agente : 
+Detalla el proceso de eleaboracion y los pasos a continuar del proyecto INGAMA
+el agente leera la carpeta y dara un informe basado el los datos del proyecto
+y los pasos que se consideraron para la culminacion del proyecto
+
+
+## Digitalizaciòn 
+Los encargados de esta operaciòn 
+se encargan de eviar fotografìa via app web
+hacia la API de code para su respectiva extraciòn 

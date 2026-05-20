@@ -9,11 +9,12 @@ import re
 from pathlib import Path
 
 # ─── Configuración ──────────────────────────────────────────────────────────
-AGGREGATES_FILE = Path("produccion_aggregates_generated.json")
-OUT_JSON = Path("calculos_dashboard_produccion.json")
-OUT_JS   = Path("calculos_dashboard_produccion.js")
+BASE = Path(__file__).parent
+AGGREGATES_FILE = BASE / "produccion_aggregates_generated.json"
+OUT_JSON = BASE / "calculos_dashboard_produccion.json"
+OUT_JS   = BASE / "calculos_dashboard_produccion.js"
 
-LOTES = ["RG 01-CV", "RG 02-CV", "BSI 01", "DA 01-CV", "AA 01-26", "AA 02-26"]
+LOTES = ["RG 01-CV", "RG 02-CV", "RG 03-CV", "RG 04-CV", "BSI 01", "DA 01-CV", "DA 02-CV", "FV 01-CV", "RE 01-CV", "AA 01-26", "AA 02-26", "AA 03-26"]
 
 # ─── Helpers ────────────────────────────────────────────────────────────────
 

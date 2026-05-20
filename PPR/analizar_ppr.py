@@ -52,3 +52,4 @@ for subcarpeta, archivos in mq.items():
                         area_nombre = str(fila)
                     if len(fila) > 5 and any(str(x) in ['1.0','2.0','3.0','1','2','3'] for x in fila[:3]):
                         print(f"  [{nombre[:40]}] area=[{area_nombre[:60]}] fila={fila[:8]}")
+                       
