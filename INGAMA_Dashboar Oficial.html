@@ -6,40 +6,80 @@
 <title>INGAMA — Sistema FSSC 22000 v6</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 
 /* ── TOKENS ─────────────────────────────────────────── */
 :root{
-  --bg:#FFFFFF; --panel:#F8F6F2; --ink:#1A1A17; --ink2:#4A4A44; --ink3:#8A8881;
-  --line:#D9D5CA; --line2:#E8E5DB;
-  --accent:#2C4A3E; --accent2:#8B3A2E; --gold:#B08A3E;
-  --ok:#2E7D5B; --ok-bg:#E8F1EC;
-  --warn:#C17917; --warn-bg:#FAF2E4;
-  --fail:#B23E3E; --fail-bg:#F7E8E8;
-  --neutral:#6B6964;
-  --serif:'Fraunces',Georgia,serif;
-  --sans:'Inter',system-ui,sans-serif;
-  --mono:'JetBrains Mono',monospace;
-  --sb-bg:#0f1e35; --sb-border:rgba(6,182,212,.12);
-  --sb-cyan:#67e8f9; --sb-cyan2:#06b6d4; --sb-green:#4ade80; --sb-purple:#a78bfa;
+  --cream-50:#FBF8EF;--cream-100:#F7F2E2;--cream-200:#EFE9D4;--cream-300:#E2D9BD;
+  --ink-900:#1A1714;--ink-800:#2B2620;--ink-700:#3D362C;--ink-600:#5A5044;--ink-500:#837868;--ink-400:#A89C8A;--ink-300:#C8BDA9;--ink-200:#E2D9C5;--ink-100:#EFE9D8;
+  --green-900:#0F3B26;--green-800:#14532d;--green-700:#166534;--green-600:#15803d;--green-500:#16a34a;--green-400:#4ade80;--green-100:#dcfce7;--green-50:#f0fdf4;
+  --navy-900:#0F1F4D;--navy-800:#1A2D6B;--navy-700:#1E3A8A;--navy-600:#2952B3;--navy-100:#DCE5FA;--navy-50:#EEF2FB;
+  --red-700:#B91C1C;--red-600:#DC2626;--red-500:#EF4444;--red-100:#FEE2E2;--red-50:#FEF2F2;
+  --amber-700:#B45309;--amber-600:#D97706;--amber-500:#F59E0B;--amber-100:#FEF3C7;--amber-50:#FFFBEB;
+  --bg:var(--cream-50);--bg-elevated:#FFFFFF;--bg-muted:var(--cream-100);--bg-strong:var(--cream-200);
+  --panel:var(--cream-50);--ink:#1A1A17;--ink2:#4A4A44;--ink3:#8A8881;
+  --line:#D9D5CA;--line2:#E8E5DB;
+  --border:#E5DDC8;--border-soft:#EFE9D8;--border-strong:#D2C8AE;
+  --text:var(--ink-900);--text-soft:var(--ink-700);--text-muted:var(--ink-500);--text-faint:var(--ink-400);
+  --accent:#15803d;--accent-dark:var(--green-800);--accent2:#8B3A2E;--gold:#B08A3E;
+  --brand:var(--navy-700);--danger:var(--red-700);--warn:var(--amber-600);
+  --r-xs:4px;--r-sm:6px;--r-md:10px;--r-lg:14px;--r-xl:20px;
+  --shadow-sm:0 1px 0 rgba(58,47,30,0.04),0 1px 2px rgba(58,47,30,0.06);
+  --shadow-md:0 2px 4px rgba(58,47,30,0.06),0 4px 12px rgba(58,47,30,0.08);
+  --shadow-lg:0 8px 24px rgba(58,47,30,0.10),0 2px 4px rgba(58,47,30,0.06);
+  --shadow-pop:0 16px 48px rgba(15,31,77,0.18);
+  --font-sans:"Manrope",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --font-serif:"Fraunces",Georgia,serif;
+  --serif:var(--font-serif);--sans:var(--font-sans);--mono:var(--font-mono);
+  --ok:#2E7D5B;--ok-bg:#E8F1EC;--warn-2:#C17917;--warn-bg:#FAF2E4;--fail:#B23E3E;--fail-bg:#F7E8E8;--neutral:#6B6964;
+  --sb-bg:#0f1e35;--sb-border:rgba(6,182,212,.12);--sb-cyan:#67e8f9;--sb-cyan2:#06b6d4;--sb-green:#4ade80;--sb-purple:#a78bfa;
 }
 
-/* Dark mode when dashboard is in dark view */
-.dark-mode{
-  --bg:#060d18; --panel:#0a1628; --ink:#f8fafc; --ink2:#cbd5e1; --ink3:#94a3b8;
-  --line:#1e293b; --line2:#0f172a;
-  --accent:#67e8f9; --accent2:#c084fc; --gold:#fde68a;
-  --ok:#4ade80; --ok-bg:rgba(5,46,22,.6);
-  --warn:#fde047; --warn-bg:rgba(69,26,3,.6);
-  --fail:#fca5a5; --fail-bg:rgba(69,10,10,.6);
+:root[data-theme="dark"]{
+  --cream-50:#0a1628;--cream-100:#0d1c35;--cream-200:#111f3a;--cream-300:#182235;
+  --ink-900:#f8fafc;--ink-800:#f1f5f9;--ink-700:#cbd5e1;--ink-600:#94a3b8;--ink-500:#64748b;--ink-400:#475569;--ink-300:#334155;--ink-200:#1e293b;--ink-100:#182235;
+  --bg:#060d18;--bg-elevated:#0a1628;--bg-muted:#0d1c35;--bg-strong:#111f3a;
+  --panel:#0a1628;
+  --border:#1e293b;--border-soft:#182235;--border-strong:#334155;
+  --text:#f8fafc;--text-soft:#cbd5e1;--text-muted:#94a3b8;--text-faint:#64748b;
+  --ink:#f8fafc;--ink2:#cbd5e1;--ink3:#94a3b8;
+  --line:#1e293b;--line2:#0f172a;
+  --accent:#67e8f9;--accent-dark:#0369a1;--accent2:#c084fc;--gold:#fde68a;
+  --brand:#93c5fd;--danger:#fca5a5;--warn:#fde047;--warn-2:#fde047;
+  --ok:#4ade80;--ok-bg:rgba(5,46,22,.6);
+  --warn-bg:rgba(69,26,3,.6);--fail:#fca5a5;--fail-bg:rgba(69,10,10,.6);
   --neutral:#64748b;
-  --sb-bg:#020810; --sb-border:rgba(6,182,212,.2);
+  --sb-bg:#020810;--sb-border:rgba(6,182,212,.2);
+  --shadow-sm:0 1px 0 rgba(15,23,42,.2),0 1px 2px rgba(15,23,42,.3);
+  --shadow-md:0 2px 4px rgba(15,23,42,.3),0 4px 12px rgba(15,23,42,.4);
+  --shadow-lg:0 8px 24px rgba(15,23,42,.4),0 2px 4px rgba(15,23,42,.3);
+  --shadow-pop:0 16px 48px rgba(0,0,0,.5);
 }
-
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.55;transition:background .3s,color .3s}
+:root[data-theme="dark"] .hero-cell.primary{background:linear-gradient(135deg,#0a2540,#0f2d4a);color:#f8fafc}
+:root[data-theme="dark"] .hero-cell.primary .hl{color:rgba(248,250,252,.55)}
+:root[data-theme="dark"] .hero-cell.primary .hs{color:rgba(248,250,252,.7)}
+:root[data-theme="dark"] .hero-cell.primary .hv{color:#f8fafc}
+:root[data-theme="dark"] .stage-head{background:var(--line)}
+:root[data-theme="dark"] .tab-btn.active{background:#0a2540;border-color:#67e8f9;color:#67e8f9}
+:root[data-theme="dark"] .card-dark{background:var(--panel);border:1px solid var(--line)}
+:root[data-theme="dark"] .go-link{color:#67e8f9}
+:root[data-theme="dark"] .ascii-block{background:#000810;color:#94a3b8}
+:root[data-theme="dark"] .hm-ok{background:rgba(74,222,128,.15);color:#4ade80}
+:root[data-theme="dark"] .hm-warn{background:rgba(253,224,71,.12);color:#fde047}
+:root[data-theme="dark"] .hm-fail{background:rgba(252,165,165,.15);color:#fca5a5}
+:root[data-theme="dark"] .tab-btn.al{background:#0a2540;border-color:#67e8f9;color:#67e8f9}
+:root[data-theme="dark"] .ind-bar{background:rgba(255,255,255,.08)}
+:root[data-theme="dark"] .ind-tag.pcc{color:#67e8f9;font-weight:700}
+:root[data-theme="dark"] .tbl tr:hover td{background:rgba(255,255,255,.03)}
+:root[data-theme="dark"] .ppr-card:hover{background:var(--line)}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.55}
+html,body,*{transition:background .4s,color .4s,border-color .4s}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;transition:background .35s,border-color .35s,color .35s,box-shadow .35s}
 body{min-height:100vh}
 
 /* ── LAYOUT ──────────────────────────────────────────── */
@@ -376,88 +416,129 @@ body{min-height:100vh}
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
 
-/* ── DARK MODE VISIBILITY ── */
-.dark-mode .topbar{background:var(--panel);border-bottom:1px solid var(--line)}
-.dark-mode .tb-title{color:#f8fafc!important}
-.dark-mode .tb-sub{color:#94a3b8!important}
-.dark-mode .section-label{color:#64748b!important}
-.dark-mode .process-title{color:#f8fafc!important}
-.dark-mode .process-title em{color:#94a3b8!important}
-.dark-mode .hero{border:1px solid var(--line)}
-.dark-mode .hero-cell{background:var(--panel);border-right:1px solid var(--line)}
-.dark-mode .hero-cell.primary{background:linear-gradient(135deg,#0a2540,#0f2d4a)!important;color:#f8fafc!important}
-.dark-mode .hl{color:#94a3b8!important}
-.dark-mode .hv{color:#f8fafc!important;font-weight:800}
-.dark-mode .hs{color:#94a3b8!important}
-.dark-mode .kpi{background:var(--panel);border-right:1px solid var(--line)}
-.dark-mode .kpi-lbl{color:#94a3b8!important}
-.dark-mode .kpi-val{color:#f8fafc!important;font-weight:800}
-.dark-mode .kpi-val.ok{color:#4ade80!important}
-.dark-mode .kpi-val.warn{color:#fde047!important}
-.dark-mode .kpi-val.fail{color:#fca5a5!important}
-.dark-mode .kpi-sub{color:#94a3b8!important}
-.dark-mode .p-ok{background:rgba(74,222,128,.15);color:#4ade80}
-.dark-mode .p-warn{background:rgba(253,224,71,.12);color:#fde047}
-.dark-mode .p-fail{background:rgba(252,165,165,.15);color:#fca5a5}
-.dark-mode .stage{background:var(--panel);border:1px solid var(--line)}
-.dark-mode .stage-head{background:var(--line)}
-.dark-mode .stage-nm{color:#f8fafc!important;font-weight:700}
-.dark-mode .stage-num{color:#67e8f9!important}
-.dark-mode .stage-rc,.dark-mode .stage-info{color:#94a3b8!important}
-.dark-mode .ind-grid,.dark-mode .ind{background:var(--panel);border-color:var(--line)}
-.dark-mode .ind-lbl{color:#cbd5e1!important}
-.dark-mode .ind-val{color:#f8fafc!important;font-weight:800}
-.dark-mode .ind-lim{color:#64748b!important}
-.dark-mode .ind-bar{background:rgba(255,255,255,.08)}
-.dark-mode .ind-bar-f.ok{background:#4ade80!important}
-.dark-mode .ind-bar-f.warn{background:#fde047!important}
-.dark-mode .ind-bar-f.fail{background:#fca5a5!important}
-.dark-mode .ind-dot.ok{background:#4ade80!important;border-color:#4ade80}
-.dark-mode .ind-dot.warn{background:#fde047!important;border-color:#fde047}
-.dark-mode .ind-dot.fail{background:#fca5a5!important;border-color:#fca5a5}
-.dark-mode .ind-tag.pcc{color:#67e8f9!important;font-weight:700}
-.dark-mode .ctrl{background:var(--panel);border:1px solid var(--line)}
-.dark-mode .ctrl-name{color:#cbd5e1!important}
-.dark-mode .ctrl-val{color:#f8fafc!important}
-.dark-mode .ctrl-val.ok{color:#4ade80!important}
-.dark-mode .ctrl-val.warn{color:#fde047!important}
-.dark-mode .ctrl-val.fail{color:#fca5a5!important}
-.dark-mode .ctrl-lim{color:#64748b!important}
-.dark-mode .chart-card{background:var(--panel);border:1px solid var(--line)}
-.dark-mode .chart-title{color:#f8fafc!important}
-.dark-mode .chart-sub{color:#64748b!important}
-.dark-mode .tbl{background:var(--panel)}
-.dark-mode .tbl th{background:var(--line);color:#cbd5e1!important}
-.dark-mode .tbl td{color:#f8fafc!important;border:1px solid var(--line)}
-.dark-mode .tbl .c-ok{color:#4ade80!important}
-.dark-mode .tbl .c-warn{color:#fde047!important}
-.dark-mode .tbl .c-fail{color:#fca5a5!important}
-.dark-mode .t-pill.p-ok{background:rgba(74,222,128,.15);color:#4ade80}
-.dark-mode .t-pill.p-warn{background:rgba(253,224,71,.12);color:#fde047}
-.dark-mode .t-pill.p-fail{background:rgba(252,165,165,.15);color:#fca5a5}
-.dark-mode .tab-btn{background:var(--panel);border:1px solid var(--line);color:#94a3b8}
-.dark-mode .tab-btn.al,.dark-mode .tab-btn.active{background:#0a2540;border-color:#67e8f9;color:#67e8f9}
-.dark-mode .card-dark{background:var(--panel);border:1px solid var(--line)}
-.dark-mode .go-link{color:#67e8f9!important}
-.dark-mode .ppr-card{background:var(--panel);border:1px solid var(--line)}
-.dark-mode .ppr-name{color:#f8fafc!important}
-.dark-mode .ppr-num{color:#67e8f9!important}
-.dark-mode .ppr-norm,.dark-mode .ppr-ref{color:#64748b!important}
-.dark-mode .ppr-est.ok{color:#4ade80!important}
-.dark-mode .hm-ok{background:rgba(74,222,128,.15)!important;color:#4ade80!important}
-.dark-mode .hm-warn{background:rgba(253,224,71,.12)!important;color:#fde047!important}
-.dark-mode .hm-fail{background:rgba(252,165,165,.15)!important;color:#fca5a5!important}
-.dark-mode .ascii-block{background:#000810;color:#94a3b8}
-.dark-mode .prod-card{background:var(--panel);border:1px solid var(--line)}
-.dark-mode .prod-code{color:#67e8f9!important}
-.dark-mode .prod-name{color:#f8fafc!important}
-.dark-mode .alert-card{background:rgba(252,165,165,.08);border:1px solid rgba(252,165,165,.2)}
-.dark-mode .alert-title{color:#fca5a5!important}
 .kpi-val{font-family:var(--mono);font-size:32px;font-weight:800;line-height:1;color:var(--ink);margin:6px 0 4px}
 .kpi-val.ok{color:var(--ok)}.kpi-val.warn{color:var(--warn)}.kpi-val.fail{color:var(--fail)}
+@keyframes pulseRed{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.5)}50%{box-shadow:0 0 0 10px rgba(239,68,68,0)}}@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}.pulse-red{animation:pulseRed 1.4s infinite}.blink{animation:blink 1s infinite}
+#splash{position:fixed;inset:0;z-index:99999;background:#14532d;display:flex;align-items:center;justify-content:center;transition:opacity .4s}#splash.hide{opacity:0;pointer-events:none}#splash svg{width:100%;height:100%;object-fit:contain;max-width:600px;max-height:500px}
+#splash-loading{position:fixed;bottom:20px;right:20px;font:13px/1.4 Inter,system-ui,sans-serif;color:#666;background:#fff;padding:8px 14px;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.12);z-index:100000}
+/* ── NEW SISTEMA INGAMA COMPONENTS ─────────────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border-radius:var(--r-sm);font-family:var(--sans);font-size:13px;font-weight:600;line-height:1.3;cursor:pointer;border:1px solid transparent;transition:all .18s;text-decoration:none;white-space:nowrap}
+.btn.primary{background:var(--green-600);color:#fff}.btn.primary:hover{background:var(--green-700)}
+.btn.danger{background:var(--red-600);color:#fff}.btn.danger:hover{background:var(--red-700)}
+.btn.ghost{background:transparent;color:var(--text-soft);border:1px solid var(--border)}.btn.ghost:hover{background:var(--bg-muted);color:var(--text)}
+.btn.sm{padding:5px 10px;font-size:11px}.btn.lg{padding:12px 24px;font-size:15px}
+:root[data-theme="dark"] .btn.ghost{border-color:var(--border);color:var(--text-soft)}
+:root[data-theme="dark"] .btn.ghost:hover{background:var(--bg-strong);color:var(--text)}
+
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--r-xs);font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.03em;line-height:1.5}
+.badge.ok{background:var(--green-100);color:var(--green-800)}.badge.warn{background:var(--amber-100);color:var(--amber-700)}.badge.danger{background:var(--red-100);color:var(--red-700)}.badge.info{background:var(--navy-50);color:var(--navy-700)}.badge.muted{background:var(--ink-100);color:var(--ink-500)}
+.badge.solid-green{background:var(--green-600);color:#fff}.badge.solid-navy{background:var(--navy-700);color:#fff}
+.badge.dot{padding-left:4px}.badge.dot::before{content:"";width:6px;height:6px;border-radius:50%;flex-shrink:0}.badge.dot.ok::before{background:var(--green-600)}.badge.dot.warn::before{background:var(--amber-600)}.badge.dot.danger::before{background:var(--red-600)}
+:root[data-theme="dark"] .badge.ok{background:rgba(74,222,128,.15);color:#4ade80}
+:root[data-theme="dark"] .badge.warn{background:rgba(253,224,71,.12);color:#fde047}
+:root[data-theme="dark"] .badge.danger{background:rgba(252,165,165,.15);color:#fca5a5}
+:root[data-theme="dark"] .badge.info{background:rgba(147,197,253,.15);color:#93c5fd}
+:root[data-theme="dark"] .badge.muted{background:rgba(148,163,184,.1);color:#94a3b8}
+
+.callout{padding:14px 16px;border-radius:var(--r-md);font-size:13px;line-height:1.6;display:flex;gap:10px;align-items:flex-start;border-left:3px solid}
+.callout.green{background:var(--green-50);border-color:var(--green-600);color:var(--green-800)}
+.callout.navy{background:var(--navy-50);border-color:var(--navy-600);color:var(--navy-800)}
+.callout.amber{background:var(--amber-50);border-color:var(--amber-600);color:var(--amber-700)}
+.callout.danger{background:var(--red-50);border-color:var(--red-600);color:var(--red-700)}
+:root[data-theme="dark"] .callout.green{background:rgba(34,197,94,.08);border-color:#4ade80;color:#4ade80}
+:root[data-theme="dark"] .callout.navy{background:rgba(147,197,253,.08);border-color:#93c5fd;color:#93c5fd}
+:root[data-theme="dark"] .callout.amber{background:rgba(253,224,71,.08);border-color:#fde047;color:#fde047}
+:root[data-theme="dark"] .callout.danger{background:rgba(252,165,165,.08);border-color:#fca5a5;color:#fca5a5}
+
+.card{padding:20px;border-radius:var(--r-md)}.card.flat{background:var(--bg-muted);border:1px solid var(--border-soft)}.card.elev{background:var(--bg-elevated);border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+
+.stat{text-align:center;padding:16px 12px}.stat .val{font-family:var(--serif);font-size:36px;font-weight:600;line-height:1;color:var(--text);letter-spacing:-.02em}.stat .lbl{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-top:6px}.stat .sub{font-size:11px;color:var(--text-faint);margin-top:3px}
+
+.progress{height:8px;background:var(--bg-muted);border-radius:var(--r-xs);overflow:hidden}.progress-f{height:100%;border-radius:var(--r-xs);transition:width .5s;background:var(--green-600)}.progress.warn .progress-f{background:var(--amber-600)}.progress.danger .progress-f{background:var(--red-600)}.progress.na{background:var(--ink-200)}.progress.na .progress-f{background:var(--ink-500)}
+
+.kbd{display:inline-block;padding:2px 6px;border-radius:var(--r-xs);background:var(--bg-strong);border:1px solid var(--border);font-family:var(--mono);font-size:10px;color:var(--text-soft);line-height:1.4;box-shadow:0 1px 0 var(--border)}
+:root[data-theme="dark"] .kbd{background:var(--bg-muted);border-color:var(--border-strong)}
+
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}.dot.ok{background:var(--ok)}.dot.warn{background:var(--warn)}.dot.fail{background:var(--fail)}.dot.nd{background:var(--neutral)}
+
+.theme-switch{display:inline-flex;background:var(--bg-muted);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;font-family:var(--sans);font-size:11px}
+.theme-switch button{padding:6px 12px;border:none;background:transparent;color:var(--text-muted);cursor:pointer;transition:all .15s;font-family:var(--sans);font-size:11px;font-weight:500}
+.theme-switch button.active{background:var(--bg-elevated);color:var(--text);box-shadow:var(--shadow-sm);border-radius:var(--r-sm)}
+:root[data-theme="dark"] .theme-switch{background:var(--bg-strong);border-color:var(--border)}
+:root[data-theme="dark"] .theme-switch button.active{background:var(--bg-elevated);color:var(--text)}
+
+.chat-fab{position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;background:var(--green-600);color:#fff;border:none;font-size:24px;cursor:pointer;box-shadow:var(--shadow-lg);z-index:500;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.chat-fab:hover{background:var(--green-700);transform:scale(1.1)}
+.chat-panel{position:fixed;bottom:90px;right:24px;width:380px;max-height:520px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-pop);z-index:501;display:flex;flex-direction:column;overflow:hidden;transition:opacity .2s}
+.chat-head{padding:14px 16px;background:var(--green-700);color:#fff;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600}.chat-head .title{font-family:var(--serif);font-size:16px}.chat-head .sub{font-size:10px;opacity:.8;font-family:var(--mono)}
+.chat-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;max-height:320px}
+.chat-msg{max-width:85%;padding:10px 14px;border-radius:var(--r-md);font-size:12px;line-height:1.5;word-break:break-word}
+.chat-msg.bot{background:var(--bg-muted);color:var(--text);align-self:flex-start;border-bottom-left-radius:var(--r-lg)}
+.chat-msg.user{background:var(--green-600);color:#fff;align-self:flex-end;border-bottom-right-radius:var(--r-lg)}
+.chat-suggest{padding:8px 12px;display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid var(--border-soft)}
+.chat-suggest button{padding:4px 10px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--bg);color:var(--text-soft);font-size:11px;cursor:pointer;transition:all .15s;font-family:var(--sans)}
+.chat-suggest button:hover{background:var(--green-50);border-color:var(--green-600);color:var(--green-600)}
+.chat-input{padding:10px 12px;display:flex;gap:8px;border-top:1px solid var(--border);align-items:center}
+.chat-input input{flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:var(--r-sm);font-family:var(--sans);font-size:12px;background:var(--bg);color:var(--text);outline:none;transition:border .15s}
+.chat-input input:focus{border-color:var(--green-600)}
+
+.role-card{padding:20px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r-md);box-shadow:var(--shadow-sm);transition:all .2s}
+.role-card:hover{border-color:var(--green-600);box-shadow:var(--shadow-md)}
+.role-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+
+.clause-item{padding:12px 14px;background:var(--bg-muted);border:1px solid var(--border-soft);border-radius:var(--r-sm);font-size:12px;color:var(--text);transition:all .15s}
+.clause-item:hover{background:var(--bg-strong);border-color:var(--border)}
+.clause-tree{padding-left:0;list-style:none}.clause-tree li{padding:6px 10px;margin-bottom:2px;border-left:2px solid var(--border-soft);font-size:12px;color:var(--text-soft);transition:border-color .15s}.clause-tree li:hover{border-left-color:var(--green-600);color:var(--text)}
+.clause-list{display:flex;flex-direction:column;gap:6px}
+
+:root[data-theme="dark"] .tbl tr:hover td{background:rgba(255,255,255,.03)}
+
+@keyframes fade-up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}.fade-up{animation:fade-up .4s ease-out}
+@keyframes pulse-dot{0%,100%{box-shadow:0 0 0 0 var(--green-600)}50%{box-shadow:0 0 0 8px rgba(21,128,61,0)}}.pulse-dot{animation:pulse-dot 2s infinite}
+
+.bars{display:flex;align-items:flex-end;gap:2px;height:40px}.bar-item{flex:1;background:var(--green-600);border-radius:2px 2px 0 0;min-height:2px;transition:height .3s}.bar-item.warn{background:var(--amber-600)}.bar-item.fail{background:var(--red-600)}.bar-item.nd{background:var(--ink-200)}
+.spark{display:flex;align-items:flex-end;gap:1px;height:24px}.spark-dot{width:3px;background:var(--green-600);border-radius:1px;min-height:1px}.spark-dot.warn{background:var(--amber-600)}.spark-dot.fail{background:var(--red-600)}
+.histo{display:flex;align-items:flex-end;gap:1px;height:48px}.histo-bar{flex:1;background:var(--green-600);border-radius:2px;min-height:2px;transition:height .3s}
+.donut{position:relative;width:120px;height:120px}.donut-ring{fill:none;stroke:var(--bg-muted);stroke-width:12}.donut-seg{fill:none;stroke:var(--green-600);stroke-width:12;stroke-linecap:round;transition:stroke-dasharray .6s}.donut-seg.warn{stroke:var(--amber-600)}.donut-seg.fail{stroke:var(--red-600)}.donut-seg.ok{stroke:var(--green-600)}.donut-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}.donut-val{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--text);line-height:1}.donut-lbl{font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-top:2px}
+
+.chart-card{border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg-elevated)}
+.chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:14px}
+.chart-limit-line{stroke-dasharray:6 3;stroke-width:2}.chart-area{fill-opacity:.12}.chart-line{fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}.chart-dot{fill:#fff;stroke-width:2}
+.legend{display:flex;flex-wrap:wrap;gap:12px;padding:4px 0;font-family:var(--mono);font-size:10px;color:var(--text-muted)}.legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}.legend-item{display:flex;align-items:center;gap:5px}
+
+.side-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--r-sm);font-family:var(--sans);font-size:12px;font-weight:500;color:var(--text-soft);cursor:pointer;transition:all .15s;position:relative;text-decoration:none}.side-item:hover{background:var(--bg-muted);color:var(--text)}.side-item.active{background:var(--green-50);color:var(--green-800);font-weight:600}.side-item.active::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:3px;background:var(--green-600);border-radius:var(--r-xs)}.side-item .count{font-family:var(--mono);font-size:10px;font-weight:600;background:var(--bg-strong);color:var(--text-muted);padding:1px 7px;border-radius:var(--r-sm);margin-left:auto;line-height:1.6}.side-item.active .count{background:var(--green-100);color:var(--green-700)}
+:root[data-theme="dark"] .side-item.active{background:rgba(34,197,94,.1);color:#4ade80}
+:root[data-theme="dark"] .side-item.active .count{background:rgba(34,197,94,.15);color:#4ade80}
+
+.topbar-status{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:var(--r-sm);background:var(--bg-muted);border:1px solid var(--border);font-family:var(--mono);font-size:10px;font-weight:500;color:var(--text-soft)}.topbar-status.live{background:var(--green-50);border-color:var(--green-600);color:var(--green-800)}.topbar-status.live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green-600);animation:pg 2s infinite}
+:root[data-theme="dark"] .topbar-status.live{background:rgba(34,197,94,.1);border-color:#4ade80;color:#4ade80}
+
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--green-600);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:14px;font-weight:600;flex-shrink:0}.avatar-sm{width:24px;height:24px;font-size:10px}.avatar-lg{width:48px;height:48px;font-size:20px}
+
+.eyebrow{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:6px}.h1{font-family:var(--serif);font-size:32px;font-weight:600;letter-spacing:-.02em;color:var(--text);line-height:1.15}.h2{font-family:var(--serif);font-size:24px;font-weight:500;letter-spacing:-.01em;color:var(--text)}.h3{font-size:18px;font-weight:600;color:var(--text)}.h4{font-size:14px;font-weight:600;color:var(--text)}
+
+.grid-2-5{display:grid;grid-template-columns:2fr 5fr;gap:20px}@media(max-width:800px){.grid-2-5{grid-template-columns:1fr}}
+.row{display:flex;flex-wrap:wrap;gap:14px}.col{flex:1;min-width:200px}.spacer{flex-grow:1}
 </style>
 </head>
 <body>
+
+<!-- SPLASH SCREEN -->
+<div id="splash">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#14532d"></rect>
+    <g transform="translate(600 360)" text-anchor="middle">
+      <circle r="120" fill="#FBF8EF"></circle>
+      <text y="14" font-family="Fraunces, Georgia, serif" font-size="120" font-weight="800" fill="#1E3A8A">i</text>
+      <circle cx="-2" cy="-32" r="14" fill="#B91C1C"></circle>
+    </g>
+    <text x="600" y="560" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="64" font-weight="800" fill="#FBF8EF" letter-spacing="8">INGAMA</text>
+    <text x="600" y="612" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="600" fill="#BBF0C9" letter-spacing="6">SGIA · FSSC 22000 v6</text>
+    <text x="600" y="700" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="18" fill="#BBF0C9" opacity="0.8">Cargando el sistema…</text>
+  </svg>
+</div>
+<div id="splash-loading">Cargando INGAMA SGIA…</div>
+<noscript><div style="position:fixed;inset:0;z-index:99999;background:#450a0a;color:#fca5a5;display:flex;align-items:center;justify-content:center;font:16px Inter,system-ui,sans-serif;text-align:center;padding:20px">INGAMA SGIA requiere JavaScript para funcionar. Por favor, habilítelo en su navegador.</div></noscript>
 
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
@@ -490,15 +571,21 @@ body{min-height:100vh}
 
   <div class="sb-div"></div>
   <div id="sbPPRSection" style="display:none">
+    <div class="sb-lbl">PPR · Módulos</div>
+    <div id="sbPPRModules" style="padding:0 8px"></div>
+    <div class="sb-div" style="margin:6px 10px"></div>
     <div class="sb-lbl">PPR · FSSC 22000 v6</div>
     <div id="sbPPRList"></div>
   </div>
   <div class="sb-foot">
     Actualizado: 31/03/2026<br>
     FSSC 22000 v6 · ISO/TS 22002-1
-    <button class="sb-theme-btn" onclick="toggleTheme()">☀ / 🌙 Cambiar tema</button>
+    <div class="theme-switch"><button id="themeLight" class="active" onclick="setTheme('light')">☀️ Claro</button><button id="themeDark" onclick="setTheme('dark')">🌙 Oscuro</button></div>
+    <button class="sb-theme-btn" onclick="openPDFModal()" style="margin-top:6px">📄 Exportar PDF (APA)</button>
   </div>
 </div>
+
+<button class="chat-fab" id="chatFab" onclick="toggleChat()" title="Asistente SGIA">💬</button>
 
 <!-- MAIN AREA -->
 <div class="main-area">
@@ -795,8 +882,38 @@ body{min-height:100vh}
   </div><!-- content -->
 </div><!-- main-area -->
 
+<!-- PDF MODAL -->
+<div id="pdfModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);align-items:center;justify-content:center" onclick="if(!window._pdfGenerating)document.getElementById('pdfModal').style.display='none'">
+  <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:28px;max-width:460px;width:90%;box-shadow:0 25px 50px rgba(0,0,0,.3)" onclick="event.stopPropagation()">
+    <h3 style="font-family:var(--serif);font-size:18px;font-weight:600;color:var(--accent);margin-bottom:16px">Exportar Informe PDF — APA 7.ª ed.</h3>
+    <p style="font-size:13px;color:var(--ink2);margin-bottom:6px">Alcance: <strong style="color:var(--ink)" id="pdfModalAlcance">—</strong></p>
+    <p style="font-size:13px;color:var(--ink2);margin-bottom:14px">Lote: <strong style="color:var(--ink)" id="pdfModalLote">—</strong></p>
+    <p style="font-size:11px;color:var(--ink3);margin-bottom:18px;line-height:1.6">Incluye: portada, gráficos de tendencia con caption APA, párrafo interpretativo por registro (conforme / advertencia / no conformidad) y referencias bibliográficas.</p>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="document.getElementById('pdfModal').style.display='none'" style="padding:8px 16px;border-radius:7px;background:var(--line2);color:var(--ink2);border:none;cursor:pointer;font-family:var(--sans);font-size:13px">Cancelar</button>
+      <button onclick="document.getElementById('pdfModal').style.display='none';generarInformePDF();" style="padding:8px 16px;border-radius:7px;background:var(--accent);color:#fff;border:none;cursor:pointer;font-family:var(--sans);font-size:13px;font-weight:600">⬇ Generar y descargar</button>
+    </div>
+  </div>
+</div>
+
 <!-- DATA -->
 <script>
+(function initSplash(){
+  var splash=document.getElementById('splash');
+  var loadEl=document.getElementById('splash-loading');
+  function hide(){if(splash){splash.classList.add('hide');setTimeout(function(){if(splash.parentNode)splash.parentNode.removeChild(splash);if(loadEl&&loadEl.parentNode)loadEl.parentNode.removeChild(loadEl);},500);}}
+  if(loadEl)loadEl.textContent='Cargando Chart.js…';
+  var check=function(){
+    if(typeof Chart!=='undefined'){if(loadEl)loadEl.textContent='Renderizando dashboard…';setTimeout(hide,300);}
+    else{setTimeout(check,100);}
+  };
+  check();
+  window.addEventListener('error',function(e){
+    var d=document.getElementById('splash-err');
+    if(!d){d=document.createElement('div');d.id='splash-err';d.style.cssText='position:fixed;bottom:40px;left:12px;right:12px;font:12px/1.4 ui-monospace,monospace;background:#2a1215;color:#ff8a80;padding:10px 14px;border-radius:8px;border:1px solid #5c2b2e;z-index:99999;white-space:pre-wrap;max-height:40vh;overflow:auto';document.body.appendChild(d);}
+    d.textContent=(d.textContent||'')+'[error] '+(e.message||e.type||'unknown')+'\n';
+  });
+})();
 window.AGGREGATES_BY_TAB_GENERATED = {
   "RG 01-CV": {
     "RC.CC.01": {
@@ -3958,40 +4075,58 @@ window.LOTE_INFO_PD02={};
 // ═══════════════════════════════════════════════════
 const LOTES = [
   {
-    codigo:'CONV. 01',proveedor:'Ricardo Gamarra Tellez',proveedorCorto:'RG 01-CV',certif:'Convencional',kilosTotal:52952,tipo:'Midget',
-    recepcion:{humedad:24.5,humedadMuestras:[24.5,24.5,24.5,24.1,24.1,24.7,23.8,23.0],humedadFechas:['06/12','06/12','06/12','10/12','10/12','11/12','29/12','03/01'],corte:4.5},
-    sancochado:{presionDist:7,presionAuto:4,tiempo:'2:05',humIng:5.7,humSal:4.0},
-    seleccionado:{fechas:['07/01','09/01','12/01','13/01','15/01'],ombligo:[1.32,1.29,1.22,1.13,1.53],podrida:[2.49,2.33,2.22,2.21,2.04],promOmb:1.30,promPod:2.26,chiaLona:0.81,pedazosLona:2.43,tipos:{large:52,medium:57,midget:71,tiny:120}},
+    codigo:'CONV. 01',proveedor:'Ricardo Gamarra Tellez',proveedorCorto:'RG 01-CV',certif:'Convencional',kilosTotal:12840,tipo:'Midget',
+    recepcion:{humedad:24.5,humedadMuestras:[24.5,24.1,24.7,24.4,23.8,23.2,23.0],humedadFechas:['06/12','10/12','11/12','15/12','22/12','29/12','03/01'],corte:4.5},
+    sancochado:{presionDist:7,presionAuto:4,tiempo:'2:05',humIng:5,humSal:4},
+    seleccionado:{fechas:['07/01','09/01','12/01','13/01','15/01'],ombligo:[1.32,1.29,1.22,1.13,1.53],podrida:[2.49,2.33,2.22,2.21,2.04],promOmb:1.30,promPod:2.26,chiaLona:1.6,pedazosLona:3.0,tipos:{large:52,medium:57,midget:71,tiny:120}},
     deshidratado:{danadas:3.6,sevDanadas:7.3,chipped:3.6,chia:7.3},
-    pt:{planilla:8,fecha:'29/01',cajasProducidas:951,cajasPinchadas:77,cajasReembazadas:77,danadasPT:1.43,sevDanadasPT:0.92,metalesPCC:'OK',imanesPCC:'OK'},
-    exportacion:{coa:'083/26',cliente:'Caro Nut Company',destino:'Estados Unidos',aflatoxB1:'<0.50',aflatoxTotal:'<0.90',humPT:3.20,ecoli:'Ausente',salmonella:'Ausente',contenedor:'MSNU-310035-9',inspec:'Aprobado'}
+    pt:{planilla:1,fecha:'16/01',cajasProducidas:76,cajasPinchadas:4,cajasReembazadas:4,danadasPT:1.5,sevDanadasPT:0.5,metalesPCC:'OK',imanesPCC:'OK'},
+    exportacion:{coa:'083/26',cliente:'Caro Nut Company',destino:'Estados Unidos',aflatoxB1:'<0.50',aflatoxTotal:'<0.90',bacteriana:'2.0×10³',humPT:3.20,ecoli:'Ausente',salmonella:'Ausente',contenedor:'MSNU-310035-9',inspec:'Aprobado'}
   },
   {
-    codigo:'CONV. 02',proveedor:'Ricardo Gamarra Tellez',proveedorCorto:'RG 02-CV',certif:'Convencional',kilosTotal:57762,tipo:'Midget',
-    recepcion:{humedad:26.8,humedadMuestras:[26.8,26.8,26.6,26.5,26.1,25.0,24.3],humedadFechas:['23/12','23/12','24/12','26/12','31/12','06/01','09/01'],corte:4.07},
-    sancochado:{presionDist:7,presionAuto:4,tiempo:'2:08',humIng:7.0,humSal:4.0},
-    seleccionado:{fechas:['16/01','17/01','19/01','20/01'],ombligo:[1.50,1.36,1.46,1.26],podrida:[2.43,2.03,1.85,1.85],promOmb:1.40,promPod:2.04,chiaLona:0.83,pedazosLona:1.47,tipos:{large:84,medium:87,midget:87,tiny:87}},
-    deshidratado:{danadas:2.5,sevDanadas:4.0,chipped:4.0,chia:5.0},
-    pt:{planilla:6,fecha:'13/02',cajasProducidas:854,cajasPinchadas:83,cajasReembazadas:83,danadasPT:1.20,sevDanadasPT:0.80,metalesPCC:'OK',imanesPCC:'OK'},
-    exportacion:{coa:'135/26',cliente:'Freeworld Trading Ltd',destino:'Polonia',aflatoxB1:'<0.45',aflatoxTotal:'<0.85',humPT:3.10,ecoli:'Ausente',salmonella:'Ausente',contenedor:'CAAU-238802-3',inspec:'Aprobado'}
+    codigo:'CONV. 02',proveedor:'Ricardo Gamarra Tellez',proveedorCorto:'RG 02-CV',certif:'Convencional',kilosTotal:17280,tipo:'Midget',
+    recepcion:{humedad:26.8,humedadMuestras:[26.8,26.6,26.5,26.1,25.0,24.3],humedadFechas:['23/12','24/12','26/12','31/12','06/01','09/01'],corte:4.07},
+    sancochado:{presionDist:7,presionAuto:4,tiempo:'2:06',humIng:5,humSal:4},
+    seleccionado:{fechas:['16/01','17/01','19/01','20/01'],ombligo:[1.50,1.36,1.46,1.26],podrida:[2.43,2.03,1.85,1.85],promOmb:1.40,promPod:2.04,chiaLona:1.7,pedazosLona:2.8,tipos:{large:87,medium:88,midget:87,tiny:87}},
+    deshidratado:{danadas:5.3,sevDanadas:11.1,chipped:6.2,chia:11.1},
+    pt:{planilla:9,fecha:'02/02',cajasProducidas:149,cajasPinchadas:9,cajasReembazadas:9,danadasPT:1.4,sevDanadasPT:1.0,metalesPCC:'OK',imanesPCC:'OK'},
+    exportacion:{coa:'135/26',cliente:'Freeworld Trading Ltd',destino:'Polonia',aflatoxB1:'<0.90',aflatoxTotal:'<1.50',bacteriana:'2.2×10³',humPT:3.10,ecoli:'Ausente',salmonella:'Ausente',contenedor:'CAAU-238802-3',inspec:'Aprobado'}
   },
   {
-    codigo:'ORG. 03',proveedor:'Barraca San Ignacio',proveedorCorto:'BSI 01',certif:'Orgánico',kilosTotal:57654,tipo:'Large/Medium',
-    recepcion:{humedad:25.4,humedadMuestras:[25.0,25.0,25.0,24.3,24.8,24.4],humedadFechas:['18/12','18/12','20/12','20/12','22/12','24/12'],corte:4.57},
-    sancochado:{presionDist:7,presionAuto:4,tiempo:'2:06',humIng:8.0,humSal:4.0},
-    seleccionado:{fechas:['23/01','24/01','26/01','27/01'],ombligo:[1.79,1.65,1.58,1.57],podrida:[2.21,2.53,2.25,2.39],promOmb:1.65,promPod:2.35,chiaLona:0.75,pedazosLona:1.90,tipos:{large:88,medium:91,midget:91,tiny:90}},
-    deshidratado:{danadas:2.1,sevDanadas:2.5,chipped:3.0,chia:3.5},
-    pt:{planilla:7,fecha:'27/02',cajasProducidas:901,cajasPinchadas:101,cajasReembazadas:101,danadasPT:1.50,sevDanadasPT:0.85,metalesPCC:'OK',imanesPCC:'OK'},
-    exportacion:{coa:'187/26',cliente:'Red River Foods',destino:'Alemania',aflatoxB1:'<0.48',aflatoxTotal:'<0.88',humPT:3.15,ecoli:'Ausente',salmonella:'Ausente',contenedor:'MSNU-867960-2',inspec:'Aprobado'}
+    codigo:'ORG. 03',proveedor:'Barraca San Ignacio',proveedorCorto:'BSI 01-26',certif:'Orgánico',kilosTotal:11000,tipo:'Large/Medium/Midget',
+    recepcion:{humedad:25.7,humedadMuestras:[25.7,25.2,24.8,24.4],humedadFechas:['16/01','18/01','20/01','22/01'],corte:4.57},
+    sancochado:{presionDist:7,presionAuto:4,tiempo:'2:10',humIng:9,humSal:5},
+    seleccionado:{fechas:['23/01','24/01','26/01','27/01'],ombligo:[1.79,1.65,1.58,1.57],podrida:[2.21,2.53,2.25,2.39],promOmb:1.65,promPod:2.35,chiaLona:1.8,pedazosLona:3.2,tipos:{large:89,medium:91,midget:89,tiny:89}},
+    deshidratado:{danadas:4.5,sevDanadas:7.3,chipped:4.5,chia:7.3},
+    pt:{planilla:5,fecha:'23/01',cajasProducidas:102,cajasPinchadas:2,cajasReembazadas:2,danadasPT:1.5,sevDanadasPT:0.9,metalesPCC:'OK',imanesPCC:'OK'},
+    exportacion:{coa:'118/26',cliente:'Red River Foods',destino:'Alemania',aflatoxB1:'<0.50',aflatoxTotal:'<0.90',bacteriana:'1.8×10³',humPT:3.20,ecoli:'Ausente',salmonella:'Ausente',contenedor:'MSNU-867960-2',inspec:'Aprobado'}
   },
   {
-    codigo:'CONV. 03',proveedor:'Denis Azucarela',proveedorCorto:'DA 01-CV',certif:'Convencional',kilosTotal:59717,tipo:'Midget',
-    recepcion:{humedad:23.5,humedadMuestras:[23.5,23.5,23.0,23.0,23.0],humedadFechas:['10/01','10/01','10/01','10/01','10/01'],corte:5.57},
-    sancochado:{presionDist:7,presionAuto:4,tiempo:'2:06',humIng:6.0,humSal:4.0},
-    seleccionado:{fechas:['28/01','29/01','31/01','02/02'],ombligo:[1.56,1.67,1.42,1.57],podrida:[2.67,2.54,2.20,2.28],promOmb:1.56,promPod:2.42,chiaLona:0.78,pedazosLona:2.10,tipos:{large:87,medium:86,midget:87,tiny:86}},
-    deshidratado:{danadas:2.5,sevDanadas:3.5,chipped:3.5,chia:4.0},
-    pt:{planilla:6,fecha:'09/03',cajasProducidas:1031,cajasPinchadas:120,cajasReembazadas:120,danadasPT:1.35,sevDanadasPT:0.90,metalesPCC:'OK',imanesPCC:'OK'},
-    exportacion:{coa:'N/D',cliente:'Pendiente',destino:'Pendiente',aflatoxB1:'N/D',aflatoxTotal:'N/D',humPT:3.30,ecoli:'N/D',salmonella:'N/D',contenedor:'N/D',inspec:'Pendiente'}
+    codigo:'CONV. 03',proveedor:'Dennis Azucarela',proveedorCorto:'DA 01-CV',certif:'Convencional',kilosTotal:14520,tipo:'Midget',
+    recepcion:{humedad:28.4,humedadMuestras:[28.4,27.5,26.2,25.1,24.3],humedadFechas:['10/01','14/01','18/01','22/01','26/01'],corte:5.57},
+    sancochado:{presionDist:7,presionAuto:4,tiempo:'2:06',humIng:8,humSal:2},
+    seleccionado:{fechas:['28/01','29/01','31/01','02/02'],ombligo:[1.56,1.67,1.42,1.57],podrida:[2.67,2.54,2.20,2.28],promOmb:1.55,promPod:2.42,chiaLona:2.0,pedazosLona:3.5,tipos:{large:89,medium:90,midget:87,tiny:84}},
+    deshidratado:{danadas:4.5,sevDanadas:9.1,chipped:5.0,chia:9.1},
+    pt:{planilla:12,fecha:'12/02',cajasProducidas:144,cajasPinchadas:6,cajasReembazadas:6,danadasPT:2.0,sevDanadasPT:1.0,metalesPCC:'OK',imanesPCC:'OK'},
+    exportacion:{coa:'152/26',cliente:'Chelmer Foods Ltd',destino:'Reino Unido',aflatoxB1:'<0.90',aflatoxTotal:'<1.50',bacteriana:'2.5×10³',humPT:3.30,ecoli:'Ausente',salmonella:'Ausente',contenedor:'MSNU-412587-1',inspec:'Aprobado'}
+  },
+  {
+    codigo:'CONV. 04',proveedor:'AARENARMAPA',proveedorCorto:'AA 01-26',certif:'Convencional',kilosTotal:9800,tipo:'Medium',
+    recepcion:{humedad:25.9,humedadMuestras:[25.9,25.4,25.3,24.9,24.4,24.3],humedadFechas:['18/12','22/12','24/12','29/12','06/01','14/01'],corte:4.85},
+    sancochado:{presionDist:7,presionAuto:4,tiempo:'2:08',humIng:7,humSal:4},
+    seleccionado:{fechas:['04/02','05/02','07/02','09/02'],ombligo:[1.45,1.38,1.51,1.42],podrida:[2.35,2.48,2.18,2.30],promOmb:1.44,promPod:2.33,chiaLona:1.9,pedazosLona:2.9,tipos:{large:85,medium:88,midget:86,tiny:84}},
+    deshidratado:{danadas:4.2,sevDanadas:5.8,chipped:4.0,chia:5.8},
+    pt:{planilla:14,fecha:'16/02',cajasProducidas:169,cajasPinchadas:7,cajasReembazadas:7,danadasPT:1.8,sevDanadasPT:0.9,metalesPCC:'OK',imanesPCC:'OK'},
+    exportacion:{coa:'168/26',cliente:'En proceso',destino:'Polonia',aflatoxB1:'<0.50',aflatoxTotal:'<0.95',bacteriana:'2.1×10³',humPT:3.25,ecoli:'Ausente',salmonella:'Ausente',contenedor:'Pendiente',inspec:'Pendiente'}
+  },
+  {
+    codigo:'CONV. 07',proveedor:'Dennis Azucarela',proveedorCorto:'DA 02-CV',certif:'Convencional',kilosTotal:59057,tipo:'Mezclada',
+    recepcion:{humedad:27.2,humedadMuestras:[27.2,26.5,25.8,24.9],humedadFechas:['21/02','28/02','07/03','14/03'],corte:5.12},
+    sancochado:{presionDist:7,presionAuto:4,tiempo:'2:07',humIng:6,humSal:3},
+    seleccionado:{fechas:['04/03','05/03','06/03','07/03','09/03'],ombligo:[1.48,1.52,1.46,1.41,1.49],podrida:[2.41,2.35,2.28,2.22,2.31],promOmb:1.47,promPod:2.31,chiaLona:1.75,pedazosLona:3.0,tipos:{large:82,medium:85,midget:83,tiny:80}},
+    deshidratado:{danadas:4.1,sevDanadas:6.2,chipped:3.9,chia:6.2},
+    pt:{planilla:18,fecha:'18/03',cajasProducidas:185,cajasPinchadas:5,cajasReembazadas:5,danadasPT:1.6,sevDanadasPT:0.8,metalesPCC:'OK',imanesPCC:'OK'},
+    exportacion:{coa:'189/26',cliente:'En proceso',destino:'USA',aflatoxB1:'<0.60',aflatoxTotal:'<1.10',bacteriana:'2.0×10³',humPT:3.20,ecoli:'Ausente',salmonella:'Ausente',contenedor:'Pendiente',inspec:'Pendiente'}
   }
 ];
 
@@ -4118,9 +4253,23 @@ const SHEET_TAB_MAP = {
   14:["RG 01-CV","RG 02-CV","BSI 01"]
 };
 
+// ═══════════════════════════════════════════════════
+// IA ALIASING — Lote → IA-XXX
+// ═══════════════════════════════════════════════════
+const qualityAliasMap = {};
+TAB_REFERENCE.forEach(function(tab, idx){
+  qualityAliasMap[tab] = 'IA-' + String(idx + 1).padStart(3, '0');
+});
+function qualityDisplayName(tabName){
+  var clean = String(tabName || '').trim();
+  if (!clean) return '';
+  var key = TAB_REFERENCE.find(function(name){ return sameTab(name, clean); }) || clean;
+  return qualityAliasMap[key] || key;
+}
+
 const COLORS={ok:'#2E7D5B',warn:'#C17917',fail:'#B23E3E',nd:'#6B6964'}
 function getColors(){
-  const dm=document.body.classList.contains('dark-mode');
+  const dm=document.documentElement.getAttribute('data-theme')==='dark';
   return {
     ok:dm?'#4ade80':'#2E7D5B', warn:dm?'#fde047':'#C17917',
     fail:dm?'#fca5a5':'#B23E3E', nd:dm?'#94a3b8':'#6B6964',
@@ -4131,7 +4280,6 @@ function getColors(){
 
 let selectedTab = "RG 01-CV";
 let currentLote = 0;
-let isDark = false;
 const charts = {};
 
 // ═══════════════════════════════════════════════════
@@ -4181,11 +4329,23 @@ function getLote(){ const idx=LOTES.findIndex(l=>sameTab(l.proveedorCorto,select
 // ═══════════════════════════════════════════════════
 // THEME
 // ═══════════════════════════════════════════════════
-function toggleTheme(){
-  isDark=!isDark;
-  document.body.classList.toggle('dark-mode',isDark);
-  setTimeout(function(){if(typeof renderV1Charts==='function')renderV1Charts();if(typeof renderProdCharts==='function')renderProdCharts();},50);
+function setTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('themeLight').classList.toggle('active', t==='light');
+  document.getElementById('themeDark').classList.toggle('active', t==='dark');
+  try{localStorage.setItem('ingama-theme', t);}catch(e){}
+  if(window._redrawCharts)window._redrawCharts();
 }
+function toggleTheme(){
+  var current=document.documentElement.getAttribute('data-theme')||'light';
+  setTheme(current==='dark'?'light':'dark');
+}
+setTimeout(function(){if(typeof renderV1Charts==='function')renderV1Charts();if(typeof renderProdCharts==='function')renderProdCharts();},50);
+
+window._redrawCharts = function(){
+  if(typeof renderV1Charts==='function')renderV1Charts();
+  if(typeof renderProdCharts==='function')renderProdCharts();
+};
 
 // ═══════════════════════════════════════════════════
 // VIEW SWITCHING
@@ -4408,7 +4568,7 @@ function renderV1Charts(){
   const t=L.seleccionado.tipos;
   const tot=t.large+t.medium+t.midget+t.tiny;
   const cvTy=document.getElementById('chartTypes');
-  if(cvTy) charts.chartTypes=new Chart(cvTy,{type:'doughnut',data:{labels:['Large','Medium','Midget','Tiny'],datasets:[{data:[t.large,t.medium,t.midget,t.tiny],backgroundColor:document.body.classList.contains('dark-mode')?['#5eead4','#34d399','#f87171','#fbbf24']:['#2C4A3E','#4A7C6F','#8B3A2E','#B08A3E'],borderColor:'var(--panel)',borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{color:getColors().ink2,font:{family:'JetBrains Mono',size:10},padding:10,generateLabels:function(chart){const d=chart.data;return d.labels.map((l,i)=>({text:`${l}: ${d.datasets[0].data[i]} (${Math.round(d.datasets[0].data[i]/tot*100)}%)`,fillStyle:d.datasets[0].backgroundColor[i],strokeStyle:'var(--panel)',lineWidth:2,index:i}));}}}}}});
+  if(cvTy) charts.chartTypes=new Chart(cvTy,{type:'doughnut',data:{labels:['Large','Medium','Midget','Tiny'],datasets:[{data:[t.large,t.medium,t.midget,t.tiny],backgroundColor:document.documentElement.getAttribute('data-theme')==='dark'?['#5eead4','#34d399','#f87171','#fbbf24']:['#2C4A3E','#4A7C6F','#8B3A2E','#B08A3E'],borderColor:'var(--panel)',borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{color:getColors().ink2,font:{family:'JetBrains Mono',size:10},padding:10,generateLabels:function(chart){const d=chart.data;return d.labels.map((l,i)=>({text:`${l}: ${d.datasets[0].data[i]} (${Math.round(d.datasets[0].data[i]/tot*100)}%)`,fillStyle:d.datasets[0].backgroundColor[i],strokeStyle:'var(--panel)',lineWidth:2,index:i}));}}}}}});
 
   destroyChart('chartRadar');
   const radarData=[L.seleccionado.promPod/3*100,L.seleccionado.promOmb/2*100,L.seleccionado.chiaLona/3*100,L.deshidratado.danadas/5*100,L.deshidratado.chia/8*100,L.pt.cajasPinchadas/10*100,L.recepcion.humedad/25*100];
@@ -5051,6 +5211,27 @@ function renderSBPPR(){
   var el=document.getElementById('sbPPRList');
   if(!el)return;
   el.innerHTML='';
+
+  var modsEl=document.getElementById('sbPPRModules');
+  if(modsEl){
+    modsEl.innerHTML='';
+    ['TODOS','BPM 2026','Eliminación Residuos','Materiales Quebradizos','Material Embalaje','Control Plagas'].forEach(function(mod){
+      var mb=document.createElement('button');
+      mb.style.cssText='width:100%;text-align:left;padding:4px 12px;border-radius:5px;margin-bottom:2px;background:transparent;border:1px solid transparent;font-family:var(--mono);font-size:9px;color:#475569;cursor:pointer;transition:all .12s';
+      mb.textContent=mod;
+      mb.onmouseenter=function(){if(!mb.classList.contains('am'))mb.style.background='rgba(255,255,255,.04)';mb.style.color='#94a3b8';};
+      mb.onmouseleave=function(){if(!mb.classList.contains('am')){mb.style.background='transparent';mb.style.color='#475569';}};
+      mb.onclick=function(){
+        document.querySelectorAll('#sbPPRModules button').forEach(function(b){b.style.background='transparent';b.style.color='#475569';b.classList.remove('am');});
+        mb.classList.add('am');mb.style.background='rgba(180,131,62,.14)';mb.style.color='#E8B846';
+      };
+      modsEl.appendChild(mb);
+    });
+    modsEl.firstChild.classList.add('am');
+    modsEl.firstChild.style.background='rgba(180,131,62,.14)';
+    modsEl.firstChild.style.color='#E8B846';
+  }
+
   var gBtn=document.createElement('button');
   gBtn.className='sb-btn';
   gBtn.style.cssText='display:flex;justify-content:space-between;align-items:center;width:100%;border-bottom:2px solid var(--sb-cyan2);padding-bottom:8px;margin-bottom:8px';
@@ -5076,7 +5257,93 @@ function renderSBPPR(){
   });
 }
 
+// ═══════════════════════════════════════════════════
+// PDF EXPORT (jsPDF + APA)
+// ═══════════════════════════════════════════════════
+window._pdfGenerating = false;
+function openPDFModal(){
+  document.getElementById('pdfModalAlcance').textContent = 'Todos los registros RC.CC activos';
+  document.getElementById('pdfModalLote').textContent = selectedTab;
+  document.getElementById('pdfModal').style.display = 'flex';
+}
+async function generarInformePDF(){
+  if(window._pdfGenerating) return;
+  window._pdfGenerating = true;
+  try{
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    var mg=25.4, pw=210, ph=297, cw=pw-mg*2, bsz=11, lh=8.5, ind=12.7, y=mg;
+    function chkPg(h){h=h||lh;if(y+h>ph-mg){doc.addPage();y=mg;}}
+    function addPara(text,opts){
+      opts=opts||{};var italic=opts.italic||false,size=opts.size||bsz,noInd=opts.noInd||false;
+      doc.setFont("helvetica",italic?"italic":"normal");doc.setFontSize(size);
+      var mw=cw-(noInd?0:ind),lines=doc.splitTextToSize(text,mw);
+      lines.forEach(function(line,i){
+        chkPg();var isFirst=i===0&&!noInd,xPos=mg+(isFirst?ind:0);
+        doc.text(line,xPos,y);y+=lh;
+      });y+=3;
+    }
+    function addH(text,lvl){
+      lvl=lvl||1;var sz={1:16,2:13,3:12}[lvl]||bsz;
+      chkPg(sz*0.35+8);doc.setFont("helvetica","bold");doc.setFontSize(sz);
+      doc.text(text,lvl===1?pw/2:mg,y,{align:lvl===1?'center':'left'});y+=lh+4;
+    }
+    y=90;
+    addH("Informe de Control de Calidad",1);
+    addH("FSSC 22000 v6 \u2014 INGAMA Beneficiadora",1);
+    y+=4;doc.setFont("helvetica","normal");doc.setFontSize(12);
+    ['Lote/Pesta\u00f1a: '+selectedTab,'Fecha: '+new Date().toLocaleDateString('es-BO',{year:'numeric',month:'long',day:'numeric'}),'Sistema de Gesti\u00f3n de Inocuidad Alimentaria FSSC 22000 v6'].forEach(function(line){doc.text(line,pw/2,y,{align:"center"});y+=lh;});
+    doc.addPage();y=mg;
+    addH("An\u00e1lisis de Tendencias con L\u00edmites Cr\u00edticos",1);
+    addPara("El presente informe contiene el an\u00e1lisis de los registros de control de calidad del sistema FSSC 22000 v6 de INGAMA Beneficiadora para el lote "+selectedTab+". Cada secci\u00f3n incluye la tendencia gr\u00e1fica del registro seguida de un p\u00e1rrafo interpretativo que clasifica el estado de conformidad seg\u00fan los l\u00edmites cr\u00edticos establecidos.");
+    var sheets=(window.SHEETS||[]).filter(function(s){return matchTab(s,selectedTab);});
+    var figN=0;
+    for(var i=0;i<sheets.length;i++){
+      var sheet=sheets[i];figN++;
+      var ctrlsN=(sheet.controles||[]).filter(function(c){return typeof c.valor==="number";});
+      var fueraC=ctrlsN.filter(fuera),cercaC=ctrlsN.filter(cerca);
+      var cv=document.getElementById('chart-cc-'+sheet.codigo.replace(/[^A-Za-z0-9]/g,'_'));
+      var hasImg=cv&&cv.width>0&&cv.height>0,aspectR=hasImg?(cv.height/cv.width):0.5;
+      var pdfW=cw*0.90,pdfH=pdfW*aspectR,blqMin=lh*2.5+(hasImg?pdfH+10+lh:lh*2);
+      chkPg(blqMin);addH(sheet.codigo+' \u2014 '+sheet.nombre,2);
+      if(hasImg){
+        var imgD=cv.toDataURL('image/png',1.0),xImg=mg+(cw-pdfW)/2;
+        chkPg(pdfH+8);doc.addImage(imgD,'PNG',xImg+100/*offset for sidebar? let's just use what we have */,y,pdfW,pdfH);
+        y+=pdfH+3;
+        var cap='Figura '+figN+'. Tendencia hist\u00f3rica de controles cr\u00edticos \u2014 '+sheet.codigo+': '+sheet.nombre+' (Lote: '+selectedTab+').';
+        doc.setFont("helvetica","italic");doc.setFontSize(10);
+        doc.splitTextToSize(cap,cw).forEach(function(line){chkPg(5.5);doc.text(line,mg,y);y+=5.5;});y+=5;
+      }
+      var par="";
+      if(fueraC.length){
+        var det=fueraC.map(function(c){return c.name+' con valor '+c.valor+c.unidad+' (l\u00edmite '+(c.op==="max"?"<":"\u2265")+c.limite+(typeof c.limite==="number"?c.unidad:"");}).join("; ");
+        par='El registro '+sheet.codigo+' ('+sheet.nombre+') present\u00f3 no conformidades en '+(fueraC.length===1?"un":fueraC.length)+' control(es): '+det+'. Estos resultados requieren la aplicaci\u00f3n inmediata de acciones correctivas conforme al procedimiento establecido en el sistema de gesti\u00f3n de inocuidad FSSC 22000 v6 de INGAMA Beneficiadora.';
+      }else if(cercaC.length){
+        var det2=cercaC.map(function(c){return c.name+': '+c.valor+c.unidad;}).join(", ");
+        par='El registro '+sheet.codigo+' ('+sheet.nombre+') opera dentro de los par\u00e1metros de inocuidad establecidos; sin embargo, '+(cercaC.length===1?"un control present\u00f3 valores":cercaC.length+" controles presentaron valores")+' pr\u00f3ximos al l\u00edmite cr\u00edtico: '+det2+'. Se recomienda el monitoreo continuo.';
+      }else if(ctrlsN.length){
+        par='El registro '+sheet.codigo+' ('+sheet.nombre+') demostr\u00f3 plena conformidad en todos los controles cr\u00edticos evaluados para el lote '+selectedTab+'. Los valores registrados se mantuvieron dentro de los l\u00edmites establecidos en el sistema FSSC 22000 v6 de INGAMA Beneficiadora.';
+      }else{par='El registro '+sheet.codigo+' ('+sheet.nombre+') no presenta datos num\u00e9ricos disponibles para el per\u00edodo analizado.';}
+      addPara(par);
+    }
+    chkPg(60);y+=8;addH("Referencias",1);
+    ['Food Safety System Certification (FSSC). (2023). FSSC 22000 Scheme version 6. Foundation FSSC 22000.','ISO. (2018). ISO 22000:2018 \u2014 Food safety management systems. International Organization for Standardization.','INGAMA Beneficiadora. (2026). Registros de control de calidad FSSC 22000 v6 [Base de datos interna]. INGAMA.'].forEach(function(ref){
+      var rl=doc.splitTextToSize(ref,cw-ind);
+      rl.forEach(function(line,li){chkPg();doc.text(line,li===0?mg:mg+ind,y);y+=lh;});y+=3;
+    });
+    var now=new Date(),ds=''+now.getFullYear()+String(now.getMonth()+1).padStart(2,"0")+String(now.getDate()).padStart(2,"0");
+    doc.save('INGAMA_Calidad_'+selectedTab.replace(/\s/g,'-')+'_'+ds+'.pdf');
+  }catch(e){console.error("PDF error:",e);alert("Error al generar PDF: "+(e.message||String(e)));}
+  window._pdfGenerating=false;
+}
+
+function toggleChat(){var p=document.getElementById('chatPanel');p.style.display=p.style.display==='none'?'flex':'none';}
+function sendChat(msg){if(!msg||!msg.trim())return;var body=document.getElementById('chatBody');var input=document.getElementById('chatInput');if(input)input.value='';body.innerHTML+='<div class="chat-msg user">'+msg.replace(/</g,'&lt;')+'</div>';setTimeout(function(){var resp=generateChatResponse(msg);body.innerHTML+='<div class="chat-msg bot">'+resp+'</div>';body.scrollTop=body.scrollHeight;},600);}
+function generateChatResponse(msg){msg=msg.toLowerCase();if(msg.includes('no conformidad')||msg.includes('fuera')){var sheets=window.SHEETS||[];var nc=[];sheets.forEach(function(s){if(s.controles&&s.controles.some(function(c){return typeof c.valor==='number'&&((c.op==='max'&&c.valor>c.limite)||(c.op==='min'&&c.valor<c.limite));}))nc.push(s.codigo+' ('+s.nombre+')');});return nc.length?'Registros con no conformidades: '+nc.join(', ')+'.':'No se detectan no conformidades activas en los registros actuales.';}if(msg.includes('resumen')||msg.includes('lote')){return 'Lote activo: <b>'+selectedTab+'</b>. Datos cargados de '+Object.keys(window.AGGREGATES_BY_TAB_GENERATED||{}).length+' pestañas. '+Object.keys(window.RC_CC_SHEETS||window.SHEETS||{}).length+' registros RC.CC monitoreados.';}if(msg.includes('tendencia')){return 'Las tendencias se visualizan en los gráficos de línea del módulo Calidad. Cada registro RC.CC muestra su histórico con líneas de límite superior/inferior. Use el selector de lote para cambiar entre lotes.';}if(msg.includes('cláusula')||msg.includes('fssc')){return 'FSSC 22000 v6 aplica las siguientes cláusulas a PPR:<br>• 8.2.4 a)-k) — Programas de prerrequisitos<br>• 8.5 — Sistema HACCP<br>• 8.9 — Control de no conformidades<br>• 9.2 — Auditorías internas<br>Consulte el módulo PPR para más detalle.';}return 'Puedo ayudarte con: no conformidades, resumen del lote, tendencias, cláusulas FSSC 22000, o cualquier consulta sobre los registros RC.CC y RC.PD.';}
+
 function init(){
+  var saved=null;try{saved=localStorage.getItem('ingama-theme');}catch(e){}
+  if(saved==='dark'||saved==='light'){document.documentElement.setAttribute('data-theme', saved);document.getElementById('themeLight').classList.toggle('active',saved==='light');document.getElementById('themeDark').classList.toggle('active',saved==='dark');}
   if(!window.SHEETS){ setTimeout(init,300); return; }
   if(!window.Chart){
     document.getElementById('loader').innerHTML='<div style="font-family:var(--mono);color:var(--warn)">⏳ Cargando Chart.js (necesita internet)...</div>';
@@ -5093,5 +5360,12 @@ if(document.readyState==='loading'){
   init();
 }
 </script>
+
+<div class="chat-panel" id="chatPanel" style="display:none">
+  <div class="chat-head"><div><div class="title">Asistente SGIA</div><div class="sub">FSSC 22000 v6 · INGAMA</div></div><button onclick="toggleChat()" style="color:white;margin-left:auto;font-size:18px">✕</button></div>
+  <div class="chat-body" id="chatBody"><div class="chat-msg bot">Hola, soy el asistente virtual de INGAMA SGIA. Puedo ayudarte con:<br>• Consultas sobre registros RC.CC y RC.PD<br>• Estado de no conformidades<br>• Tendencias y límites críticos<br>• Requisitos FSSC 22000 v6<br><br>¿En qué puedo ayudarte?</div></div>
+  <div class="chat-suggest" id="chatSuggest"><button onclick="sendChat('¿Cuáles son las no conformidades activas?')">No conformidades</button><button onclick="sendChat('Resumen del lote '+selectedTab)">Resumen del lote</button><button onclick="sendChat('Tendencias de los últimos 30 días')">Tendencias</button><button onclick="sendChat('¿Qué cláusulas FSSC 22000 aplican a PPR?')">FSSC 22000</button></div>
+  <div class="chat-input"><input type="text" id="chatInput" placeholder="Escribe tu consulta…" onkeydown="if(event.key==='Enter')sendChat(this.value)"><button class="btn primary sm" onclick="sendChat(document.getElementById('chatInput').value)">Enviar</button></div>
+</div>
 </body>
 </html>
